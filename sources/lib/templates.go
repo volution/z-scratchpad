@@ -3,6 +3,9 @@
 package zscratchpad
 
 
+import "io/fs"
+import "path"
+
 import html_template "html/template"
 import text_template "text/template"
 
@@ -31,6 +34,8 @@ type Templates struct {
 	documentExportSource *text_template.Template
 	
 	versionHtml *html_template.Template
+	
+	assets fs.FS
 }
 
 
@@ -38,7 +43,9 @@ type Templates struct {
 
 func TemplatesNew () (*Templates, *Error) {
 	
-	_templates := & Templates {}
+	_templates := & Templates {
+			assets : embedded.Assets,
+		}
 	
 	
 	if _template, _error := html_template.New ("") .Parse (embedded.LibrariesIndexHtml); _error == nil {
@@ -135,5 +142,43 @@ func TemplatesNew () (*Templates, *Error) {
 	}
 	
 	return _templates, nil
+}
+
+
+
+
+func TemplatesAssetResolve (_templates *Templates, _path string) (string, []byte, *Error) {
+	
+	_data, _error := fs.ReadFile (_templates.assets, _path)
+	if _error != nil {
+		return "", nil, errorw (0x007f2426, _error)
+	}
+	
+	// NOTE:  https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+	_contentType := ""
+	switch path.Ext (_path) {
+		
+		case ".txt" :
+			_contentType = "text/plain; charset=utf-8"
+		case ".html" :
+			_contentType = "text/plain; charset=utf-8"
+		
+		case ".css" :
+			_contentType = "text/css; charset=utf-8"
+		case ".js" :
+			_contentType = "text/javascript; charset=utf-8"
+		
+		case ".png" :
+			_contentType = "image/png"
+		case ".jpeg" :
+			_contentType = "image/jpeg"
+		case ".svg" :
+			_contentType = "image/svg+xml"
+		case ".ico" :
+			_contentType = "image/x-icon"
+		
+	}
+	
+	return _contentType, _data, nil
 }
 

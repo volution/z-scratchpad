@@ -141,6 +141,18 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 		return ServerHandleVersion (_server, _response)
 	}
 	
+	switch _path {
+		case "/favicon.ico", "/favicon.png" :
+			_path = "/assets/favicons/" + _path[1:]
+		case "/apple-touch-icon.png" :
+			_path = "/assets/favicons/favicon.png"
+	}
+	
+	if strings.HasPrefix (_path, "/assets/") {
+		_path := _path[1:]
+		return ServerHandleAsset (_server, _path, _response)
+	}
+	
 	return errorw (0x7b01a78b, nil)
 }
 
@@ -341,6 +353,16 @@ func ServerHandleVersion (_server *Server, _response http.ResponseWriter) (*Erro
 			
 		}
 	return respondWithHtmlTemplate (_response, _server.templates.versionHtml, _context)
+}
+
+
+
+func ServerHandleAsset (_server *Server, _path string, _response http.ResponseWriter) (*Error) {
+	_contentType, _body, _error := TemplatesAssetResolve (_server.templates, _path)
+	if _error != nil {
+		return _error
+	}
+	return respondWithBuffer (_response, _contentType, bytes.NewBuffer (_body))
 }
 
 
