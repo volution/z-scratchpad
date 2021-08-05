@@ -149,6 +149,18 @@
 
 
 
+<< go / dependencies / include
+	test "${#}" -ge 1
+	exec -- "${ZRUN[@]}" ':: go / tool' \
+			get \
+			-v \
+			-d \
+			-- \
+			"${@}" \
+	#
+!!
+
+
 << go / dependencies / update
 	test "${#}" -eq 0
 	exec -- "${ZRUN[@]}" ':: go / tool' \

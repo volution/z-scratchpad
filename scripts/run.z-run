@@ -21,6 +21,11 @@
 
 
 
+:: run / version :: exec -- "${ZRUN[@]}" ':: run / exec' --version "${@}"
+
+
+
+
 --<< run / exec
 	exec -- "${ZRUN[@]}" ':: go / execute / main / debug' "${@}"
 !!
