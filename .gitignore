@@ -1,0 +1,11 @@
+
+.*
+!.gitignore
+
+*~
+*#
+*.bak
+
+*.log
+*.tmp
+
