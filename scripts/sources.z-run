@@ -126,7 +126,8 @@
 			--filter "${_sources}/cmd/**" \
 			--filter "${_sources}/lib/**" \
 			--filter "${_sources}/embedded/*.go" \
-			--filter "${_sources}/embedded/templates/*.go" \
+			--filter "${_sources}/embedded/templates/**" \
+			--filter "${_sources}/embedded/assets/**" \
 			--filter "${_examples}/**" \
 			\
 			--restart \
