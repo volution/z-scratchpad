@@ -49,7 +49,7 @@ func PreMain () () {
 			fmt.Fprintf (os.Stdout, "* build number  : %s, %s\n", BUILD_NUMBER, BUILD_TIMESTAMP)
 			fmt.Fprintf (os.Stdout, "* sources md5   : %s\n", BUILD_SOURCES_MD5)
 			fmt.Fprintf (os.Stdout, "* sources git   : %s\n", BUILD_GIT_HASH)
-			fmt.Fprintf (os.Stdout, "* code & issues : %s\n", "https://github.com/cipriancraciun/z-scratchpad")
+			fmt.Fprintf (os.Stdout, "* code & issues : %s\n", PROJECT_URL)
 			fmt.Fprintf (os.Stdout, "* uname node    : %s\n", UNAME_NODE)
 			fmt.Fprintf (os.Stdout, "* uname system  : %s, %s, %s\n", UNAME_SYSTEM, UNAME_RELEASE, UNAME_MACHINE)
 			

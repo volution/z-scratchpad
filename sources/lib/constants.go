@@ -13,6 +13,8 @@ import "golang.org/x/sys/unix"
 
 
 
+var PROJECT_URL string = "https://github.com/cipriancraciun/z-scratchpad"
+
 var BUILD_TARGET string = "{unknown-target}"
 var BUILD_TARGET_ARCH string = runtime.GOARCH
 var BUILD_TARGET_OS string = runtime.GOOS
