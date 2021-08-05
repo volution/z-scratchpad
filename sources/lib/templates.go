@@ -29,6 +29,8 @@ type Templates struct {
 	documentExportHtml *html_template.Template
 	documentExportText *text_template.Template
 	documentExportSource *text_template.Template
+	
+	versionHtml *html_template.Template
 }
 
 
@@ -107,6 +109,13 @@ func TemplatesNew () (*Templates, *Error) {
 		_templates.documentExportSource = _template
 	} else {
 		return nil, errorw (0x01bfce67, _error)
+	}
+	
+	
+	if _template, _error := html_template.New ("") .Parse (embedded.VersionHtml); _error == nil {
+		_templates.versionHtml = _template
+	} else {
+		return nil, errorw (0x9ac0bdea, _error)
 	}
 	
 	

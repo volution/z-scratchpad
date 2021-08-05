@@ -133,6 +133,10 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 		return ServerHandleDocumentEdit (_server, _identifier, _response)
 	}
 	
+	if _path == "/__/version" {
+		return ServerHandleVersion (_server, _response)
+	}
+	
 	return errorw (0x7b01a78b, nil)
 }
 
@@ -281,6 +285,58 @@ func ServerHandleDocumentEdit (_server *Server, _identifier string, _response ht
 	}
 	http.Error (_response, "", http.StatusNoContent)
 	return nil
+}
+
+
+
+
+func ServerHandleVersion (_server *Server, _response http.ResponseWriter) (*Error) {
+	_context := struct {
+			
+			ProjectUrl string
+			
+			BuildTarget string
+			BuildTargetArch string
+			BuildTargetOs string
+			BuildCompilerType string
+			BuildCompilerVersion string
+			
+			BuildVersion string
+			BuildNumber string
+			BuildTimestamp string
+			BuildSourcesMd5 string
+			BuildGitHash string
+			
+			UnameNode string
+			UnameSystem string
+			UnameRelease string
+			UnameVersion string
+			UnameMachine string
+			
+		} {
+			
+			PROJECT_URL,
+			
+			BUILD_TARGET,
+			BUILD_TARGET_ARCH,
+			BUILD_TARGET_OS,
+			BUILD_COMPILER_TYPE,
+			BUILD_COMPILER_VERSION,
+			
+			BUILD_VERSION,
+			BUILD_NUMBER,
+			BUILD_TIMESTAMP,
+			BUILD_SOURCES_MD5,
+			BUILD_GIT_HASH,
+			
+			UNAME_NODE,
+			UNAME_SYSTEM,
+			UNAME_RELEASE,
+			UNAME_VERSION,
+			UNAME_MACHINE,
+			
+		}
+	return respondWithHtmlTemplate (_response, _server.templates.versionHtml, _context)
 }
 
 

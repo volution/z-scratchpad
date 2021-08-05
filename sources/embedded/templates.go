@@ -52,3 +52,7 @@ var GlobalNavigationHtml string
 //go:embed templates/global-partials.html
 var GlobalPartialsHtml string
 
+
+//go:embed templates/version.html
+var VersionHtml string
+
