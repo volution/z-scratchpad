@@ -1,0 +1,11 @@
+#!/dev/null
+
+
+&& _/workspace.z-run
+&& _/sources.z-run
+&& _/go.z-run
+
+&& _/deploy.z-run
+
+&&?? _/.local.z-run
+
