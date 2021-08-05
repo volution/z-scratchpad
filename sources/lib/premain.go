@@ -3,6 +3,7 @@
 package zscratchpad
 
 
+import "fmt"
 import "os"
 import "log"
 import "strings"
@@ -33,6 +34,27 @@ func PreMain () () {
 			_environment[_name] = _value
 		} else {
 			logf ('w', 0x7bb25433, "invalid environment variable (missing `=`):  `%s`", _variable)
+		}
+	}
+	
+	
+	if len (_arguments) == 1 {
+		_argument := _arguments[0]
+		
+		if (_argument == "--version") || (_argument == "-v") {
+			
+			fmt.Fprintf (os.Stdout, "* version       : %s\n", BUILD_VERSION)
+			fmt.Fprintf (os.Stdout, "* executable    : %s\n", os.Args[0])
+			fmt.Fprintf (os.Stdout, "* build target  : %s, %s-%s, %s, %s\n", BUILD_TARGET, BUILD_TARGET_OS, BUILD_TARGET_ARCH, BUILD_COMPILER_VERSION, BUILD_COMPILER_TYPE)
+			fmt.Fprintf (os.Stdout, "* build number  : %s, %s\n", BUILD_NUMBER, BUILD_TIMESTAMP)
+			fmt.Fprintf (os.Stdout, "* sources md5   : %s\n", BUILD_SOURCES_MD5)
+			fmt.Fprintf (os.Stdout, "* sources git   : %s\n", BUILD_GIT_HASH)
+			fmt.Fprintf (os.Stdout, "* code & issues : %s\n", "https://github.com/cipriancraciun/z-scratchpad")
+			fmt.Fprintf (os.Stdout, "* uname node    : %s\n", UNAME_NODE)
+			fmt.Fprintf (os.Stdout, "* uname system  : %s, %s, %s\n", UNAME_SYSTEM, UNAME_RELEASE, UNAME_MACHINE)
+			
+			os.Exit (0)
+			panic (abortErrorw (0xd80435fe, nil))
 		}
 	}
 	
