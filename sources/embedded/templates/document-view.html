@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+	
+	<head>
+		{{ template "document-html-head-title" .Document }}
+	</head>
+	
+	<body>
+		
+		<header>
+			{{ template "document-html-header-title" .Document }}
+			{{ template "global-navigation" }}
+		</header>
+		
+		<main>
+{{ .DocumentHtml }}
+		</main>
+		
+		<footer>
+			{{ template "document-html-export-nav" .Document }}
+		</footer>
+		
+	</body>
+	
+</html>

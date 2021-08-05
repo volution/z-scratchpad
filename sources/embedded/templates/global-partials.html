@@ -1,0 +1,69 @@
+
+
+{{ define "library-html-head-title" -}}
+	{{- if .Name -}}
+	<title>{{ .Name }}</title>
+	{{- else -}}
+	<title>[{{ .Identifier }}]</title>
+	{{- end -}}
+{{- end }}
+
+
+{{ define "library-html-header-title" -}}
+	{{- if .Name -}}
+		<h1>{{ .Name }}</h1>
+	{{- else -}}
+		<h1>[{{ .Identifier }}]</h1>
+	{{- end -}}
+{{- end }}
+
+
+{{ define "library-html-a-link" -}}
+	{{- if .Name -}}
+		<a href="/l/{{ .Identifier }}">{{ .Name }}</a>
+	{{- else -}}
+		<a href="/l/{{ .Identifier }}">[{{ .Identifier }}]</a>
+	{{- end -}}
+{{- end }}
+
+
+
+
+{{ define "document-html-head-title" -}}
+	{{- if .Title -}}
+	<title>{{ .Title }}</title>
+	{{- else -}}
+	<title>[{{ .Identifier }}]</title>
+	{{- end -}}
+{{- end }}
+
+
+{{ define "document-html-header-title" -}}
+	{{- if .Title -}}
+		<h1>{{ .Title }}</h1>
+	{{- else -}}
+		<h1>[{{ .Identifier }}]</h1>
+	{{- end -}}
+{{- end }}
+
+
+{{ define "document-html-a-link" -}}
+	{{- if .Title -}}
+		<a href="/d/{{ .Identifier }}">{{ .Title }}</a>
+	{{- else -}}
+		<a href="/d/{{ .Identifier }}">[{{ .Identifier }}]</a>
+	{{- end -}}
+{{- end }}
+
+
+{{ define "document-html-export-nav" -}}
+	<nav>
+		<ul>
+			<li><a href="/de/{{ .Identifier }}">{edit}</a>
+			<li><a href="/dx/source/{{ .Identifier }}">{source}</a>
+			<li><a href="/dx/html/{{ .Identifier }}">{export HTML}</a>
+			<li><a href="/dx/text/{{ .Identifier }}">{export txt}</a>
+		</ul>
+	</nav>
+{{- end }}
+

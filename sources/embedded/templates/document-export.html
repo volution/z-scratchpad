@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+	<head>
+		{{ template "document-html-head-title" .Document }}
+	</head>
+	<body>
+		<header>
+			{{ template "document-html-header-title" .Document }}
+		</header>
+		<main>
+{{ .DocumentHtml }}
+		</main>
+	</body>
+</html>

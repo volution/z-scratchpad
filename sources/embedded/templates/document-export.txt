@@ -1,0 +1,10 @@
+
+{{ if .Document.Title -}}
+	{{ .Document.Title }}
+{{- else -}}
+	[{{ .Document.Identifier }}]
+{{- end }}
+
+--------------------------------------------------------------------------------
+
+{{ .DocumentText }}

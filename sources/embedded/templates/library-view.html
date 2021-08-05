@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+	
+	<head>
+		{{ template "library-html-head-title" .Library }}
+	</head>
+	
+	<body>
+		
+		<header>
+			{{ template "library-html-header-title" .Library }}
+			{{ template "global-navigation" }}
+		</header>
+		
+		<main>
+			{{ if .Documents }}
+				<ul>
+					{{ range $_, $document := .Documents }}
+						<li>{{ template "document-html-a-link" $document }}</li>
+					{{ end }}
+				</ul>
+			{{ else }}
+				<p>No documents!</p>
+			{{ end }}
+		</main>
+		
+	</body>
+	
+</html>
