@@ -101,6 +101,10 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 		return errorw (0x828c5f04, nil)
 	}
 	
+	if _path == "/__/heartbeat" {
+		return respondWithBuffer (_response, "text/plain", bytes.NewBufferString ("OK\n"))
+	}
+	
 	if (_path == "/d") || (_path == "/d/") || (_path == "/documents") || (_path == "/documents/") {
 		return ServerHandleDocumentsIndex (_server, _response)
 	}
