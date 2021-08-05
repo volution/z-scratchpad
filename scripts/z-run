@@ -1,6 +1,8 @@
 #!/dev/null
 
 
+&& _/run.z-run
+
 && _/workspace.z-run
 && _/sources.z-run
 && _/go.z-run

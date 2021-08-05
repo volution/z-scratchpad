@@ -91,3 +91,65 @@
 	mv -T -- ./.outputs/markers/build-git-hash.tmp ./.outputs/markers/build-git-hash.txt
 !!
 
+
+
+
+<< sources / watch
+	
+	test "${#}" -ge 1
+	_command="${1}"
+	shift -- 1
+	
+	_delegate=()
+	case "${_command}" in
+		( '::'* )
+			_delegate+=( "${ZRUN[@]}" "${_command}" )
+		;;
+		( /* )
+			_delegate+=( "${_command}" )
+		;;
+		( * )
+			printf -- '[ee]  invalid delegate `%s`;  aborting!\n' "${_delegate}"
+			exit -- 1
+		;;
+	esac
+	
+	_sources="$( exec -- readlink -e -- ./sources )"
+	_examples="$( exec -- readlink -e -- ./examples )"
+	
+	exec -- watchexec \
+			\
+			--watch "${_sources}" \
+			--watch "${_examples}" \
+			\
+			--filter "${_sources}/go.*" \
+			--filter "${_sources}/cmd/**" \
+			--filter "${_sources}/lib/**" \
+			--filter "${_sources}/embedded/*.go" \
+			--filter "${_sources}/embedded/templates/*.go" \
+			--filter "${_examples}/**" \
+			\
+			--restart \
+			\
+			--no-shell \
+			\
+			--no-default-ignore \
+			--no-vcs-ignore \
+			--no-ignore \
+			\
+			-- \
+			\
+			"${ZRUN[@]}" ':: sources / watch / delegate' \
+			"${_delegate[@]}" \
+			"${@}" \
+	#
+!!
+
+
+--<< sources / watch / delegate
+	test "${#}" -ge 1
+	_timestamp="$( exec -- date -- '+%H:%M:%S' )"
+	printf -- '\n[--]  --------[ %s ]------------------------------------------------------\n\n' "${_timestamp}" >&2
+	exec -- "${@}"
+!!
+

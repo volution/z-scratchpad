@@ -1,0 +1,27 @@
+#!/dev/null
+
+
+
+
+::// run / ...
+::// watch / run / ...
+
+
+
+
+++<< run / examples / server
+	test "${#}" -eq 0
+	exec -- "${ZRUN[@]}" ':: run / exec' \
+			./examples \
+	#
+!!
+
+:: watch / run / examples / server / watch :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / examples / server' "${@}"
+
+
+
+
+--<< run / exec
+	exec -- "${ZRUN[@]}" ':: go / execute / main / debug' "${@}"
+!!
+
