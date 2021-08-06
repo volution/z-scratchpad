@@ -12,7 +12,7 @@ type Index struct {
 	globals *Globals
 	documents map[string]*Document
 	libraries map[string]*Library
-	libraryDocuments map[string][]string
+	libraryDocuments map[string]map[string]*Document
 }
 
 
@@ -23,7 +23,7 @@ func IndexNew (_globals *Globals) (*Index, *Error) {
 			globals : _globals,
 			documents : make (map[string]*Document, 1024),
 			libraries : make (map[string]*Library, 128),
-			libraryDocuments : make (map[string][]string, 128),
+			libraryDocuments : make (map[string]map[string]*Document, 1024),
 		}
 	return _index, nil
 }
@@ -39,7 +39,7 @@ func IndexLibraryInclude (_index *Index, _library *Library) (*Error) {
 		return errorw (0xb8990674, nil)
 	}
 	_index.libraries[_library.Identifier] = _library
-	_index.libraryDocuments[_library.Identifier] = make ([]string, 0, 1024)
+	_index.libraryDocuments[_library.Identifier] = make (map[string]*Document, 1024)
 	return nil
 }
 
@@ -53,14 +53,44 @@ func IndexDocumentInclude (_index *Index, _document *Document) (*Error) {
 	if _document.Library == "" {
 		return errorw (0xf45e4633, nil)
 	}
-	if _, _exists := _index.libraries[_document.Library]; ! _exists {
+	if _, _exists := _index.libraries[_document.Library]; !_exists {
 		return errorw (0x4c68b8a9, nil)
 	}
 	if _, _exists := _index.documents[_document.Identifier]; _exists {
 		return errorw (0x9c9f9c42, nil)
 	}
 	_index.documents[_document.Identifier] = _document
-	_index.libraryDocuments[_document.Library] = append (_index.libraryDocuments[_document.Library], _document.Identifier)
+	_index.libraryDocuments[_document.Library][_document.Identifier] = _document
+	return nil
+}
+
+
+func IndexDocumentExclude (_index *Index, _document *Document) (*Error) {
+	if _document.Identifier == "" {
+		return errorw (0x18c096d9, nil)
+	}
+	if _document.Library == "" {
+		return errorw (0x73f953db, nil)
+	}
+	if _, _exists := _index.libraries[_document.Library]; !_exists {
+		return errorw (0x40bb92b4, nil)
+	}
+	if _, _exists := _index.documents[_document.Identifier]; !_exists {
+		return errorw (0x20f5597e, nil)
+	}
+	delete (_index.documents, _document.Identifier)
+	delete (_index.libraryDocuments[_document.Library], _document.Identifier)
+	return nil
+}
+
+
+func IndexDocumentUpdate (_index *Index, _documentNew *Document, _documentOld *Document) (*Error) {
+	if _error := IndexDocumentExclude (_index, _documentOld); _error != nil {
+		return _error
+	}
+	if _error := IndexDocumentInclude (_index, _documentNew); _error != nil {
+		return _error
+	}
 	return nil
 }
 
@@ -91,11 +121,7 @@ func IndexDocumentsSelectInLibrary (_index *Index, _libraryIdentifier string) ([
 	if !_libraryExists {
 		return nil, errorw (0xb14719d6, nil)
 	}
-	for _, _documentIdentifier := range _libraryDocuments {
-		_document, _documentExists := _index.documents[_documentIdentifier]
-		if !_documentExists {
-			return nil, errorw (0x842e9a51, nil)
-		}
+	for _, _document := range _libraryDocuments {
 		_documents = append (_documents, _document)
 	}
 	DocumentsSort (_documents)

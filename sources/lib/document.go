@@ -109,6 +109,29 @@ func DocumentResolveFormat (_document *Document, _perhapsUseFileExtension bool) 
 
 
 
+func DocumentReload (_old *Document) (*Document, *Error) {
+	
+	_new, _error := DocumentLoadFromPath (_old.PathOriginal)
+	if _error != nil {
+		return nil, _error
+	}
+	
+	if _new.Identifier == "" {
+		_new.Identifier = _old.Identifier
+	}
+	if _new.Format == "" {
+		_new.Format = _old.Format
+	}
+	if _new.Library == "" {
+		_new.Library = _old.Library
+		_new.PathInLibrary = _old.PathInLibrary
+	}
+	
+	return _new, nil
+}
+
+
+
 
 func DocumentLoadFromPath (_path string) (*Document, *Error) {
 	
