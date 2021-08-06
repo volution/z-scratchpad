@@ -12,7 +12,7 @@
 	all : unset;
 }
 
-:not(svg|*) {
+* {
 	
 	/* NOTE:  https://bugs.chromium.org/p/chromium/issues/detail?id=420781 */
 	-webkit-text-fill-color : currentcolor;
@@ -30,7 +30,7 @@
 
 
 
-:not(svg|*) {
+* {
 	display : inline-block;
 	display : inline flow-root;
 	position : static;
@@ -86,7 +86,7 @@ html:root > body script {
 
 
 
-:not(svg|*) {
+* {
 	
 	font-family : inherit;
 	font-size : inherit;
@@ -114,7 +114,7 @@ html:root > body script {
 
 html:root {
 	
-	font-family : "JetBrains Mono NL", "JetBrains Mono", "Fira Mono", "Courier New", monospace;
+	font-family : monospace;
 	font-size : 16px;
 	font-size-adjust : none;
 	font-weight : normal;
@@ -141,18 +141,18 @@ html:root {
 
 
 
-:not(svg|*) {
+* {
 	border : none;
 	outline : none;
 	box-sizing : border-box;
 	list-style : none;
 }
-:not(svg|*) {
+* {
 	border-width : 0px;
 	border-style : solid;
 	border-color : hsl(0, 0%, 25%);
 }
-:not(svg|*) {
+* {
 	outline-width : 0px;
 	outline-style : solid;
 	outline-color : hsl(0, 0%, 25%);

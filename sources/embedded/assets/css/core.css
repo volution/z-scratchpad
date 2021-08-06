@@ -1,0 +1,67 @@
+
+
+html:root {
+	font-family : "JetBrains Mono NL", "JetBrains Mono", "Fira Mono", "Courier New", monospace;
+	font-size : 22px;
+	line-height : 32px;
+}
+
+
+
+
+body, section, article, aside,
+main, header, footer,
+h1, h2, h3, h4, h5, h6, hgroup,
+p, blockquote, pre,
+nav, address, details,
+dl, ul, ol, dt, dd, li,
+div, dialog, form, fieldset,
+table, figure, figcaption,
+hr {
+	display : block;
+	display : flow-root;
+	display : block flow-root;
+}
+
+
+
+
+ul > li, ol > li {
+	display : list-item;
+	display : list-item block flow-root;
+}
+ul > li {
+	list-style-type : square;
+	list-style-position : inside;
+}
+ol > li {
+	list-style-type : decimal;
+	list-style-position : inside;
+}
+
+
+
+
+a,
+button, select,
+input[type="submit"], input[type="reset"], input[type="button"],
+details > summary {
+	color : hsl(270, 50%, 75%) !important;
+	cursor : pointer !important;
+}
+a *,
+button *, select *,
+input[type="submit"] *, input[type="reset"] *, input[type="button"] *,
+details > summary * {
+	color : inherit !important;
+	cursor : inherit !important;
+}
+a:hover,
+button:hover, select:hover,
+input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover,
+details > summary:hover {
+	color : hsl(360, 50%, 75%) !important;
+	outline : dotted 1px hsl(360, 50%, 15%) !important;
+	outline-offset : -1px !important;
+}
+
