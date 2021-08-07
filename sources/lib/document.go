@@ -275,6 +275,16 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 			return nil, _error
 		}
 	}
+	if _format != "" {
+		switch _format {
+			case "commonmark", "snippets", "text" :
+				// NOP
+			case "markdown" :
+				_format = "commonmark"
+			default :
+				return nil, errorf (0x32158fbf, "format invalid `%s`", _format)
+		}
+	}
 	
 	_sourceFingerprint := fingerprintString (_source)
 	_bodyFingerprint := fingerprintString (_body)
