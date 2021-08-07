@@ -9,16 +9,24 @@
 
 
 
+<< run / version
+	test "${#}" -eq 0
+	exec -- "${ZRUN[@]}" ':: run / exec' --version
+!!
+
+<< run / sources
+	test "${#}" -eq 0
+	exec -- "${ZRUN[@]}" ':: run / exec' --sources
+!!
+
+
+
+
 ++<< run / server
 	exec -- "${ZRUN[@]}" ':: run / exec' server "${@}"
 !!
 
 :: watch / run / server / watch :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / server' "${@}"
-
-
-
-
-:: run / version :: exec -- "${ZRUN[@]}" ':: run / exec' --version "${@}"
 
 
 

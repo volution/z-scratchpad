@@ -49,9 +49,11 @@
 
 << sources / embedded / hash
 	
+	test "${#}" -eq 0
+	
 	find ./sources/ \
 			-type f \
-			-not -path './sources/embedded/build/*.txt' \
+			-not -path './sources/embedded/build/*' \
 			-print0 \
 	| xargs -0 -I {} -- md5sum -b -z -- {} \
 	| LC_ALL=C sort -z \
@@ -60,6 +62,11 @@
 		>| ./.outputs/markers/build-sources-md5.tmp \
 	#
 	
+	if test -s ./sources/embedded/build/sources.cpio.gz ; then
+		rm -- ./sources/embedded/build/sources.cpio.gz
+		touch -- ./sources/embedded/build/sources.cpio.gz
+	fi
+	
 	if ! cmp -s -- ./.outputs/markers/build-sources-md5.tmp ./sources/embedded/build/sources-md5.txt ; then
 		
 		_build_number="$( exec -- cat -- ./sources/embedded/build/number.txt )"
@@ -67,8 +74,9 @@
 		_build_timestamp="$( exec -- date -- '+%Y-%m-%d-%H-%M-%S' )"
 		
 		printf -- '%d\n' "${_build_number}" >| ./sources/embedded/build/number.tmp
-		mv -T -- ./sources/embedded/build/number.tmp ./sources/embedded/build/number.txt
 		printf -- '%s\n' "${_build_timestamp}" >| ./sources/embedded/build/timestamp.tmp
+		
+		mv -T -- ./sources/embedded/build/number.tmp ./sources/embedded/build/number.txt
 		mv -T -- ./sources/embedded/build/timestamp.tmp ./sources/embedded/build/timestamp.txt
 		
 		mv -T -- ./.outputs/markers/build-sources-md5.tmp ./sources/embedded/build/sources-md5.txt
@@ -89,6 +97,45 @@
 	
 	printf -- '%s\n' "${_git_hash}" >| ./.outputs/markers/build-git-hash.tmp
 	mv -T -- ./.outputs/markers/build-git-hash.tmp ./.outputs/markers/build-git-hash.txt
+!!
+
+
+
+
+<< sources / embedded / bundle
+	
+	test "${#}" -eq 0
+	
+	if test -s ./sources/embedded/build/sources.cpio.gz ; then
+		rm -- ./sources/embedded/build/sources.cpio.gz
+		touch -- ./sources/embedded/build/sources.cpio.gz
+	fi
+	
+	execline-cd ./sources \
+	find . \
+			-type f \
+			-print0 \
+	| LC_ALL=C sort -z \
+	| execline-cd ./sources \
+	cpio \
+			--create \
+			--format newc \
+			--no-absolute-filenames \
+			--quiet \
+			--warning all \
+			--owner +65534:+65534 \
+			--ignore-devno \
+			--renumber-inodes \
+			--block-size 1 \
+			--null \
+	| gzip \
+			--best \
+			--rsyncable \
+			--no-name \
+		>| ./.outputs/sources.cpio.gz.tmp \
+	#
+	
+	mv -T -- ./.outputs/sources.cpio.gz.tmp ./sources/embedded/build/sources.cpio.gz
 !!
 
 

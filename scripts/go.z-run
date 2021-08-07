@@ -64,6 +64,7 @@
 	
 	test "${#}" -eq 0
 	"${ZRUN[@]}" ':: sources / embedded / prepare'
+	"${ZRUN[@]}" ':: sources / embedded / bundle'
 	_outputs="$( exec -- readlink -e -- ./.outputs )"
 	
 	_build_target=release
@@ -189,6 +190,15 @@
 	test "${#}" -eq 0
 	exec -- "${ZRUN[@]}" ':: go / tool' \
 			mod tidy \
+	#
+!!
+
+
+<< go / dependencies / vendor
+	test "${#}" -eq 0
+	exec -- "${ZRUN[@]}" ':: go / tool' \
+			mod vendor \
+			-v \
 	#
 !!
 
