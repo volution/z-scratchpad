@@ -3,6 +3,7 @@
 package zscratchpad
 
 
+import "bytes"
 import "net"
 import "os"
 
@@ -11,9 +12,11 @@ import "os"
 
 func Main (_executable string, _arguments []string, _environment map[string]string) (*Error) {
 	
-	_serverEndpoint := "127.79.75.28:8080"
+	if len (_arguments) != 0 {
+		return errorw (0x79150e1f, nil)
+	}
 	
-	_libraryPath := _arguments[0]
+	_serverEndpoint := "127.79.75.28:8080"
 	
 	_globals, _error := GlobalsNew ()
 	if _error != nil {
@@ -30,53 +33,65 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		return _error
 	}
 	
-	_library := & Library {
-			Identifier : "scratchpad",
-			Name : "Scratchpad",
-			Path : _libraryPath,
-			UseFileNameAsIdentifier : true,
-			UseFileExtensionAsFormat : true,
+	_libraries := []*Library {
+			{
+				Identifier : "inbox",
+				Name : "Inbox",
+				Path : "./examples/inbox",
+				UseFileNameAsIdentifier : true,
+				UseFileExtensionAsFormat : true,
+			},
+			{
+				Identifier : "tests",
+				Name : "Tests",
+				Path : "./examples/tests",
+				UseFileNameAsIdentifier : true,
+				UseFileExtensionAsFormat : true,
+			},
 		}
 	
-	_error = IndexLibraryInclude (_index, _library)
-	if _error != nil {
-		return _error
-	}
-	
-	_documentPaths, _error := libraryDocumentsWalk (_library.Path)
-	if _error != nil {
-		return _error
-	}
-	
-	_documents, _error := libraryDocumentsLoad (_library.Path, _documentPaths)
-	if _error != nil {
-		return _error
-	}
-	
-	for _, _document := range _documents {
+	for _, _library := range _libraries {
 		
-		if _document.Library == "" {
-			_document.Library = _library.Identifier
-		}
-		
-		_error = DocumentResolveIdentifier (_document, _library.UseFileNameAsIdentifier)
+		_error = IndexLibraryInclude (_index, _library)
 		if _error != nil {
 			return _error
 		}
 		
-		_error = DocumentResolveFormat (_document, _library.UseFileExtensionAsFormat)
+		_documentPaths, _error := libraryDocumentsWalk (_library.Path)
 		if _error != nil {
 			return _error
 		}
 		
-		_error = IndexDocumentInclude (_index, _document)
+		_documents, _error := libraryDocumentsLoad (_library.Path, _documentPaths)
 		if _error != nil {
 			return _error
 		}
+		
+		for _, _document := range _documents {
+			
+			if _document.Library == "" {
+				_document.Library = _library.Identifier
+			}
+			
+			_error = DocumentResolveIdentifier (_document, _library.UseFileNameAsIdentifier)
+			if _error != nil {
+				return _error
+			}
+			
+			_error = DocumentResolveFormat (_document, _library.UseFileExtensionAsFormat)
+			if _error != nil {
+				return _error
+			}
+			
+			_error = IndexDocumentInclude (_index, _document)
+			if _error != nil {
+				return _error
+			}
+		}
 	}
 	
-	if false {
-		_documents, _error = IndexDocumentsSelectAll (_index)
+	if true {
+		_documents, _error := IndexDocumentsSelectAll (_index)
 		if _error != nil {
 			return _error
 		}
@@ -91,17 +106,23 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			}
 		}
 	}
-	if false {
-		_documents, _error = IndexDocumentsSelectAll (_index)
+	if true {
+		_documents, _error := IndexDocumentsSelectAll (_index)
 		if _error != nil {
 			return _error
 		}
+		_buffer := bytes.NewBuffer (nil)
 		for _, _document := range _documents {
-			_error = DocumentDump (os.Stdout, _document, true, false, false)
+			_error = DocumentDump (_buffer, _document, true, false, false)
 			if _error != nil {
 				return _error
 			}
-			os.Stdout.WriteString ("\n")
+			_buffer.WriteString ("\n")
+		}
+		if false {
+			if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
+				return errorw (0xbf6a449c, _error)
+			}
 		}
 	}
 	
