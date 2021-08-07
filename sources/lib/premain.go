@@ -3,6 +3,7 @@
 package zscratchpad
 
 
+import "bytes"
 import "fmt"
 import "os"
 import "log"
@@ -43,18 +44,32 @@ func PreMain () () {
 		
 		if (_argument == "--version") || (_argument == "-v") {
 			
-			fmt.Fprintf (os.Stdout, "* version       : %s\n", BUILD_VERSION)
-			fmt.Fprintf (os.Stdout, "* executable    : %s\n", os.Args[0])
-			fmt.Fprintf (os.Stdout, "* build target  : %s, %s-%s, %s, %s\n", BUILD_TARGET, BUILD_TARGET_OS, BUILD_TARGET_ARCH, BUILD_COMPILER_VERSION, BUILD_COMPILER_TYPE)
-			fmt.Fprintf (os.Stdout, "* build number  : %s, %s\n", BUILD_NUMBER, BUILD_TIMESTAMP)
-			fmt.Fprintf (os.Stdout, "* sources md5   : %s\n", BUILD_SOURCES_MD5)
-			fmt.Fprintf (os.Stdout, "* sources git   : %s\n", BUILD_GIT_HASH)
-			fmt.Fprintf (os.Stdout, "* code & issues : %s\n", PROJECT_URL)
-			fmt.Fprintf (os.Stdout, "* uname node    : %s\n", UNAME_NODE)
-			fmt.Fprintf (os.Stdout, "* uname system  : %s, %s, %s\n", UNAME_SYSTEM, UNAME_RELEASE, UNAME_MACHINE)
+			_buffer := bytes.NewBuffer (nil)
+			fmt.Fprintf (_buffer, "* version       : %s\n", BUILD_VERSION)
+			fmt.Fprintf (_buffer, "* executable    : %s\n", os.Args[0])
+			fmt.Fprintf (_buffer, "* build target  : %s, %s-%s, %s, %s\n", BUILD_TARGET, BUILD_TARGET_OS, BUILD_TARGET_ARCH, BUILD_COMPILER_VERSION, BUILD_COMPILER_TYPE)
+			fmt.Fprintf (_buffer, "* build number  : %s, %s\n", BUILD_NUMBER, BUILD_TIMESTAMP)
+			fmt.Fprintf (_buffer, "* sources md5   : %s\n", BUILD_SOURCES_MD5)
+			fmt.Fprintf (_buffer, "* sources git   : %s\n", BUILD_GIT_HASH)
+			fmt.Fprintf (_buffer, "* code & issues : %s\n", PROJECT_URL)
+			fmt.Fprintf (_buffer, "* uname node    : %s\n", UNAME_NODE)
+			fmt.Fprintf (_buffer, "* uname system  : %s, %s, %s\n", UNAME_SYSTEM, UNAME_RELEASE, UNAME_MACHINE)
+			if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
+				panic (abortErrorw (0x26567db5, _error))
+			}
 			
 			os.Exit (0)
 			panic (abortErrorw (0xd80435fe, nil))
+		}
+		
+		if _argument == "--sources" {
+			
+			if _, _error := os.Stdout.Write (BUILD_SOURCES_CPIO); _error != nil {
+				panic (abortErrorw (0xf5b73ab8, _error))
+			}
+			
+			os.Exit (0)
+			panic (abortErrorw (0x97f9faf1, nil))
 		}
 	}
 	

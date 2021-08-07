@@ -27,6 +27,8 @@ var BUILD_TIMESTAMP string = strings.Trim (embedded.BuildTimestamp, "\n")
 var BUILD_SOURCES_MD5 string = strings.Trim (embedded.BuildSourcesMd5, "\n")
 var BUILD_GIT_HASH string = "{unknown-git-hash}"
 
+var BUILD_SOURCES_CPIO []byte = embedded.BuildSourcesCpio
+
 var UNAME_NODE string = "{unknown-node}"
 var UNAME_SYSTEM string = "{unknown-system}"
 var UNAME_RELEASE string = "{unknown-release}"

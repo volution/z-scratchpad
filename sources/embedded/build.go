@@ -20,3 +20,6 @@ var BuildTimestamp string
 //go:embed build/sources-md5.txt
 var BuildSourcesMd5 string
 
+//go:embed build/sources.cpio.gz
+var BuildSourcesCpio []byte
+
