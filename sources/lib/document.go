@@ -7,6 +7,7 @@ import "bytes"
 import "fmt"
 import "io"
 import "os"
+import "regexp"
 import "strings"
 import "unicode/utf8"
 
@@ -16,10 +17,8 @@ import "unicode/utf8"
 type Document struct {
 	
 	Identifier string
-	
 	Library string
-	PathInLibrary string
-	PathOriginal string
+	Path string
 	
 	Title string
 	TitleAlternatives []string
@@ -44,32 +43,25 @@ func DocumentResolveIdentifier (_document *Document, _perhapsUseFileName bool) (
 		return nil
 	}
 	
-	if (_document.Library != "") && (_document.PathInLibrary != "") && _perhapsUseFileName {
-		if _name, _, _error := pathSplitFileNameAndExtension (_document.PathOriginal); _error == nil {
-			_document.Identifier = _document.Library + "/" + _name
-			return nil
+	if (_document.Path != "") && _perhapsUseFileName {
+		if _documentName, _, _error := pathSplitFileNameAndExtension (_document.Path); _error == nil {
+			_libraryIdentifier := ""
+			if _document.Library != "" {
+				_libraryIdentifier = _document.Library
+			}
+			if _identifier, _error := DocumentFormatIdentifier (_libraryIdentifier, _documentName); _error == nil {
+				_document.Identifier = _identifier
+				return nil
+			} else {
+				return _error
+			}
 		} else {
 			return _error
 		}
 	}
 	
-	if (_document.PathOriginal != "") && _perhapsUseFileName {
-		if _name, _, _error := pathSplitFileNameAndExtension (_document.PathOriginal); _error == nil {
-			_document.Identifier = _name
-			return nil
-		} else {
-			return _error
-		}
-	}
-	
-	if (_document.Library != "") && (_document.PathInLibrary != "") {
-		_fingerprint := fingerprintString ("/:/" + _document.Library + "/:/" + _document.PathInLibrary)
-		_document.Identifier = _fingerprint[:32]
-		return nil
-	}
-	
-	if _document.PathOriginal != "" {
-		_fingerprint := fingerprintString ("/_/" + _document.PathOriginal)
+	if _document.Path != "" {
+		_fingerprint := fingerprintString (_document.Path)
 		_document.Identifier = _fingerprint[:32]
 		return nil
 	}
@@ -80,14 +72,59 @@ func DocumentResolveIdentifier (_document *Document, _perhapsUseFileName bool) (
 
 
 
+func DocumentValidateIdentifier (_identifier string) (*Error) {
+	if ! DocumentIdentifierRegex.MatchString (_identifier) {
+		return errorw (0x55874ebf, nil)
+	}
+	return nil
+}
+
+func DocumentParseIdentifier (_identifier string) (string, string, string, *Error) {
+	if _error := DocumentValidateIdentifier (_identifier); _error != nil {
+		return "", "", "", _error
+	}
+	if _splitIndex := strings.IndexByte (_identifier, ':'); _splitIndex != -1 {
+		_libraryIdentifier := _identifier[:_splitIndex]
+		_documentName := _identifier[_splitIndex + 1:]
+		return _identifier, _libraryIdentifier, _documentName, nil
+	} else {
+		return _identifier, "", "", nil
+	}
+}
+
+func DocumentFormatIdentifier (_libraryIdentifier string, _documentName string) (string, *Error) {
+	if ! DocumentIdentifierWithoutLibraryRegex.MatchString (_documentName) {
+		return "", errorw (0x9f777d70, nil)
+	}
+	if _libraryIdentifier != "" {
+		if ! LibraryIdentifierRegex.MatchString (_libraryIdentifier) {
+			return "", errorw (0xfc88cf9f, nil)
+		}
+		_identifier := _libraryIdentifier + ":" + _documentName
+		return _identifier, nil
+	} else {
+		return _documentName, nil
+	}
+}
+
+
+var DocumentIdentifierWithoutLibraryRegexToken string = `(?:(?:[a-z0-9]+)(?:[_-]+[a-z0-9]+)*)`
+var DocumentIdentifierWithoutLibraryRegex *regexp.Regexp = regexp.MustCompile (`^` + DocumentIdentifierWithoutLibraryRegexToken + `$`)
+var DocumentIdentifierWithLibraryRegexToken string = `(?:` + LibraryIdentifierRegexToken + `:` + DocumentIdentifierWithoutLibraryRegexToken + `)`
+var DocumentIdentifierRegexToken string = `(?:` + DocumentIdentifierWithoutLibraryRegexToken + `|` + DocumentIdentifierWithLibraryRegexToken + `)`
+var DocumentIdentifierRegex *regexp.Regexp = regexp.MustCompile (`^` + DocumentIdentifierRegexToken + `$`)
+
+
+
+
 func DocumentResolveFormat (_document *Document, _perhapsUseFileExtension bool) (*Error) {
 	
 	if _document.Format != "" {
 		return nil
 	}
 	
-	if (_document.PathOriginal != "") && _perhapsUseFileExtension {
-		if _, _extension, _error := pathSplitFileNameAndExtension (_document.PathOriginal); _error == nil {
+	if (_document.Path != "") && _perhapsUseFileExtension {
+		if _, _extension, _error := pathSplitFileNameAndExtension (_document.Path); _error == nil {
 			_format := ""
 			switch _extension {
 				case "md" :
@@ -109,9 +146,10 @@ func DocumentResolveFormat (_document *Document, _perhapsUseFileExtension bool) 
 
 
 
+
 func DocumentReload (_old *Document) (*Document, *Error) {
 	
-	_new, _error := DocumentLoadFromPath (_old.PathOriginal)
+	_new, _error := DocumentLoadFromPath (_old.Path)
 	if _error != nil {
 		return nil, _error
 	}
@@ -124,7 +162,6 @@ func DocumentReload (_old *Document) (*Document, *Error) {
 	}
 	if _new.Library == "" {
 		_new.Library = _old.Library
-		_new.PathInLibrary = _old.PathInLibrary
 	}
 	
 	return _new, nil
@@ -154,7 +191,7 @@ func DocumentLoadFromPath (_path string) (*Document, *Error) {
 		return nil, _error
 	}
 	
-	_document.PathOriginal = _path
+	_document.Path = _path
 	
 	return _document, nil
 }
@@ -164,6 +201,7 @@ func DocumentLoadFromPath (_path string) (*Document, *Error) {
 func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 	
 	var _identifier string
+	var _library string
 	var _format string
 	var _title string
 	var _titles []string
@@ -206,6 +244,10 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 				_identifier_0 := _header[11:]
 				_identifier_0 = stringTrimSpaces (_identifier_0)
 				_identifier = _identifier_0
+			} else if strings.HasPrefix (_header, "library:") {
+				_library_0 := _header[8:]
+				_library_0 = stringTrimSpaces (_library_0)
+				_library = _library_0
 			} else if strings.HasPrefix (_header, "format:") {
 				_format_0 := _header[7:]
 				_format_0 = stringTrimSpaces (_format_0)
@@ -223,6 +265,17 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 		}
 	}
 	
+	if _identifier != "" {
+		if _error := DocumentValidateIdentifier (_identifier); _error != nil {
+			return nil, _error
+		}
+	}
+	if _library != "" {
+		if _error := LibraryValidateIdentifier (_identifier); _error != nil {
+			return nil, _error
+		}
+	}
+	
 	_sourceFingerprint := fingerprintString (_source)
 	_bodyFingerprint := fingerprintString (_body)
 	
@@ -230,6 +283,7 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 			Title : _title,
 			TitleAlternatives : _titles,
 			Identifier : _identifier,
+			Library : _library,
 			Format : _format,
 			SourceFingerprint : _sourceFingerprint,
 			Body : _body,
@@ -256,26 +310,25 @@ func DocumentDump (_stream io.Writer, _document *Document, _includeIdentifiers b
 		fmt.Fprintf (_buffer, "-- title (alternative): `%s`\n", _title)
 	}
 	
-	if _document.Library != "" {
-		fmt.Fprintf (_buffer, "-- library: `%s`\n", _document.Library)
-	}
-	if _document.PathInLibrary != "" {
-		fmt.Fprintf (_buffer, "-- path in library: `%s`\n", _document.PathInLibrary)
-	}
-	if _document.PathOriginal != "" {
-		fmt.Fprintf (_buffer, "-- path in file-system: `%s`\n", _document.PathOriginal)
-	}
-	
-	if _document.Format != "" {
-		fmt.Fprintf (_buffer, "-- format: `%s`\n", _document.Format)
-	}
-	
 	if _includeIdentifiers {
 		if _document.Identifier != "" {
 			fmt.Fprintf (_buffer, "-- identifier: `%s`\n", _document.Identifier)
 		}
-		fmt.Fprintf (_buffer, "-- source fingerprint: `%s`\n", _document.SourceFingerprint)
-		fmt.Fprintf (_buffer, "-- body fingerprint: `%s`\n", _document.BodyFingerprint)
+		if _document.Library != "" {
+			fmt.Fprintf (_buffer, "-- library: `%s`\n", _document.Library)
+		}
+		if _document.Format != "" {
+			fmt.Fprintf (_buffer, "-- format: `%s`\n", _document.Format)
+		}
+		if _document.Path != "" {
+			fmt.Fprintf (_buffer, "-- path: `%s`\n", _document.Path)
+		}
+		if _document.SourceFingerprint != "" {
+			fmt.Fprintf (_buffer, "-- source fingerprint: `%s`\n", _document.SourceFingerprint)
+		}
+		if _document.BodyFingerprint != "" {
+			fmt.Fprintf (_buffer, "-- body fingerprint: `%s`\n", _document.BodyFingerprint)
+		}
 	}
 	
 	if _document.Body == "" {

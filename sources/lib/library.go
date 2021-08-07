@@ -6,6 +6,7 @@ package zscratchpad
 import "errors"
 import "io/fs"
 import "path/filepath"
+import "regexp"
 import "strings"
 
 
@@ -31,7 +32,6 @@ func libraryDocumentsLoad (_libraryPath string, _documentPaths []string) ([]*Doc
 	for _, _documentPath := range _documentPaths {
 		_path := filepath.Join (_libraryPath, _documentPath)
 		if _document, _error := DocumentLoadFromPath (_path); _error == nil {
-			_document.PathInLibrary = _documentPath
 			_documents = append (_documents, _document)
 		} else {
 			return nil, _error
@@ -91,4 +91,24 @@ func libraryDocumentsWalk (_libraryPath string) ([]string, *Error) {
 	
 	return _documentPaths, nil
 }
+
+
+
+
+func LibraryValidateIdentifier (_identifier string) (*Error) {
+	if ! LibraryIdentifierRegex.MatchString (_identifier) {
+		return errorw (0x2d8a1040, nil)
+	}
+	return nil
+}
+
+func LibraryParseIdentifier (_identifier string) (string, *Error) {
+	if _error := LibraryValidateIdentifier (_identifier); _error != nil {
+		return "", _error
+	}
+	return _identifier, nil
+}
+
+var LibraryIdentifierRegexToken string = `(?:(?:[a-z0-9]+)(?:[_-]+[a-z0-9]+)*)`
+var LibraryIdentifierRegex *regexp.Regexp = regexp.MustCompile (`^` + LibraryIdentifierRegexToken + `$`)
 
