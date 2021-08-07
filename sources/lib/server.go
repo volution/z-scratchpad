@@ -150,6 +150,12 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 	if _path == "/__/version" {
 		return ServerHandleVersion (_server, _response)
 	}
+	if _path == "/__/sources.md5" {
+		return ServerHandleSourcesMd5 (_server, _response)
+	}
+	if _path == "/__/sources.cpio" {
+		return ServerHandleSourcesCpio (_server, _response)
+	}
 	
 	switch _path {
 		case "/favicon.ico", "/favicon.png" :
@@ -422,6 +428,16 @@ func ServerHandleVersion (_server *Server, _response http.ResponseWriter) (*Erro
 			
 		}
 	return respondWithHtmlTemplate (_response, _server.templates.versionHtml, _context)
+}
+
+
+func ServerHandleSourcesMd5 (_server *Server, _response http.ResponseWriter) (*Error) {
+	return respondWithBuffer (_response, "text/plain; charset=utf-8", bytes.NewBufferString (BUILD_SOURCES_MD5))
+}
+
+func ServerHandleSourcesCpio (_server *Server, _response http.ResponseWriter) (*Error) {
+	_response.Header () .Add ("Content-Encoding", "gzip")
+	return respondWithBuffer (_response, "text/plain; charset=utf-8", bytes.NewBuffer (BUILD_SOURCES_CPIO_GZ))
 }
 
 

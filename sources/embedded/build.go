@@ -25,5 +25,5 @@ var BuildSourcesHash string
 var BuildSourcesMd5 string
 
 //go:embed build/sources.cpio.gz
-var BuildSourcesCpio []byte
+var BuildSourcesCpioGz []byte
 

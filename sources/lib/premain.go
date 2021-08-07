@@ -70,7 +70,7 @@ func PreMain () () {
 			panic (abortErrorw (0xbe9f73ad, nil))
 		}
 		if _argument == "--sources-cpio" {
-			if _, _error := os.Stdout.Write (BUILD_SOURCES_CPIO); _error != nil {
+			if _, _error := os.Stdout.Write (BUILD_SOURCES_CPIO_GZ); _error != nil {
 				panic (abortErrorw (0xf5b73ab8, _error))
 			}
 			os.Exit (0)
