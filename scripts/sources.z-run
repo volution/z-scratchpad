@@ -115,20 +115,17 @@
 	esac
 	
 	_sources="$( exec -- readlink -e -- ./sources )"
-	_examples="$( exec -- readlink -e -- ./examples )"
 	
 	exec -- watchexec \
 			\
-			--watch "${_sources}" \
-			--watch "${_examples}" \
+			--watch="${_sources}" \
 			\
-			--filter "${_sources}/go.*" \
-			--filter "${_sources}/cmd/**" \
-			--filter "${_sources}/lib/**" \
-			--filter "${_sources}/embedded/*.go" \
-			--filter "${_sources}/embedded/templates/**" \
-			--filter "${_sources}/embedded/assets/**" \
-			--filter "${_examples}/**" \
+			--filter="${_sources}/go.*" \
+			--filter="${_sources}/cmd/**" \
+			--filter="${_sources}/lib/**" \
+			--filter="${_sources}/embedded/*.go" \
+			--filter="${_sources}/embedded/templates/**" \
+			--filter="${_sources}/embedded/assets/**" \
 			\
 			--restart \
 			\
