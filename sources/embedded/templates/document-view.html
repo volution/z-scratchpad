@@ -18,7 +18,10 @@
 		</main>
 		
 		<footer>
-			{{ template "document-html-export-nav" .Document }}
+			{{ template "document-html-nav" .Document }}
+			{{ if .Library }}
+				{{ template "library-html-nav" .Library }}
+			{{ end }}
 		</footer>
 		
 	</body>

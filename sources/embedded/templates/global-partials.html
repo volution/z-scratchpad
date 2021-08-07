@@ -26,6 +26,14 @@
 	{{- end -}}
 {{- end }}
 
+{{ define "library-html-nav" -}}
+	<nav>
+		<ul>
+			<li><a href="/dc/{{ .Identifier }}">{create}</a>
+		</ul>
+	</nav>
+{{- end }}
+
 
 
 
@@ -56,7 +64,7 @@
 {{- end }}
 
 
-{{ define "document-html-export-nav" -}}
+{{ define "document-html-nav" -}}
 	<nav>
 		<ul>
 			<li><a href="/de/{{ .Identifier }}">{edit}</a>
