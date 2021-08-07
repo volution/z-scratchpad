@@ -17,7 +17,11 @@ var BuildNumber string
 //go:embed build/timestamp.txt
 var BuildTimestamp string
 
-//go:embed build/sources-md5.txt
+
+//go:embed build/sources.hash
+var BuildSourcesHash string
+
+//go:embed build/sources.md5
 var BuildSourcesMd5 string
 
 //go:embed build/sources.cpio.gz

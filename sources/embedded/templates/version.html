@@ -10,21 +10,18 @@
 		
 		<header>
 			<h1>{version}</h1>
-			<h2><a href="{{ .ProjectUrl }}">{{ .ProjectUrl }}</a></h2>
 		</header>
 		
 		<main>
-			<hr/>
 			<pre>
 * version       : {{ .BuildVersion }}
 * build target  : {{ .BuildTarget }}, {{ .BuildTargetOs }}-{{ .BuildTargetArch }}, {{ .BuildCompilerVersion }}, {{ .BuildCompilerType }}
 * build number  : {{ .BuildNumber }}, {{ .BuildTimestamp }}
-* sources md5   : {{ .BuildSourcesMd5 }}
+* code & issues : <a href="{{ .ProjectUrl }}">{{ .ProjectUrl }}</a>
 * sources git   : {{ .BuildGitHash }}
-* code & issues : {{ .ProjectUrl }}
+* sources hash  : {{ .BuildSourcesHash }}
 * uname system  : {{ .UnameSystem }}, {{ .UnameRelease }}, {{ .UnameMachine }}
 			</pre>
-			<hr/>
 		</main>
 		
 	</body>

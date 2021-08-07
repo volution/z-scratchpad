@@ -51,39 +51,55 @@
 	
 	test "${#}" -eq 0
 	
-	find ./sources/ \
-			-type f \
-			-not -path './sources/embedded/build/*' \
-			-print0 \
-	| xargs -0 -I {} -- md5sum -b -z -- {} \
-	| LC_ALL=C sort -z \
-	| md5sum -b \
-	| cut -f 1 -d ' ' \
-		>| ./.outputs/markers/build-sources-md5.tmp \
-	#
-	
 	if test -s ./sources/embedded/build/sources.cpio.gz ; then
 		rm -- ./sources/embedded/build/sources.cpio.gz
 		touch -- ./sources/embedded/build/sources.cpio.gz
 	fi
 	
-	if ! cmp -s -- ./.outputs/markers/build-sources-md5.tmp ./sources/embedded/build/sources-md5.txt ; then
+	execline-cd ./sources \
+	find . \
+			-type f \
+			-not -path './embedded/build/*' \
+			-printf '%P\0' \
+	| LC_ALL=C sort -z \
+		>| ./.outputs/markers/build-sources.list.tmp \
+	#
+	
+	execline-cd ./sources \
+	xargs -0 -I {} -- md5sum -b -z -- {} \
+		< ./.outputs/markers/build-sources.list.tmp \
+	| tr '\0' '\n' \
+		>| ./.outputs/markers/build-sources.md5.tmp \
+	#
+	
+	md5sum -b \
+		< ./.outputs/markers/build-sources.md5.tmp \
+	| cut -f 1 -d ' ' \
+		>| ./.outputs/markers/build-sources.hash.tmp \
+	#
+	
+	if ! cmp -s -- ./.outputs/markers/build-sources.hash.tmp ./sources/embedded/build/sources.hash ; then
 		
 		_build_number="$( exec -- cat -- ./sources/embedded/build/number.txt )"
 		_build_number="$(( _build_number + 1 ))"
 		_build_timestamp="$( exec -- date -- '+%Y-%m-%d-%H-%M-%S' )"
 		
-		printf -- '%d\n' "${_build_number}" >| ./sources/embedded/build/number.tmp
-		printf -- '%s\n' "${_build_timestamp}" >| ./sources/embedded/build/timestamp.tmp
+		printf -- '%d\n' "${_build_number}" >| ./sources/embedded/build/number.txt.tmp
+		printf -- '%s\n' "${_build_timestamp}" >| ./sources/embedded/build/timestamp.txt.tmp
 		
-		mv -T -- ./sources/embedded/build/number.tmp ./sources/embedded/build/number.txt
-		mv -T -- ./sources/embedded/build/timestamp.tmp ./sources/embedded/build/timestamp.txt
+		mv -T -- ./sources/embedded/build/number.txt.tmp ./sources/embedded/build/number.txt
+		mv -T -- ./sources/embedded/build/timestamp.txt.tmp ./sources/embedded/build/timestamp.txt
 		
-		mv -T -- ./.outputs/markers/build-sources-md5.tmp ./sources/embedded/build/sources-md5.txt
+		mv -T -- ./.outputs/markers/build-sources.list.tmp ./.outputs/markers/build-sources.list
+		
+		mv -T -- ./.outputs/markers/build-sources.md5.tmp ./sources/embedded/build/sources.md5
+		mv -T -- ./.outputs/markers/build-sources.hash.tmp ./sources/embedded/build/sources.hash
 		
 	else
 		
-		rm -- ./.outputs/markers/build-sources-md5.tmp
+		rm -- ./.outputs/markers/build-sources.list.tmp
+		rm -- ./.outputs/markers/build-sources.md5.tmp
+		rm -- ./.outputs/markers/build-sources.hash.tmp
 	fi
 	
 	if test -e ./.git ; then
@@ -95,8 +111,8 @@
 		_git_hash='unknown'
 	fi
 	
-	printf -- '%s\n' "${_git_hash}" >| ./.outputs/markers/build-git-hash.tmp
-	mv -T -- ./.outputs/markers/build-git-hash.tmp ./.outputs/markers/build-git-hash.txt
+	printf -- '%s\n' "${_git_hash}" >| ./.outputs/markers/build-git-hash.txt.tmp
+	mv -T -- ./.outputs/markers/build-git-hash.txt.tmp ./.outputs/markers/build-git-hash.txt
 !!
 
 

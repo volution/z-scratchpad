@@ -132,6 +132,7 @@ func TemplatesNew () (*Templates, *Error) {
 			_templates.libraryViewHtml,
 			_templates.documentViewHtml,
 			_templates.documentExportHtml,
+			_templates.versionHtml,
 	} {
 		if _, _error := _topTemplate.New ("global-navigation") .Parse (embedded.GlobalNavigationHtml); _error != nil {
 			return nil, errorw (0xea0e8f0e, _error)

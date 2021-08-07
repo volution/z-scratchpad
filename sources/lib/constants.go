@@ -24,9 +24,10 @@ var BUILD_COMPILER_VERSION string = runtime.Version ()
 var BUILD_VERSION string = strings.Trim (embedded.BuildVersion, "\n")
 var BUILD_NUMBER string = strings.Trim (embedded.BuildNumber, "\n")
 var BUILD_TIMESTAMP string = strings.Trim (embedded.BuildTimestamp, "\n")
-var BUILD_SOURCES_MD5 string = strings.Trim (embedded.BuildSourcesMd5, "\n")
-var BUILD_GIT_HASH string = "{unknown-git-hash}"
 
+var BUILD_GIT_HASH string = "{unknown-git-hash}"
+var BUILD_SOURCES_HASH string = strings.Trim (embedded.BuildSourcesHash, "\n")
+var BUILD_SOURCES_MD5 string = embedded.BuildSourcesMd5
 var BUILD_SOURCES_CPIO []byte = embedded.BuildSourcesCpio
 
 var UNAME_NODE string = "{unknown-node}"

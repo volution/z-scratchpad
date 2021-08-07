@@ -387,8 +387,9 @@ func ServerHandleVersion (_server *Server, _response http.ResponseWriter) (*Erro
 			BuildVersion string
 			BuildNumber string
 			BuildTimestamp string
-			BuildSourcesMd5 string
+			
 			BuildGitHash string
+			BuildSourcesHash string
 			
 			UnameNode string
 			UnameSystem string
@@ -409,8 +410,9 @@ func ServerHandleVersion (_server *Server, _response http.ResponseWriter) (*Erro
 			BUILD_VERSION,
 			BUILD_NUMBER,
 			BUILD_TIMESTAMP,
-			BUILD_SOURCES_MD5,
+			
 			BUILD_GIT_HASH,
+			BUILD_SOURCES_HASH,
 			
 			UNAME_NODE,
 			UNAME_SYSTEM,
