@@ -12,7 +12,7 @@ import "os"
 
 func Main (_executable string, _arguments []string, _environment map[string]string) (*Error) {
 	
-	if len (_arguments) != 0 {
+	if (len (_arguments) != 1) || (_arguments[0] != "server") {
 		return errorw (0x79150e1f, nil)
 	}
 	

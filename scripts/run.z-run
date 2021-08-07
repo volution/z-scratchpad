@@ -9,14 +9,11 @@
 
 
 
-++<< run / examples / server
-	test "${#}" -eq 0
-	exec -- "${ZRUN[@]}" ':: run / exec' \
-			./examples \
-	#
+++<< run / server
+	exec -- "${ZRUN[@]}" ':: run / exec' server "${@}"
 !!
 
-:: watch / run / examples / server / watch :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / examples / server' "${@}"
+:: watch / run / server / watch :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / server' "${@}"
 
 
 
