@@ -1,5 +1,7 @@
-## snippets (spaces)
+## snippets (breaks with spaces)
 ## -- format: snippets
+
+
 
 
 command a 1
@@ -33,3 +35,4 @@ command d 2
 command e 1
 
 command e 2
+

@@ -1,4 +1,4 @@
 ## document with title
 ## document with title (alternative)
 
-some content
+some text
