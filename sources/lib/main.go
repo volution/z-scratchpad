@@ -75,24 +75,27 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		}
 	}
 	
-	_documents, _error = IndexDocumentsSelectAll (_index)
-	if _error != nil {
-		return _error
-	}
-	for _, _document := range _documents {
-		
-		_, _error = DocumentRenderToText (_document)
-		if _error != nil {
-			return _error
-		}
-		
-		_, _error = DocumentRenderToHtml (_document)
-		if _error != nil {
-			return _error
-		}
-	}
-	
 	if false {
+		_documents, _error = IndexDocumentsSelectAll (_index)
+		if _error != nil {
+			return _error
+		}
+		for _, _document := range _documents {
+			_, _error = DocumentRenderToText (_document)
+			if _error != nil {
+				return _error
+			}
+			_, _error = DocumentRenderToHtml (_document)
+			if _error != nil {
+				return _error
+			}
+		}
+	}
+	if false {
+		_documents, _error = IndexDocumentsSelectAll (_index)
+		if _error != nil {
+			return _error
+		}
 		for _, _document := range _documents {
 			_error = DocumentDump (os.Stdout, _document, true, false, false)
 			if _error != nil {
@@ -103,17 +106,14 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	}
 	
 	if _serverEndpoint != "" {
-		
 		_serverListener, _error_0 := net.Listen ("tcp", _serverEndpoint)
 		if _error_0 != nil {
 			return errorw (0xedeea766, _error_0)
 		}
-		
 		_server, _error := ServerNew (_globals, _index, _editor, _serverListener)
 		if _error != nil {
 			return _error
 		}
-		
 		_error = ServerRun (_server)
 		if _error != nil {
 			return _error

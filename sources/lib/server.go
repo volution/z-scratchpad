@@ -132,9 +132,19 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 		_identifier := _path[11:]
 		return ServerHandleDocumentExportSource (_server, _identifier, _response)
 	}
+	
 	if strings.HasPrefix (_path, "/de/") {
 		_identifier := _path[4:]
 		return ServerHandleDocumentEdit (_server, _identifier, _response)
+	}
+	
+	if (_path == "/dc") || (_path == "/dc/") {
+		_identifier := ""
+		return ServerHandleDocumentCreate (_server, _identifier, _response)
+	}
+	if strings.HasPrefix (_path, "/dc/") {
+		_identifier := _path[4:]
+		return ServerHandleDocumentCreate (_server, _identifier, _response)
 	}
 	
 	if _path == "/__/version" {
@@ -181,8 +191,8 @@ func ServerHandleDocumentsIndex (_server *Server, _response http.ResponseWriter)
 
 
 
-func ServerHandleLibraryView (_server *Server, _identifier string, _response http.ResponseWriter) (*Error) {
-	_library, _error := serverLibraryResolve (_server, _identifier)
+func ServerHandleLibraryView (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
+	_library, _error := serverLibraryResolve (_server, _identifierUnsafe)
 	if _error != nil {
 		return _error
 	}
@@ -203,8 +213,8 @@ func ServerHandleLibraryView (_server *Server, _identifier string, _response htt
 
 
 
-func ServerHandleDocumentView (_server *Server, _identifier string, _response http.ResponseWriter) (*Error) {
-	_document, _library, _error := serverDocumentAndLibraryResolve (_server, _identifier)
+func ServerHandleDocumentView (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
+	_document, _library, _error := serverDocumentAndLibraryResolve (_server, _identifierUnsafe)
 	if _error != nil {
 		return _error
 	}
@@ -225,8 +235,8 @@ func ServerHandleDocumentView (_server *Server, _identifier string, _response ht
 }
 
 
-func ServerHandleDocumentExportHtml (_server *Server, _identifier string, _response http.ResponseWriter) (*Error) {
-	_document, _error := serverDocumentResolve (_server, _identifier)
+func ServerHandleDocumentExportHtml (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
+	_document, _error := serverDocumentResolve (_server, _identifierUnsafe)
 	if _error != nil {
 		return _error
 	}
@@ -245,8 +255,8 @@ func ServerHandleDocumentExportHtml (_server *Server, _identifier string, _respo
 }
 
 
-func ServerHandleDocumentExportText (_server *Server, _identifier string, _response http.ResponseWriter) (*Error) {
-	_document, _error := serverDocumentResolve (_server, _identifier)
+func ServerHandleDocumentExportText (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
+	_document, _error := serverDocumentResolve (_server, _identifierUnsafe)
 	if _error != nil {
 		return _error
 	}
@@ -265,8 +275,8 @@ func ServerHandleDocumentExportText (_server *Server, _identifier string, _respo
 }
 
 
-func ServerHandleDocumentExportSource (_server *Server, _identifier string, _response http.ResponseWriter) (*Error) {
-	_document, _error := serverDocumentResolve (_server, _identifier)
+func ServerHandleDocumentExportSource (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
+	_document, _error := serverDocumentResolve (_server, _identifierUnsafe)
 	if _error != nil {
 		return _error
 	}
@@ -287,15 +297,72 @@ func ServerHandleDocumentExportSource (_server *Server, _identifier string, _res
 
 
 
-func ServerHandleDocumentEdit (_server *Server, _identifier string, _response http.ResponseWriter) (*Error) {
-	_document, _error := serverDocumentResolve (_server, _identifier)
+func ServerHandleDocumentCreate (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
+	if _identifierUnsafe == "" {
+		// FIXME:  Add support for random document creation!
+		return errorw (0x19f48aa6, nil)
+	}
+	_libraryIdentifier := ""
+	_documentName := ""
+	if _libraryIdentifier == "" {
+		if _libraryIdentifier_0, _error := LibraryParseIdentifier (_identifierUnsafe); _error == nil {
+			_libraryIdentifier = _libraryIdentifier_0
+		}
+	}
+	if _libraryIdentifier == "" {
+		if _, _libraryIdentifier_0, _documentName_0, _error := DocumentParseIdentifier (_identifierUnsafe); _error == nil {
+			_libraryIdentifier = _libraryIdentifier_0
+			_documentName = _documentName_0
+		}
+	}
+	if _libraryIdentifier == "" {
+		return errorw (0x4f21b7fb, nil)
+	}
+	if _documentName == "" {
+		_documentName = generateRandomToken ()
+	}
+	_identifier, _error := DocumentFormatIdentifier (_libraryIdentifier, _documentName)
+	if _error != nil {
+		return _error
+	}
+	_documentExisting, _error := IndexDocumentResolve (_server.index, _identifier)
+	if _error != nil {
+		return _error
+	}
+	if _documentExisting != nil {
+		return errorw (0x054e7a60, nil)
+	}
+	if _libraryIdentifier == "" {
+		return errorw (0x2b40ce32, nil)
+	}
+	_library, _error := IndexLibraryResolve (_server.index, _libraryIdentifier)
+	if _error != nil {
+		return _error
+	}
+	if _library == nil {
+		return errorw (0x5e581595, nil)
+	}
+	if _server.editor == nil {
+		return errorw (0x14317f29, nil)
+	}
+	_error = EditorDocumentCreate (_server.editor, _library, _documentName, false)
+	if _error != nil {
+		return _error
+	}
+	http.Error (_response, "", http.StatusNoContent)
+	return nil
+}
+
+
+func ServerHandleDocumentEdit (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
+	_document, _library, _error := serverDocumentAndLibraryResolve (_server, _identifierUnsafe)
 	if _error != nil {
 		return _error
 	}
 	if _server.editor == nil {
 		return errorw (0xee28afb6, nil)
 	}
-	_error = EditorDocumentOpen (_server.editor, _document)
+	_error = EditorDocumentEdit (_server.editor, _library, _document, false)
 	if _error != nil {
 		return _error
 	}
@@ -368,9 +435,13 @@ func ServerHandleAsset (_server *Server, _path string, _response http.ResponseWr
 
 
 
-func serverLibraryResolve (_server *Server, _identifier string) (*Library, *Error) {
-	if _identifier == "" {
+func serverLibraryResolve (_server *Server, _identifierUnsafe string) (*Library, *Error) {
+	if _identifierUnsafe == "" {
 		return nil, errorw (0xbef72625, nil)
+	}
+	_identifier, _error := LibraryParseIdentifier (_identifierUnsafe)
+	if _error != nil {
+		return nil, _error
 	}
 	_library, _error := IndexLibraryResolve (_server.index, _identifier)
 	if _error != nil {
@@ -382,9 +453,13 @@ func serverLibraryResolve (_server *Server, _identifier string) (*Library, *Erro
 	return _library, nil
 }
 
-func serverDocumentResolve (_server *Server, _identifier string) (*Document, *Error) {
-	if _identifier == "" {
+func serverDocumentResolve (_server *Server, _identifierUnsafe string) (*Document, *Error) {
+	if _identifierUnsafe == "" {
 		return nil, errorw (0xc7f50900, nil)
+	}
+	_identifier, _, _, _error := DocumentParseIdentifier (_identifierUnsafe)
+	if _error != nil {
+		return nil, _error
 	}
 	_document, _error := IndexDocumentResolve (_server.index, _identifier)
 	if _error != nil {
@@ -396,8 +471,8 @@ func serverDocumentResolve (_server *Server, _identifier string) (*Document, *Er
 	return _document, nil
 }
 
-func serverDocumentAndLibraryResolve (_server *Server, _identifier string) (*Document, *Library, *Error) {
-	_document, _error := serverDocumentResolve (_server, _identifier)
+func serverDocumentAndLibraryResolve (_server *Server, _identifierUnsafe string) (*Document, *Library, *Error) {
+	_document, _error := serverDocumentResolve (_server, _identifierUnsafe)
 	if _error != nil {
 		return nil, nil, _error
 	}
