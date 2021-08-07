@@ -2,6 +2,9 @@
 .*
 !.gitignore
 
+/examples/inbox/**
+!/examples/inbox/.gitignore
+
 *~
 *#
 *.bak
