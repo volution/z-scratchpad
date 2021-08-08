@@ -304,55 +304,10 @@ func ServerHandleDocumentExportSource (_server *Server, _identifierUnsafe string
 
 
 func ServerHandleDocumentCreate (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
-	if _identifierUnsafe == "" {
-		// FIXME:  Add support for random document creation!
-		return errorw (0x19f48aa6, nil)
-	}
-	_libraryIdentifier := ""
-	_documentName := ""
-	if _libraryIdentifier == "" {
-		if _libraryIdentifier_0, _error := LibraryParseIdentifier (_identifierUnsafe); _error == nil {
-			_libraryIdentifier = _libraryIdentifier_0
-		}
-	}
-	if _libraryIdentifier == "" {
-		if _, _libraryIdentifier_0, _documentName_0, _error := DocumentParseIdentifier (_identifierUnsafe); _error == nil {
-			_libraryIdentifier = _libraryIdentifier_0
-			_documentName = _documentName_0
-		}
-	}
-	if _libraryIdentifier == "" {
-		return errorw (0x4f21b7fb, nil)
-	}
-	if _documentName == "" {
-		_documentName = generateRandomToken ()
-	}
-	_identifier, _error := DocumentFormatIdentifier (_libraryIdentifier, _documentName)
-	if _error != nil {
-		return _error
-	}
-	_documentExisting, _error := IndexDocumentResolve (_server.index, _identifier)
-	if _error != nil {
-		return _error
-	}
-	if _documentExisting != nil {
-		return errorw (0x054e7a60, nil)
-	}
-	if _libraryIdentifier == "" {
-		return errorw (0x2b40ce32, nil)
-	}
-	_library, _error := IndexLibraryResolve (_server.index, _libraryIdentifier)
-	if _error != nil {
-		return _error
-	}
-	if _library == nil {
-		return errorw (0x5e581595, nil)
-	}
 	if _server.editor == nil {
 		return errorw (0x14317f29, nil)
 	}
-	_error = EditorDocumentCreate (_server.editor, _library, _documentName, false)
-	if _error != nil {
+	if _error := WorkflowDocumentCreate (_identifierUnsafe, _server.index, _server.editor, false); _error != nil {
 		return _error
 	}
 	http.Error (_response, "", http.StatusNoContent)
@@ -361,15 +316,10 @@ func ServerHandleDocumentCreate (_server *Server, _identifierUnsafe string, _res
 
 
 func ServerHandleDocumentEdit (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
-	_document, _library, _error := serverDocumentAndLibraryResolve (_server, _identifierUnsafe)
-	if _error != nil {
-		return _error
-	}
 	if _server.editor == nil {
 		return errorw (0xee28afb6, nil)
 	}
-	_error = EditorDocumentEdit (_server.editor, _library, _document, false)
-	if _error != nil {
+	if _error := WorkflowDocumentEdit (_identifierUnsafe, _server.index, _server.editor, false); _error != nil {
 		return _error
 	}
 	http.Error (_response, "", http.StatusNoContent)
@@ -454,54 +404,15 @@ func ServerHandleAsset (_server *Server, _path string, _response http.ResponseWr
 
 
 func serverLibraryResolve (_server *Server, _identifierUnsafe string) (*Library, *Error) {
-	if _identifierUnsafe == "" {
-		return nil, errorw (0xbef72625, nil)
-	}
-	_identifier, _error := LibraryParseIdentifier (_identifierUnsafe)
-	if _error != nil {
-		return nil, _error
-	}
-	_library, _error := IndexLibraryResolve (_server.index, _identifier)
-	if _error != nil {
-		return nil, _error
-	}
-	if _library == nil {
-		return nil, errorw (0xb1852bf9, nil)
-	}
-	return _library, nil
+	return WorkflowLibraryResolve (_identifierUnsafe, _server.index)
 }
 
 func serverDocumentResolve (_server *Server, _identifierUnsafe string) (*Document, *Error) {
-	if _identifierUnsafe == "" {
-		return nil, errorw (0xc7f50900, nil)
-	}
-	_identifier, _, _, _error := DocumentParseIdentifier (_identifierUnsafe)
-	if _error != nil {
-		return nil, _error
-	}
-	_document, _error := IndexDocumentResolve (_server.index, _identifier)
-	if _error != nil {
-		return nil, _error
-	}
-	if _document == nil {
-		return nil, errorw (0x054e7a60, nil)
-	}
-	return _document, nil
+	return WorkflowDocumentResolve (_identifierUnsafe, _server.index)
 }
 
 func serverDocumentAndLibraryResolve (_server *Server, _identifierUnsafe string) (*Document, *Library, *Error) {
-	_document, _error := serverDocumentResolve (_server, _identifierUnsafe)
-	if _error != nil {
-		return nil, nil, _error
-	}
-	if _document.Library == "" {
-		return _document, nil, nil
-	}
-	_library, _error := serverLibraryResolve (_server, _document.Library)
-	if _error != nil {
-		return nil, nil, _error
-	}
-	return _document, _library, nil
+	return WorkflowDocumentAndLibraryResolve (_identifierUnsafe, _server.index)
 }
 
 
