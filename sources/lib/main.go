@@ -4,6 +4,7 @@ package zscratchpad
 
 
 import "bytes"
+import "encoding/json"
 import "fmt"
 import "net"
 import "os"
@@ -33,6 +34,7 @@ type ServerFlags struct {
 type ListFlags struct {
 	Type *string `long:"type" short:"t" choice:"libraries" choice:"documents"`
 	What *string `long:"what" short:"w" choice:"identifiers" choice:"titles" choice:"names" choice:"paths"`
+	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
 }
 
 type DumpFlags struct {}
@@ -138,6 +140,7 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 	
 	_type := flagStringOrDefault (_flags.Type, "documents")
 	_what := flagStringOrDefault (_flags.What, "identifiers")
+	_format := flagStringOrDefault (_flags.Format, "text")
 	
 	_list := make ([]string, 0, 1024)
 	
@@ -194,10 +197,29 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 	sort.Strings (_list)
 	
 	_buffer := bytes.NewBuffer (nil)
-	for _, _value := range _list {
-		_buffer.WriteString (_value)
-		_buffer.WriteByte ('\n')
+	
+	switch _format {
+		
+		case "text", "text-0" :
+			_separator := byte ('\n')
+			if _format == "text-0" {
+				_separator = 0
+			}
+			for _, _value := range _list {
+				_buffer.WriteString (_value)
+				_buffer.WriteByte (_separator)
+			}
+		
+		case "json" :
+			_encoder := json.NewEncoder (_buffer)
+			if _error := _encoder.Encode (_list); _error != nil {
+				return errorw (0xc65a050c, _error)
+			}
+		
+		default :
+			return errorw (0x4def007c, nil)
 	}
+	
 	if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
 		return errorw (0xcf76965f, _error)
 	}
