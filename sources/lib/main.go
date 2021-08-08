@@ -43,6 +43,15 @@ type ExportFlags struct {
 	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html"`
 }
 
+type EditFlags struct {
+	Document *string `long:"document" short:"d" required:"-" value-name:"{identifier}"`
+}
+
+type CreateFlags struct {
+	Library *string `long:"library" short:"l" value-name:"{identifier}"`
+	Document *string `long:"document" short:"d" value-name:"{identifier}"`
+}
+
 type DumpFlags struct {}
 
 type MainFlags struct {
@@ -50,6 +59,8 @@ type MainFlags struct {
 	Library *LibraryFlags `group:"Library options"`
 	List *ListFlags `command:"list"`
 	Export *ExportFlags `command:"export"`
+	Edit *EditFlags `command:"edit"`
+	Create *CreateFlags `command:"create"`
 	Server *ServerFlags `command:"server"`
 	Dump *DumpFlags `command:"dump"`
 }
@@ -64,6 +75,8 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			Library : & LibraryFlags {},
 			List : & ListFlags {},
 			Export : & ExportFlags {},
+			Edit : & EditFlags {},
+			Create : & CreateFlags {},
 			Server : & ServerFlags {},
 			Dump : & DumpFlags {},
 		}
@@ -142,6 +155,12 @@ func MainWithFlags (_command string, _flags *MainFlags) (*Error) {
 		case "export" :
 			return MainExport (_flags.Export, _globals, _index)
 		
+		case "edit" :
+			return MainEdit (_flags.Edit, _globals, _index, _editor)
+		
+		case "create" :
+			return MainCreate (_flags.Create, _globals, _index, _editor)
+		
 		case "server" :
 			return MainServer (_flags.Server, _globals, _index, _editor)
 		
@@ -161,20 +180,12 @@ func MainExport (_flags *ExportFlags, _globals *Globals, _index *Index) (*Error)
 	if _flags.Document == nil {
 		return errorw (0x1826914a, nil)
 	}
-	_identifier, _, _, _error := DocumentParseIdentifier (*_flags.Document)
+	_document, _error := WorkflowDocumentResolve (*_flags.Document, _index)
 	if _error != nil {
 		return _error
 	}
 	
 	_format := flagStringOrDefault (_flags.Format, "source")
-	
-	_document, _error := IndexDocumentResolve (_index, _identifier)
-	if _error != nil {
-		return _error
-	}
-	if _document == nil {
-		return errorw (0x127b2f28, nil)
-	}
 	
 	_buffer := (*bytes.Buffer) (nil)
 	switch _format {
@@ -214,6 +225,50 @@ func MainExport (_flags *ExportFlags, _globals *Globals, _index *Index) (*Error)
 
 
 
+func MainEdit (_flags *EditFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
+	if _flags.Document == nil {
+		return errorw (0xaf99b5bb, nil)
+	}
+	
+	return WorkflowDocumentEdit (*_flags.Document, _index, _editor, true)
+}
+
+
+
+
+func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
+	_identifier := ""
+	
+	if _flags.Library != nil {
+		if _flags.Document != nil {
+			if _identifier_0, _error := DocumentFormatIdentifier (*_flags.Library, *_flags.Document); _error == nil {
+				_identifier = _identifier_0
+			} else {
+				return _error
+			}
+		} else {
+			if _identifier_0, _error := LibraryParseIdentifier (*_flags.Library); _error == nil {
+				_identifier = _identifier_0
+			} else {
+				return _error
+			}
+		}
+	} else if _flags.Document != nil {
+		if _identifier_0, _, _, _error := DocumentParseIdentifier (*_flags.Document); _error == nil {
+			_identifier = _identifier_0
+		} else {
+			return _error
+		}
+	}
+	
+	return WorkflowDocumentCreate (_identifier, _index, _editor, true)
+}
+
+
+
+
 func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 	
 	_type := flagStringOrDefault (_flags.Type, "documents")
@@ -222,18 +277,9 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 	
 	_library := (*Library) (nil)
 	if flagStringOrDefault (_flags.Library, "") != "" {
-		_libraryIdentifier := *_flags.Library
-		if _libraryIdentifier_0, _error := LibraryParseIdentifier (_libraryIdentifier); _error == nil {
-			_libraryIdentifier = _libraryIdentifier_0
-		} else {
-			return _error
-		}
-		if _library_0, _error := IndexLibraryResolve (_index, _libraryIdentifier); _error == nil {
+		if _library_0, _error := WorkflowLibraryResolve (*_flags.Library, _index); _error == nil {
 			_library = _library_0
 		} else {
-			return _error
-		}
-		if _library == nil {
 			return errorw (0x5a3e46e1, nil)
 		}
 	}
