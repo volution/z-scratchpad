@@ -32,6 +32,7 @@ type ServerFlags struct {
 }
 
 type ListFlags struct {
+	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Type *string `long:"type" short:"t" choice:"libraries" choice:"documents"`
 	What *string `long:"what" short:"w" choice:"identifiers" choice:"titles" choice:"names" choice:"paths"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
@@ -219,14 +220,38 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 	_what := flagStringOrDefault (_flags.What, "identifiers")
 	_format := flagStringOrDefault (_flags.Format, "text")
 	
+	_library := (*Library) (nil)
+	if flagStringOrDefault (_flags.Library, "") != "" {
+		_libraryIdentifier := *_flags.Library
+		if _libraryIdentifier_0, _error := LibraryParseIdentifier (_libraryIdentifier); _error == nil {
+			_libraryIdentifier = _libraryIdentifier_0
+		} else {
+			return _error
+		}
+		if _library_0, _error := IndexLibraryResolve (_index, _libraryIdentifier); _error == nil {
+			_library = _library_0
+		} else {
+			return _error
+		}
+		if _library == nil {
+			return errorw (0x5a3e46e1, nil)
+		}
+	}
+	
 	_list := make ([]string, 0, 1024)
 	
 	switch _type {
 		
 		case "libraries", "library" :
-			_libraries, _error := IndexLibrariesSelectAll (_index)
-			if _error != nil {
-				return _error
+			_libraries := []*Library (nil)
+			if _library != nil {
+				_libraries = []*Library { _library }
+			} else {
+				if _libraries_0, _error := IndexLibrariesSelectAll (_index); _error == nil {
+					_libraries = _libraries_0
+				} else {
+					return _error
+				}
 			}
 			for _, _library := range _libraries {
 				_value := ""
@@ -246,9 +271,19 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 			}
 		
 		case "documents", "document" :
-			_documents, _error := IndexDocumentsSelectAll (_index)
-			if _error != nil {
-				return _error
+			_documents := []*Document (nil)
+			if _library != nil {
+				if _documents_0, _error := IndexDocumentsSelectInLibrary (_index, _library.Identifier); _error == nil {
+					_documents = _documents_0
+				} else {
+					return _error
+				}
+			} else {
+				if _documents_0, _error := IndexDocumentsSelectAll (_index); _error == nil {
+					_documents = _documents_0
+				} else {
+					return _error
+				}
 			}
 			for _, _document := range _documents {
 				_value := ""
