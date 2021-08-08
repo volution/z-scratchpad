@@ -37,12 +37,18 @@ type ListFlags struct {
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
 }
 
+type ExportFlags struct {
+	Document *string `long:"document" short:"d" required:"-" value-name:"{identifier}"`
+	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html"`
+}
+
 type DumpFlags struct {}
 
 type MainFlags struct {
 	Global *GlobalFlags `group:"Global options"`
 	Library *LibraryFlags `group:"Library options"`
 	List *ListFlags `command:"list"`
+	Export *ExportFlags `command:"export"`
 	Server *ServerFlags `command:"server"`
 	Dump *DumpFlags `command:"dump"`
 }
@@ -56,6 +62,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			Global : & GlobalFlags {},
 			Library : & LibraryFlags {},
 			List : & ListFlags {},
+			Export : & ExportFlags {},
 			Server : & ServerFlags {},
 			Dump : & DumpFlags {},
 		}
@@ -66,27 +73,36 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		return errorw (0x5b48e356, _error)
 	}
 	
+	_help := func (_log bool, _error *Error) (*Error) {
+		_buffer := bytes.NewBuffer (nil)
+		_parser.WriteHelp (_buffer)
+		if _log {
+			logf ('`', 0xa725b4bc, "\n%s\n", _buffer.String ())
+		} else {
+			if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
+				return errorw (0xf4170873, _error)
+			}
+		}
+		return _error
+	}
+	
 	// FIXME:  The parser always uses the actual environment variables and not `_environment`!
 	if _argumentsRest, _error := _parser.ParseArgs (_arguments); _error != nil {
-		return errorw (0xa198fbfd, _error)
+		if flagBoolOrDefault (_flags.Global.Help, false) {
+			return _help (false, nil)
+		} else {
+			return _help (true, errorw (0xa198fbfd, _error))
+		}
 	} else if len (_argumentsRest) != 0 {
-		return errorw (0x3c7b6224, nil)
+		return _help (true, errorw (0x3c7b6224, nil))
 	}
 	
 	if flagBoolOrDefault (_flags.Global.Help, false) {
-		_buffer := bytes.NewBuffer (nil)
-		_parser.WriteHelp (_buffer)
-		if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
-			return errorw (0xf4170873, _error)
-		}
-		return nil
+		return _help (false, nil)
 	}
 	
 	if _parser.Active == nil {
-		_buffer := bytes.NewBuffer (nil)
-		_parser.WriteHelp (_buffer)
-		logf ('`', 0xa725b4bc, "\n%s\n", _buffer.String ())
-		return errorw (0x4cae2ee5, nil)
+		return _help (true, errorw (0x4cae2ee5, nil))
 	}
 	
 	return MainWithFlags (_parser.Active.Name, _flags)
@@ -122,6 +138,9 @@ func MainWithFlags (_command string, _flags *MainFlags) (*Error) {
 		case "list" :
 			return MainList (_flags.List, _globals, _index)
 		
+		case "export" :
+			return MainExport (_flags.Export, _globals, _index)
+		
 		case "server" :
 			return MainServer (_flags.Server, _globals, _index, _editor)
 		
@@ -131,6 +150,64 @@ func MainWithFlags (_command string, _flags *MainFlags) (*Error) {
 		default :
 			return errorw (0xaca17bb9, nil)
 	}
+}
+
+
+
+
+func MainExport (_flags *ExportFlags, _globals *Globals, _index *Index) (*Error) {
+	
+	if _flags.Document == nil {
+		return errorw (0x1826914a, nil)
+	}
+	_identifier, _, _, _error := DocumentParseIdentifier (*_flags.Document)
+	if _error != nil {
+		return _error
+	}
+	
+	_format := flagStringOrDefault (_flags.Format, "source")
+	
+	_document, _error := IndexDocumentResolve (_index, _identifier)
+	if _error != nil {
+		return _error
+	}
+	if _document == nil {
+		return errorw (0x127b2f28, nil)
+	}
+	
+	_buffer := (*bytes.Buffer) (nil)
+	switch _format {
+		
+		case "source" :
+			if _output, _error := DocumentRenderToSource (_document); _error == nil {
+				_buffer = bytes.NewBufferString (_output)
+			} else {
+				return _error
+			}
+		
+		case "html" :
+			if _output, _error := DocumentRenderToHtml (_document); _error == nil {
+				_buffer = bytes.NewBufferString (_output)
+			} else {
+				return _error
+			}
+		
+		case "text" :
+			if _output, _error := DocumentRenderToText (_document); _error == nil {
+				_buffer = bytes.NewBufferString (_output)
+			} else {
+				return _error
+			}
+		
+		default :
+			return errorw (0x326240d3, nil)
+	}
+	
+	if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
+		return errorw (0xa797b17f, _error)
+	}
+	
+	return nil
 }
 
 
