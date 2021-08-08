@@ -7,6 +7,7 @@ import "bytes"
 import "fmt"
 import "net"
 import "os"
+import "sort"
 
 
 import "github.com/jessevdk/go-flags"
@@ -24,16 +25,22 @@ type LibraryFlags struct {
 	UseFileExtensionAsFormat *bool `long:"library-use-file-ext"`
 }
 
-type DumpFlags struct {}
-
 type ServerFlags struct {
 	EndpointIp *string `long:"server-ip" value-name:"{ip}"`
 	EndpointPort *uint16 `long:"server-port" value-name:"{port}"`
 }
 
+type ListFlags struct {
+	Type *string `long:"type" short:"t" choice:"libraries" choice:"documents"`
+	What *string `long:"what" short:"w" choice:"identifiers" choice:"titles" choice:"names" choice:"paths"`
+}
+
+type DumpFlags struct {}
+
 type MainFlags struct {
 	Global *GlobalFlags `group:"Global options"`
 	Library *LibraryFlags `group:"Library options"`
+	List *ListFlags `command:"list"`
 	Server *ServerFlags `command:"server"`
 	Dump *DumpFlags `command:"dump"`
 }
@@ -46,6 +53,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	_flags := & MainFlags {
 			Global : & GlobalFlags {},
 			Library : & LibraryFlags {},
+			List : & ListFlags {},
 			Server : & ServerFlags {},
 			Dump : & DumpFlags {},
 		}
@@ -64,7 +72,11 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	}
 	
 	if flagBoolOrDefault (_flags.Global.Help, false) {
-		_parser.WriteHelp (os.Stdout)
+		_buffer := bytes.NewBuffer (nil)
+		_parser.WriteHelp (_buffer)
+		if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
+			return errorw (0xf4170873, _error)
+		}
 		return nil
 	}
 	
@@ -105,6 +117,9 @@ func MainWithFlags (_command string, _flags *MainFlags) (*Error) {
 	
 	switch _command {
 		
+		case "list" :
+			return MainList (_flags.List, _globals, _index)
+		
 		case "server" :
 			return MainServer (_flags.Server, _globals, _index, _editor)
 		
@@ -114,6 +129,80 @@ func MainWithFlags (_command string, _flags *MainFlags) (*Error) {
 		default :
 			return errorw (0xaca17bb9, nil)
 	}
+}
+
+
+
+
+func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
+	
+	_type := flagStringOrDefault (_flags.Type, "documents")
+	_what := flagStringOrDefault (_flags.What, "identifiers")
+	
+	_list := make ([]string, 0, 1024)
+	
+	switch _type {
+		
+		case "libraries", "library" :
+			_libraries, _error := IndexLibrariesSelectAll (_index)
+			if _error != nil {
+				return _error
+			}
+			for _, _library := range _libraries {
+				_value := ""
+				switch _what {
+					case "identifiers", "identifier" :
+						_value = _library.Identifier
+					case "titles", "names", "title", "name" :
+						_value = _library.Name
+					case "paths", "path" :
+						_value = _library.Path
+					default :
+						return errorw (0x4fab7acb, nil)
+				}
+				if _value != "" {
+					_list = append (_list, _value)
+				}
+			}
+		
+		case "documents", "document" :
+			_documents, _error := IndexDocumentsSelectAll (_index)
+			if _error != nil {
+				return _error
+			}
+			for _, _document := range _documents {
+				_value := ""
+				switch _what {
+					case "identifiers", "identifier" :
+						_value = _document.Identifier
+					case "titles", "names", "title", "name" :
+						_value = _document.Title
+					case "paths", "path" :
+						_value = _document.Path
+					default :
+						return errorw (0x2f341212, nil)
+				}
+				if _value != "" {
+					_list = append (_list, _value)
+				}
+			}
+		
+		default :
+			return errorw (0x2c37fb9c, nil)
+	}
+	
+	sort.Strings (_list)
+	
+	_buffer := bytes.NewBuffer (nil)
+	for _, _value := range _list {
+		_buffer.WriteString (_value)
+		_buffer.WriteByte ('\n')
+	}
+	if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
+		return errorw (0xcf76965f, _error)
+	}
+	
+	return nil
 }
 
 
