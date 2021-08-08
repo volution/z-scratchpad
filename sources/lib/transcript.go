@@ -22,10 +22,20 @@ type Error struct {
 func logf (_slug rune, _code uint32, _format string, _arguments ... interface{}) () {
 	_pid := os.Getpid ()
 	_message := fmt.Sprintf (_format, _arguments ...)
-	if _slug != 's' {
-		log.Printf ("[z-scratchpad:%08d] [%c%c] [%08x]  %s\n", _pid, _slug, _slug, _code, _message)
-	} else {
-		log.Printf ("[z-scratchpad]  %s\n", _message)
+	switch _slug {
+		case 's' :
+			log.Printf ("[z-scratchpad]  %s\n", _message)
+		case '{' :
+			log.Printf ("[z-scratchpad:%08d] [%c%c] [%08x]\n\n", _pid, _slug, _slug, _code)
+		case '}' :
+			log.Printf ("\n[z-scratchpad:%08d] [%c%c] [%08x]\n", _pid, _slug, _slug, _code)
+		case '`' :
+			_lines, _ := stringSplitLines (_message)
+			for _, _line := range _lines {
+				log.Printf ("[z-scratchpad:%08d] [%c%c] [%08x]  %s\n", _pid, _slug, _slug, _code, _line)
+			}
+		default :
+			log.Printf ("[z-scratchpad:%08d] [%c%c] [%08x]  %s\n", _pid, _slug, _slug, _code, _message)
 	}
 }
 
