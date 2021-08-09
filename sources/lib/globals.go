@@ -33,6 +33,9 @@ type Globals struct {
 	
 	Executable string
 	Environment map[string]string
+	EnvironmentList []string
+	
+	DevNull *os.File
 }
 
 
@@ -85,11 +88,31 @@ func GlobalsNew (_executable string, _environment map[string]string) (*Globals, 
 	if _globals.XorgAvailable {
 		if _display, _ := _globals.Environment["DISPLAY"]; _display != "" {
 			_globals.XorgAvailable = true
+		} else {
+			_globals.XorgAvailable = false
 		}
 	}
-	if !_globals.TerminalAvailable {
+	if !_globals.XorgAvailable {
 		delete (_globals.Environment, "DISPLAY")
 	}
+	
+	if _file, _error := os.OpenFile (os.DevNull, os.O_RDWR, 0); _error == nil {
+		_globals.DevNull = _file
+	} else {
+		return nil, errorw (0x70754895, _error)
+	}
+	
+	_environmentList := make ([]string, 0, len (_globals.Environment))
+	for _name, _value := range _globals.Environment {
+		if (_name == "") || (_value == "") {
+			// FIXME:  We should issue a warning in this case!
+			delete (_globals.Environment, _name)
+			continue
+		}
+		_environmentVariable := _name + "=" + _value
+		_environmentList = append (_environmentList, _environmentVariable)
+	}
+	_globals.EnvironmentList = _environmentList
 	
 	return _globals, nil
 }

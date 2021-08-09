@@ -24,6 +24,7 @@ type editSession struct {
 	path string
 	file *os.File
 	command *exec.Cmd
+	synchronous bool
 	error *Error
 }
 
@@ -43,6 +44,12 @@ func EditorNew (_globals *Globals, _index *Index) (*Editor, *Error) {
 
 func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document, _synchronous bool) (*Error) {
 	
+	_globals := _editor.globals
+	
+	if !_globals.TerminalAvailable && !_globals.XorgAvailable {
+		return errorw (0x0175c9ec, nil)
+	}
+	
 	_path := _document.Path
 	if _path == "" {
 		return errorw (0xbdb59e67, nil)
@@ -56,15 +63,16 @@ func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document
 	}
 	
 	_session := & editSession {
-			globals : _editor.globals,
+			globals : _globals,
 			editor : _editor,
 			library : _library,
 			documentOld : _document,
 			path : _path,
 			file : _file,
+			synchronous : _synchronous,
 		}
 	
-	if !_synchronous {
+	if !_session.synchronous {
 		go editSessionRun (_session)
 		return nil
 	}
@@ -74,6 +82,12 @@ func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document
 
 
 func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName string, _synchronous bool) (*Error) {
+	
+	_globals := _editor.globals
+	
+	if !_globals.TerminalAvailable && !_globals.XorgAvailable {
+		return errorw (0x0175c9ec, nil)
+	}
 	
 	_path := path.Join (_library.Path, _documentName) + ".txt"
 	
@@ -85,14 +99,15 @@ func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName str
 	}
 	
 	_session := & editSession {
-			globals : _editor.globals,
+			globals : _globals,
 			editor : _editor,
 			library : _library,
 			path : _path,
 			file : _file,
+			synchronous : _synchronous,
 		}
 	
-	if !_synchronous {
+	if !_session.synchronous {
 		go editSessionRun (_session)
 		return nil
 	}
@@ -103,16 +118,39 @@ func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName str
 
 func editSessionRun (_session *editSession) (*Error) {
 	
+	_globals := _session.globals
+	
 	logf ('d', 0x0edfabbf, "[editor-session]  launching editor for `%s`...", _session.path)
 	
-	_command := & exec.Cmd {
-			Path : "/usr/bin/howl",
-			Args : []string {"howl", "--", _session.path},
-			Env : nil,
-			Stdin : nil,
-			Stdout : nil,
-			Stderr : nil,
-		}
+	_command := (*exec.Cmd) (nil)
+	
+	if _globals.TerminalAvailable {
+		
+		_command = & exec.Cmd {
+				Path : "/usr/bin/nano",
+				Args : []string {"nano", "--", _session.path},
+				Env : _globals.EnvironmentList,
+				Stdin : _globals.TerminalTty,
+				Stdout : _globals.TerminalTty,
+				Stderr : _globals.TerminalTty,
+			}
+		
+	} else if _globals.XorgAvailable {
+		
+		_command = & exec.Cmd {
+				Path : "/usr/bin/howl",
+				Args : []string {"howl", "--", _session.path},
+				Env : _globals.EnvironmentList,
+				Stdin : _globals.DevNull,
+				Stdout : _globals.DevNull,
+				Stderr : _globals.DevNull,
+			}
+		
+	} else {
+		_session.error = errorw (0xa2525849, nil)
+		return editSessionClose (_session)
+	}
+	
 	if _error := _command.Start (); _error != nil {
 		_session.error = errorw (0x4b48b0bc, _error)
 		return editSessionClose (_session)
@@ -207,7 +245,9 @@ func editSessionFinalize (_session *editSession) (*Error) {
 func editSessionClose (_session *editSession) (*Error) {
 	
 	if _session.error != nil {
-		logErrorf ('e', 0x35a898d8, _session.error, "[editor-session]  failed for `%s`!", _session.path)
+		if !_session.synchronous {
+			logErrorf ('e', 0x35a898d8, _session.error, "[editor-session]  failed for `%s`!", _session.path)
+		}
 		return _session.error
 	}
 	
