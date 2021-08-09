@@ -7,7 +7,6 @@ import "bytes"
 import "encoding/json"
 import "fmt"
 import "net"
-import "os"
 import "sort"
 
 
@@ -70,6 +69,11 @@ type MainFlags struct {
 
 func Main (_executable string, _arguments []string, _environment map[string]string) (*Error) {
 	
+	_globals, _error := GlobalsNew (_executable, _environment)
+	if _error != nil {
+		return _error
+	}
+	
 	_flags := & MainFlags {
 			Global : & GlobalFlags {},
 			Library : & LibraryFlags {},
@@ -91,9 +95,11 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		_buffer := bytes.NewBuffer (nil)
 		_parser.WriteHelp (_buffer)
 		if _log {
-			logf ('`', 0xa725b4bc, "\n%s\n", _buffer.String ())
+			if _globals.StdioIsTty && _globals.TerminalAvailable {
+				logf ('`', 0xa725b4bc, "\n%s\n", _buffer.String ())
+			}
 		} else {
-			if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
+			if _, _error := _buffer.WriteTo (_globals.Stdout); _error != nil {
 				return errorw (0xf4170873, _error)
 			}
 		}
@@ -119,18 +125,13 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		return _help (true, errorw (0x4cae2ee5, nil))
 	}
 	
-	return MainWithFlags (_parser.Active.Name, _flags)
+	return MainWithFlags (_parser.Active.Name, _flags, _globals)
 }
 
 
 
 
-func MainWithFlags (_command string, _flags *MainFlags) (*Error) {
-	
-	_globals, _error := GlobalsNew ()
-	if _error != nil {
-		return _error
-	}
+func MainWithFlags (_command string, _flags *MainFlags, _globals *Globals) (*Error) {
 	
 	_index, _error := IndexNew (_globals)
 	if _error != nil {
@@ -215,7 +216,7 @@ func MainExport (_flags *ExportFlags, _globals *Globals, _index *Index) (*Error)
 			return errorw (0x326240d3, nil)
 	}
 	
-	if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
+	if _, _error := _buffer.WriteTo (_globals.Stdout); _error != nil {
 		return errorw (0xa797b17f, _error)
 	}
 	
@@ -378,7 +379,7 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 			return errorw (0x4def007c, nil)
 	}
 	
-	if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
+	if _, _error := _buffer.WriteTo (_globals.Stdout); _error != nil {
 		return errorw (0xcf76965f, _error)
 	}
 	
@@ -435,7 +436,7 @@ func MainDump (_flags *DumpFlags, _globals *Globals, _index *Index) (*Error) {
 		_buffer.WriteString ("\n")
 	}
 	
-	if _, _error := _buffer.WriteTo (os.Stdout); _error != nil {
+	if _, _error := _buffer.WriteTo (_globals.Stdout); _error != nil {
 		return errorw (0xbf6a449c, _error)
 	}
 	
