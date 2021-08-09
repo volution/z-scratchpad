@@ -55,8 +55,11 @@ func logErrorf (_slug rune, _code uint32, _error *Error, _format string, _argume
 			log.Printf ("[z-scratchpad:%08d] [%c%c] [%08x]  %s\n", _pid, _slug, _slug, _error.Code, "unexpected error encountered!")
 		}
 		if _error.Error != nil {
-			log.Printf ("[z-scratchpad:%08d] [%c%c] [%08x]  %s\n", _pid, _slug, _slug, _error.Code, _error.Error.Error ())
-			log.Printf ("[z-scratchpad:%08d] [%c%c] [%08x]  %#v\n", _pid, _slug, _slug, _error.Code, _error.Error)
+			_errorMessage := _error.Error.Error ()
+			if _errorMessage != "" {
+				log.Printf ("[z-scratchpad:%08d] [%c%c] [%08x]  >> %s\n", _pid, _slug, _slug, _error.Code, _errorMessage)
+			}
+//			log.Printf ("[z-scratchpad:%08d] [%c%c] [%08x]  >> %#v\n", _pid, _slug, _slug, _error.Code, _error.Error)
 		}
 	}
 }
@@ -68,7 +71,7 @@ func abortError (_error *Error) (*Error) {
 
 func abortErrorf (_error *Error, _code uint32, _format string, _arguments ... interface{}) (*Error) {
 	logErrorf ('!', _code, _error, _format, _arguments ...)
-//	logf ('!', 0xb7a5fb86, "aborting!")
+	logf ('!', 0xb7a5fb86, "aborting!")
 	os.Exit (1)
 	panic (0xa235deea)
 }
