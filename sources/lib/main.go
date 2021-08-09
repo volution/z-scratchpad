@@ -37,6 +37,14 @@ type ListFlags struct {
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
 }
 
+type SelectFlags struct {
+	Library *string `long:"library" short:"l" value-name:"{identifier}"`
+	Type *string `long:"type" short:"t" choice:"libraries" choice:"documents"`
+	What *string `long:"what" short:"w" choice:"identifiers" choice:"titles" choice:"names" choice:"paths"`
+	How *string `long:"how" short:"W" choice:"identifiers" choice:"titles" choice:"names" choice:"pahs"`
+	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
+}
+
 type ExportFlags struct {
 	Document *string `long:"document" short:"d" required:"-" value-name:"{identifier}"`
 	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html"`
@@ -57,6 +65,7 @@ type MainFlags struct {
 	Global *GlobalFlags `group:"Global options"`
 	Library *LibraryFlags `group:"Library options"`
 	List *ListFlags `command:"list"`
+	Select *SelectFlags `command:"select"`
 	Export *ExportFlags `command:"export"`
 	Edit *EditFlags `command:"edit"`
 	Create *CreateFlags `command:"create"`
@@ -78,6 +87,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			Global : & GlobalFlags {},
 			Library : & LibraryFlags {},
 			List : & ListFlags {},
+			Select : & SelectFlags {},
 			Export : & ExportFlags {},
 			Edit : & EditFlags {},
 			Create : & CreateFlags {},
@@ -152,6 +162,9 @@ func MainWithFlags (_command string, _flags *MainFlags, _globals *Globals) (*Err
 		
 		case "list" :
 			return MainList (_flags.List, _globals, _index)
+		
+		case "select" :
+			return MainSelect (_flags.Select, _globals, _index, _editor)
 		
 		case "export" :
 			return MainExport (_flags.Export, _globals, _index)
@@ -276,16 +289,79 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 	_what := flagStringOrDefault (_flags.What, "identifiers")
 	_format := flagStringOrDefault (_flags.Format, "text")
 	
-	_library := (*Library) (nil)
-	if flagStringOrDefault (_flags.Library, "") != "" {
-		if _library_0, _error := WorkflowLibraryResolve (*_flags.Library, _index); _error == nil {
-			_library = _library_0
+	_options, _error := mainListOptions (flagStringOrDefault (_flags.Library, ""), _type, _what, "identifiers", _index)
+	if _error != nil {
+		return _error
+	}
+	
+	_list := make ([]string, 0, len (_options))
+	for _, _option := range _options {
+		_value := _option[1]
+		_list = append (_list, _value)
+	}
+	
+	return mainListOutput (_list, _format, _globals)
+}
+
+
+func MainSelect (_flags *SelectFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
+	_type := flagStringOrDefault (_flags.Type, "documents")
+	_what := flagStringOrDefault (_flags.What, "identifiers")
+	_how := flagStringOrDefault (_flags.How, "titles")
+	_format := flagStringOrDefault (_flags.Format, "text")
+	
+	_options, _error := mainListOptions (flagStringOrDefault (_flags.Library, ""), _type, _what, _how, _index)
+	if _error != nil {
+		return _error
+	}
+	
+	_labels := make ([]string, 0, len (_options))
+	_values := make (map[string][]string, len (_options))
+	for _, _option := range _options {
+		_label := _option[0]
+		_value := _option[1]
+		_labels = append (_labels, _label)
+		if _, _exists := _values[_label]; _exists {
+			// FIXME:  How should we handle duplicate labels?
+			_values[_label] = append (_values[_label], _value)
 		} else {
-			return errorw (0x5a3e46e1, nil)
+			_values[_label] = []string { _value }
 		}
 	}
 	
+	sort.Strings (_labels)
+	
+	_selection, _error := EditorSelect (_editor, _labels)
+	if _error != nil {
+		return _error
+	}
+	
 	_list := make ([]string, 0, 1024)
+	for _, _label := range _selection {
+		if _values_0, _exists := _values[_label]; _exists {
+			_list = append (_list, _values_0 ...)
+		} else {
+			return errorw (0xdbff774c, nil)
+		}
+	}
+	
+	return mainListOutput (_list, _format, _globals)
+}
+
+
+func mainListOptions (_libraryIdentifier string, _type string, _what string, _how string, _index *Index) ([][2]string, *Error) {
+	
+	_library := (*Library) (nil)
+	if _libraryIdentifier != "" {
+		if _library_0, _error := WorkflowLibraryResolve (_libraryIdentifier, _index); _error == nil {
+			_library = _library_0
+		} else {
+			return nil, errorw (0x5a3e46e1, nil)
+		}
+	}
+	
+	_options := make ([][2]string, 0, 1024)
 	
 	switch _type {
 		
@@ -297,7 +373,7 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 				if _libraries_0, _error := IndexLibrariesSelectAll (_index); _error == nil {
 					_libraries = _libraries_0
 				} else {
-					return _error
+					return nil, _error
 				}
 			}
 			for _, _library := range _libraries {
@@ -307,13 +383,30 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 						_value = _library.Identifier
 					case "titles", "names", "title", "name" :
 						_value = _library.Name
+						if _value == "" {
+							_value = "[" + _library.Identifier + "]"
+						}
 					case "paths", "path" :
 						_value = _library.Path
 					default :
-						return errorw (0x4fab7acb, nil)
+						return nil, errorw (0x4fab7acb, nil)
 				}
-				if _value != "" {
-					_list = append (_list, _value)
+				_label := ""
+				switch _how {
+					case "identifiers", "identifier" :
+						_label = _library.Identifier
+					case "titles", "names", "title", "name" :
+						_label = _library.Name
+					case "paths", "path" :
+						_label = _library.Path
+					default :
+						return nil, errorw (0xf0f17afb, nil)
+				}
+				if _label == "" {
+					_label = "[" + _library.Identifier + "]"
+				}
+				if (_label != "") && (_value != "") {
+					_options = append (_options, [2]string { _label, _value })
 				}
 			}
 		
@@ -323,13 +416,13 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 				if _documents_0, _error := IndexDocumentsSelectInLibrary (_index, _library.Identifier); _error == nil {
 					_documents = _documents_0
 				} else {
-					return _error
+					return nil, _error
 				}
 			} else {
 				if _documents_0, _error := IndexDocumentsSelectAll (_index); _error == nil {
 					_documents = _documents_0
 				} else {
-					return _error
+					return nil, _error
 				}
 			}
 			for _, _document := range _documents {
@@ -339,19 +432,42 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 						_value = _document.Identifier
 					case "titles", "names", "title", "name" :
 						_value = _document.Title
+						if _value == "" {
+							_value = "[" + _document.Identifier + "]"
+						}
 					case "paths", "path" :
 						_value = _document.Path
 					default :
-						return errorw (0x2f341212, nil)
+						return nil, errorw (0x2f341212, nil)
 				}
-				if _value != "" {
-					_list = append (_list, _value)
+				_label := ""
+				switch _how {
+					case "identifiers", "identifier" :
+						_label = _document.Identifier
+					case "titles", "names", "title", "name" :
+						_label = _document.Title
+					case "paths", "path" :
+						_label = _document.Path
+					default :
+						return nil, errorw (0x9f3c1037, nil)
+				}
+				if _label == "" {
+					_label = "[" + _document.Identifier + "]"
+				}
+				if (_label != "") && (_value != "") {
+					_options = append (_options, [2]string { _label, _value })
 				}
 			}
 		
 		default :
-			return errorw (0x2c37fb9c, nil)
+			return nil, errorw (0x2c37fb9c, nil)
 	}
+	
+	return _options, nil
+}
+
+
+func mainListOutput (_list []string, _format string, _globals *Globals) (*Error) {
 	
 	sort.Strings (_list)
 	

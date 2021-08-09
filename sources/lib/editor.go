@@ -3,9 +3,13 @@
 package zscratchpad
 
 
+import "bufio"
+import "bytes"
+import "io"
 import "os"
 import "os/exec"
 import "path"
+import "sync"
 
 
 
@@ -235,6 +239,105 @@ func editSessionClose (_session *editSession) (*Error) {
 
 
 
+func EditorSelect (_editor *Editor, _options []string) ([]string, *Error) {
+	
+	_globals := _editor.globals
+	
+	if !_globals.TerminalEnabled && !_globals.XorgEnabled {
+		return nil, errorw (0xdafc150d, nil)
+	}
+	
+	_command := (*exec.Cmd) (nil)
+	if _command_0, _error := EditorResolveSelectCommand (_editor); _error == nil {
+		_command = _command_0
+	} else {
+		return nil, _error
+	}
+	
+	_stdin, _error := _command.StdinPipe ()
+	if _error != nil {
+		return nil, errorw (0x5acfc6bd, _error)
+	}
+	// NOTE:  Due to race conditions within the goroutine, we leave this to be closed by the garbage collector.
+	// defer _stdin.Close ()
+	
+	_stdout, _error := _command.StdoutPipe ()
+	if _error != nil {
+		return nil, errorw (0x351240e9, _error)
+	}
+	// NOTE:  Due to race conditions within the goroutine, we leave this to be closed by the garbage collector.
+	// defer _stdout.Close ()
+	
+	if _error := _command.Start (); _error != nil {
+		return nil, errorw (0xd3c76e67, _error)
+	}
+	
+	_selection := make ([]string, 0, 16)
+	_waiter := & sync.WaitGroup {}
+	
+	_waiter.Add (1)
+	_stdinError := (*Error) (nil)
+	go func () () {
+			_buffer := bytes.NewBuffer (nil)
+			for _, _option := range _options {
+				_buffer.WriteString (_option)
+				_buffer.WriteByte ('\n')
+			}
+			if _, _error := _buffer.WriteTo (_stdin); _error != nil {
+				_stdinError = errorw (0x5cf9fd4b, _error)
+			}
+			if _error := _stdin.Close (); _error != nil {
+				_stdinError = errorw (0x610bd07e, _error)
+			}
+			_waiter.Done ()
+		} ()
+	
+	_waiter.Add (1)
+	_stdoutError := (*Error) (nil)
+	go func () () {
+			_buffer := bufio.NewReaderSize (_stdout, 4096)
+			for {
+				if _line, _error := _buffer.ReadString ('\n'); _error == nil {
+					_lineLen := len (_line)
+					if (_lineLen > 0) && (_line[_lineLen - 1] == '\n') {
+						_line = _line[: _lineLen - 1]
+					}
+					_selection = append (_selection, _line)
+				} else if _error == io.EOF {
+					if _line != "" {
+						_selection = append (_selection, _line)
+					}
+					break
+				} else {
+					_stdoutError = errorw (0x66b5573e, _error)
+					break
+				}
+			}
+			if _error := _stdout.Close (); _error != nil {
+				_stdoutError = errorw (0x39e45fb4, _error)
+			}
+			_waiter.Done ()
+		} ()
+	
+	_waiter.Wait ()
+	
+	if _error := _command.Wait (); _error != nil {
+		return nil, errorw (0xe7d64749, _error)
+	}
+	
+	if _stdinError != nil {
+		return nil, _stdinError
+	}
+	if _stdoutError != nil {
+		return nil, _stdoutError
+	}
+	
+	return _selection, nil
+}
+
+
+
+
 func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error) {
 	
 	_globals := _editor.globals
@@ -252,7 +355,7 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 			}
 		}
 		if _executable == "" {
-			for _, _executableName_0 := range []string { "x-edit", "nano", "vim", "emacs" } {
+			for _, _executableName_0 := range []string { "z-scratchpad--edit", "x-edit", "nano", "vim", "emacs" } {
 				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
 					_executable = _executable_0
 					_executableName = _executableName_0
@@ -267,7 +370,7 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 		_arguments := make ([]string, 0, 16)
 		_arguments = append (_arguments, _executable)
 		switch _executableName {
-			case "x-edit" :
+			case "z-scratchpad--edit", "x-edit" :
 				_arguments = append (_arguments, _path)
 			case "nano", "vim", "emacs" :
 				_arguments = append (_arguments, "--", _path)
@@ -291,7 +394,7 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 		_executable := ""
 		_executableName := ""
 		if _executable == "" {
-			for _, _executableName_0 := range []string { "x-edit", "howl", "sublime_text", "gvim", "emacs-gtk", "emacs-x11" } {
+			for _, _executableName_0 := range []string { "z-scratchpad--edit", "x-edit", "howl", "sublime_text", "gvim", "emacs-gtk", "emacs-x11" } {
 				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
 					_executable = _executable_0
 					_executableName = _executableName_0
@@ -306,7 +409,7 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 		_arguments := make ([]string, 0, 16)
 		_arguments = append (_arguments, _executable)
 		switch _executableName {
-			case "x-edit" :
+			case "z-scratchpad--edit", "x-edit" :
 				_arguments = append (_arguments, _path)
 			case "howl", "gvim", "emacs-gtk", "emacs-x11" :
 				_arguments = append (_arguments, "--", _path)
@@ -332,3 +435,98 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 		return nil, errorw (0xfe957df1, nil)
 	}
 }
+
+
+
+
+func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, *Error) {
+	
+	_globals := _editor.globals
+	
+	if _globals.TerminalEnabled {
+		
+		_executable := ""
+		_executableName := ""
+		if _executable == "" {
+			for _, _executableName_0 := range []string { "z-scratchpad--select", "x-select", "fzf" } {
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					break
+				}
+			}
+		}
+		if _executable == "" {
+			return nil, errorw (0x10e4bef3, nil)
+		}
+		
+		_arguments := make ([]string, 0, 32)
+		_arguments = append (_arguments, _executable)
+		switch _executableName {
+			case "z-scratchpad--select", "x-select" :
+				// NOP
+			case "fzf" :
+				_arguments = append (_arguments,
+						"--prompt", ": ",
+						"-e", "-x", "-i",
+						"--tiebreak", "begin,length,index",
+						"--no-mouse", "--no-color", "--no-bold",
+					)
+			default :
+				// NOP
+		}
+		
+		_command := & exec.Cmd {
+				Path : _executable,
+				Args : _arguments,
+				Env : _globals.EnvironmentList,
+				Stderr : _globals.TerminalTty,
+			}
+		
+		return _command, nil
+		
+	} else if _globals.XorgEnabled {
+		
+		_executable := ""
+		_executableName := ""
+		if _executable == "" {
+			for _, _executableName_0 := range []string { "z-scratchpad--select", "x-select", "rofi", "dmenu" } {
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					break
+				}
+			}
+		}
+		if _executable == "" {
+			return nil, errorw (0xcdb975c1, nil)
+		}
+		
+		_arguments := make ([]string, 0, 32)
+		_arguments = append (_arguments, _executable)
+		switch _executableName {
+			case "z-scratchpad--select", "x-select" :
+				// NOP
+			case "rofi" :
+				_arguments = append (_arguments, "-dmenu", "-p", "", "-i", "-no-custom", "-matching-negate-char", "\\x0")
+			case "dmenu" :
+				_arguments = append (_arguments, "-p", "", "-l", "16", "-i")
+			default :
+				// NOP
+		}
+		
+		_command := & exec.Cmd {
+				Path : _executable,
+				Args : _arguments,
+				Env : _globals.EnvironmentList,
+				Stderr : _globals.DevNull,
+			}
+		
+		return _command, nil
+		
+	} else {
+		
+		return nil, errorw (0xdced1bf6, nil)
+	}
+}
+
