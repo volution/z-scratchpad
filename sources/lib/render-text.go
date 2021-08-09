@@ -14,7 +14,7 @@ func DocumentRenderToText (_document *Document) (string, *Error) {
 	_format := _document.Format
 	if _format == "" {
 		_format = "text"
-		// return "", errorf (0xaff80238, "format empty")
+		// return "", errorf (0xb50eb076, "format empty")
 	}
 	
 	_render := ""
@@ -32,7 +32,7 @@ func DocumentRenderToText (_document *Document) (string, *Error) {
 			_render, _error = documentRenderCommonMarkToText (_document.Body)
 		
 		default :
-			return "", errorf (0xaf60ea6d, "format invalid `%s`", _document.Format)
+			return "", errorf (0x215b1603, "format invalid `%s`", _document.Format)
 	}
 	
 	if _error != nil {

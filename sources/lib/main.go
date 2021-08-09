@@ -259,11 +259,11 @@ func MainEdit (_flags *EditFlags, _globals *Globals, _index *Index, _editor *Edi
 		}
 		switch len (_options) {
 			case 0 :
-				return errorw (0x29abcd02, nil)
+				return errorw (0x2b83fe67, nil)
 			case 1 :
 				_identifier = _options[0][1]
 			default :
-				return errorw (0x22d4ddbe, nil)
+				return errorw (0x979cfe4c, nil)
 		}
 		
 	} else {

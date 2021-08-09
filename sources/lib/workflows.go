@@ -42,7 +42,7 @@ func WorkflowDocumentCreate (_identifierUnsafe string, _index *Index, _editor *E
 		return _error
 	}
 	if _documentExisting != nil {
-		return errorw (0x054e7a60, nil)
+		return errorw (0x538cfbae, nil)
 	}
 	
 	if _libraryIdentifier == "" {

@@ -51,7 +51,7 @@ func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document
 	_globals := _editor.globals
 	
 	if !_globals.TerminalEnabled && !_globals.XorgEnabled {
-		return errorw (0x0175c9ec, nil)
+		return errorw (0xa302fef3, nil)
 	}
 	
 	_path := _document.Path
@@ -59,7 +59,7 @@ func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document
 		return errorw (0xbdb59e67, nil)
 	}
 	
-	logf ('d', 0x0edfabbf, "[editor-session]  opening file for `%s`...", _path)
+	logf ('d', 0x226a3cbd, "[editor-session]  opening file for `%s`...", _path)
 	
 	_file, _error := os.OpenFile (_path, os.O_RDWR, 0)
 	if _error != nil {
