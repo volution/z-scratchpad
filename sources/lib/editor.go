@@ -118,36 +118,11 @@ func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName str
 
 func editSessionRun (_session *editSession) (*Error) {
 	
-	_globals := _session.globals
-	
 	logf ('d', 0x0edfabbf, "[editor-session]  launching editor for `%s`...", _session.path)
 	
-	_command := (*exec.Cmd) (nil)
-	
-	if _globals.TerminalAvailable {
-		
-		_command = & exec.Cmd {
-				Path : "/usr/bin/nano",
-				Args : []string {"nano", "--", _session.path},
-				Env : _globals.EnvironmentList,
-				Stdin : _globals.TerminalTty,
-				Stdout : _globals.TerminalTty,
-				Stderr : _globals.TerminalTty,
-			}
-		
-	} else if _globals.XorgAvailable {
-		
-		_command = & exec.Cmd {
-				Path : "/usr/bin/howl",
-				Args : []string {"howl", "--", _session.path},
-				Env : _globals.EnvironmentList,
-				Stdin : _globals.DevNull,
-				Stdout : _globals.DevNull,
-				Stderr : _globals.DevNull,
-			}
-		
-	} else {
-		_session.error = errorw (0xa2525849, nil)
+	_command, _error := EditorResolveEditCommand (_session.editor, _session.path)
+	if _error != nil {
+		_session.error = _error
 		return editSessionClose (_session)
 	}
 	
@@ -155,6 +130,7 @@ func editSessionRun (_session *editSession) (*Error) {
 		_session.error = errorw (0x4b48b0bc, _error)
 		return editSessionClose (_session)
 	}
+	
 	_session.command = _command
 	
 	logf ('d', 0xff9ec344, "[editor-session]  waiting editor for `%s`...", _session.path)
@@ -256,3 +232,103 @@ func editSessionClose (_session *editSession) (*Error) {
 	return nil
 }
 
+
+
+
+func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error) {
+	
+	_globals := _editor.globals
+	
+	if _globals.TerminalAvailable {
+		
+		_executable := ""
+		_executableName := ""
+		if _executableName_0, _ := _globals.Environment["EDITOR"]; _executableName_0 != "" {
+			if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+				_executable = _executable_0
+				_executableName = _executableName_0
+			} else {
+				return nil, errorw (0xccba26a3, _error)
+			}
+		}
+		if _executable == "" {
+			for _, _executableName_0 := range []string { "x-edit", "nano", "vim", "emacs" } {
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					break
+				}
+			}
+		}
+		if _executable == "" {
+			return nil, errorw (0x2eebed4d, nil)
+		}
+		
+		_arguments := make ([]string, 0, 16)
+		_arguments = append (_arguments, _executable)
+		switch _executableName {
+			case "x-edit" :
+				_arguments = append (_arguments, _path)
+			case "nano", "vim", "emacs" :
+				_arguments = append (_arguments, "--", _path)
+			default :
+				_arguments = append (_arguments, _path)
+		}
+		
+		_command := & exec.Cmd {
+				Path : _executable,
+				Args : _arguments,
+				Env : _globals.EnvironmentList,
+				Stdin : _globals.TerminalTty,
+				Stdout : _globals.TerminalTty,
+				Stderr : _globals.TerminalTty,
+			}
+		
+		return _command, nil
+		
+	} else if _globals.XorgAvailable {
+		
+		_executable := ""
+		_executableName := ""
+		if _executable == "" {
+			for _, _executableName_0 := range []string { "x-edit", "howl", "sublime_text", "gvim", "emacs-gtk", "emacs-x11" } {
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					break
+				}
+			}
+		}
+		if _executable == "" {
+			return nil, errorw (0x5a7c2f6b, nil)
+		}
+		
+		_arguments := make ([]string, 0, 16)
+		_arguments = append (_arguments, _executable)
+		switch _executableName {
+			case "x-edit" :
+				_arguments = append (_arguments, _path)
+			case "howl", "gvim", "emacs-gtk", "emacs-x11" :
+				_arguments = append (_arguments, "--", _path)
+			case "sublime_text" :
+				_arguments = append (_arguments, "--new-window", "--wait", "--", _path)
+			default :
+				_arguments = append (_arguments, _path)
+		}
+		
+		_command := & exec.Cmd {
+				Path : _executable,
+				Args : _arguments,
+				Env : _globals.EnvironmentList,
+				Stdin : _globals.DevNull,
+				Stdout : _globals.DevNull,
+				Stderr : _globals.DevNull,
+			}
+		
+		return _command, nil
+		
+	} else {
+		
+		return nil, errorw (0xfe957df1, nil)
+	}
+}
