@@ -32,16 +32,16 @@ type ServerFlags struct {
 
 type ListFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
-	Type *string `long:"type" short:"t" choice:"libraries" choice:"documents"`
-	What *string `long:"what" short:"w" choice:"identifiers" choice:"titles" choice:"names" choice:"paths"`
+	Type *string `long:"type" short:"t" choice:"library" choice:"document"`
+	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
 }
 
 type SelectFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
-	Type *string `long:"type" short:"t" choice:"libraries" choice:"documents"`
-	What *string `long:"what" short:"w" choice:"identifiers" choice:"titles" choice:"names" choice:"paths"`
-	How *string `long:"how" short:"W" choice:"identifiers" choice:"titles" choice:"names" choice:"pahs"`
+	Type *string `long:"type" short:"t" choice:"library" choice:"document"`
+	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path"`
+	How *string `long:"how" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"pah"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
 }
 
@@ -51,12 +51,15 @@ type ExportFlags struct {
 }
 
 type EditFlags struct {
-	Document *string `long:"document" short:"d" required:"-" value-name:"{identifier}"`
+	Library *string `long:"library" short:"l" value-name:"{identifier}"`
+	Document *string `long:"document" short:"d" value-name:"{identifier}"`
+	Select *bool `long:"select" short:"s"`
 }
 
 type CreateFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Document *string `long:"document" short:"d" value-name:"{identifier}"`
+	Select *bool `long:"select" short:"s"`
 }
 
 type DumpFlags struct {}
@@ -241,11 +244,42 @@ func MainExport (_flags *ExportFlags, _globals *Globals, _index *Index) (*Error)
 
 func MainEdit (_flags *EditFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
-	if _flags.Document == nil {
-		return errorw (0xaf99b5bb, nil)
+	_flagSelect := flagBoolOrDefault (_flags.Select, false)
+	if _flagSelect && (_flags.Document != nil) {
+		return errorw (0x17114913, nil)
 	}
 	
-	return WorkflowDocumentEdit (*_flags.Document, _index, _editor, true)
+	_identifier := ""
+	if _flagSelect {
+		
+		_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
+		_options, _error := mainListOptionsAndSelect (_libraryIdentifier, "document", "identifier", "title", _index, _editor)
+		if _error != nil {
+			return _error
+		}
+		switch len (_options) {
+			case 0 :
+				return errorw (0x29abcd02, nil)
+			case 1 :
+				_identifier = _options[0][1]
+			default :
+				return errorw (0x22d4ddbe, nil)
+		}
+		
+	} else {
+		
+		if _library, _document, _error := mainMergeLibraryAndDocumentIdentifiers (_flags.Library, _flags.Document); _error != nil {
+			return _error
+		} else if _document != "" {
+			_identifier = _document
+		} else if _library != "" {
+			return errorw (0xdbe83c6c, nil)
+		} else {
+			return errorw (0xa0fc749c, nil)
+		}
+	}
+	
+	return WorkflowDocumentEdit (_identifier, _index, _editor, true)
 }
 
 
@@ -253,27 +287,40 @@ func MainEdit (_flags *EditFlags, _globals *Globals, _index *Index, _editor *Edi
 
 func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
-	_identifier := ""
+	_flagSelect := flagBoolOrDefault (_flags.Select, false)
+	if _flagSelect && (_flags.Document != nil) {
+		return errorw (0x2a0a4328, nil)
+	}
+	if _flagSelect && (_flags.Library != nil) {
+		return errorw (0x4d3444df, nil)
+	}
 	
-	if _flags.Library != nil {
-		if _flags.Document != nil {
-			if _identifier_0, _error := DocumentFormatIdentifier (*_flags.Library, *_flags.Document); _error == nil {
-				_identifier = _identifier_0
-			} else {
-				return _error
-			}
-		} else {
-			if _identifier_0, _error := LibraryParseIdentifier (*_flags.Library); _error == nil {
-				_identifier = _identifier_0
-			} else {
-				return _error
-			}
-		}
-	} else if _flags.Document != nil {
-		if _identifier_0, _, _, _error := DocumentParseIdentifier (*_flags.Document); _error == nil {
-			_identifier = _identifier_0
-		} else {
+	_identifier := ""
+	if _flagSelect {
+		
+		_options, _error := mainListOptionsAndSelect ("", "library", "identifier", "title", _index, _editor)
+		if _error != nil {
 			return _error
+		}
+		switch len (_options) {
+			case 0 :
+				return errorw (0x29abcd02, nil)
+			case 1 :
+				_identifier = _options[0][1]
+			default :
+				return errorw (0x22d4ddbe, nil)
+		}
+		
+	} else {
+		
+		if _library, _document, _error := mainMergeLibraryAndDocumentIdentifiers (_flags.Library, _flags.Document); _error != nil {
+			return _error
+		} else if _document != "" {
+			_identifier = _document
+		} else if _library != "" {
+			_identifier = _library
+		} else {
+			return errorw (0x22cc7dea, nil)
 		}
 	}
 	
@@ -285,68 +332,50 @@ func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor 
 
 func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 	
+	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
 	_type := flagStringOrDefault (_flags.Type, "documents")
 	_what := flagStringOrDefault (_flags.What, "identifiers")
 	_format := flagStringOrDefault (_flags.Format, "text")
 	
-	_options, _error := mainListOptions (flagStringOrDefault (_flags.Library, ""), _type, _what, "identifiers", _index)
+	_options, _error := mainListOptions (_libraryIdentifier, _type, _what, "identifiers", _index)
 	if _error != nil {
 		return _error
 	}
 	
-	_list := make ([]string, 0, len (_options))
-	for _, _option := range _options {
-		_value := _option[1]
-		_list = append (_list, _value)
-	}
-	
-	return mainListOutput (_list, _format, _globals)
+	return mainListOutput (_options, _format, _globals)
 }
 
 
 func MainSelect (_flags *SelectFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
+	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
 	_type := flagStringOrDefault (_flags.Type, "documents")
 	_what := flagStringOrDefault (_flags.What, "identifiers")
 	_how := flagStringOrDefault (_flags.How, "titles")
 	_format := flagStringOrDefault (_flags.Format, "text")
 	
-	_options, _error := mainListOptions (flagStringOrDefault (_flags.Library, ""), _type, _what, _how, _index)
+	_options, _error := mainListOptionsAndSelect (_libraryIdentifier, _type, _what, _how, _index, _editor)
 	if _error != nil {
 		return _error
 	}
 	
-	_labels := make ([]string, 0, len (_options))
-	_values := make (map[string][]string, len (_options))
-	for _, _option := range _options {
-		_label := _option[0]
-		_value := _option[1]
-		_labels = append (_labels, _label)
-		if _, _exists := _values[_label]; _exists {
-			// FIXME:  How should we handle duplicate labels?
-			_values[_label] = append (_values[_label], _value)
-		} else {
-			_values[_label] = []string { _value }
-		}
-	}
+	return mainListOutput (_options, _format, _globals)
+}
+
+
+func mainListOptionsAndSelect (_libraryIdentifier string, _type string, _what string, _how string, _index *Index, _editor *Editor) ([][2]string, *Error) {
 	
-	sort.Strings (_labels)
-	
-	_selection, _error := EditorSelect (_editor, _labels)
+	_options, _error := mainListOptions (_libraryIdentifier, _type, _what, _how, _index)
 	if _error != nil {
-		return _error
+		return nil, _error
 	}
 	
-	_list := make ([]string, 0, 1024)
-	for _, _label := range _selection {
-		if _values_0, _exists := _values[_label]; _exists {
-			_list = append (_list, _values_0 ...)
-		} else {
-			return errorw (0xdbff774c, nil)
-		}
+	_selection, _error := mainListSelect (_options, _editor)
+	if _error != nil {
+		return nil, _error
 	}
 	
-	return mainListOutput (_list, _format, _globals)
+	return _selection, nil
 }
 
 
@@ -467,7 +496,51 @@ func mainListOptions (_libraryIdentifier string, _type string, _what string, _ho
 }
 
 
-func mainListOutput (_list []string, _format string, _globals *Globals) (*Error) {
+func mainListSelect (_options [][2]string, _editor *Editor) ([][2]string, *Error) {
+	
+	_labels := make ([]string, 0, len (_options))
+	_values := make (map[string][]string, len (_options))
+	for _, _option := range _options {
+		_label := _option[0]
+		_value := _option[1]
+		_labels = append (_labels, _label)
+		if _, _exists := _values[_label]; _exists {
+			// FIXME:  How should we handle duplicate labels?
+			_values[_label] = append (_values[_label], _value)
+		} else {
+			_values[_label] = []string { _value }
+		}
+	}
+	
+	sort.Strings (_labels)
+	
+	_selection_0, _error := EditorSelect (_editor, _labels)
+	if _error != nil {
+		return nil, _error
+	}
+	
+	_selection := make ([][2]string, 0, 16)
+	for _, _label := range _selection_0 {
+		if _values_0, _exists := _values[_label]; _exists {
+			for _, _value := range _values_0 {
+				_selection = append (_selection, [2]string { _label, _value})
+			}
+		} else {
+			return nil, errorw (0xdbff774c, nil)
+		}
+	}
+	
+	return _selection, nil
+}
+
+
+func mainListOutput (_options [][2]string, _format string, _globals *Globals) (*Error) {
+	
+	_list := make ([]string, 0, len (_options))
+	for _, _option := range _options {
+		_value := _option[1]
+		_list = append (_list, _value)
+	}
 	
 	sort.Strings (_list)
 	
@@ -656,6 +729,41 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 	}
 	
 	return nil
+}
+
+
+
+
+func mainMergeLibraryAndDocumentIdentifiers (_library *string, _document *string) (string, string, *Error) {
+	
+	if _library != nil {
+		
+		if _document != nil {
+			if _identifier, _error := DocumentFormatIdentifier (*_library, *_document); _error == nil {
+				return "", _identifier, nil
+			} else {
+				return "", "", _error
+			}
+		} else {
+			if _identifier, _error := LibraryParseIdentifier (*_library); _error == nil {
+				return _identifier, "", nil
+			} else {
+				return "", "", _error
+			}
+		}
+		
+	} else if _document != nil {
+		
+		if _identifier, _, _, _error := DocumentParseIdentifier (*_document); _error == nil {
+			return "", _identifier, nil
+		} else {
+			return "", "", _error
+		}
+		
+	} else {
+		
+		return "", "", nil
+	}
 }
 
 
