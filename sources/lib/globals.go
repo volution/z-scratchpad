@@ -4,17 +4,17 @@ package zscratchpad
 
 
 import "os"
-import "sync"
 
 
 import "github.com/mattn/go-isatty"
+import "github.com/subchen/go-trylock/v2"
 
 
 
 
 type Globals struct {
 	
-	Mutex *sync.Mutex
+	mutex trylock.TryLocker
 	
 	Stdin *os.File
 	Stdout *os.File
@@ -29,6 +29,7 @@ type Globals struct {
 	TerminalEnabled bool
 	TerminalType string
 	TerminalTty *os.File
+	terminalMutex trylock.TryLocker
 	
 	XorgAvailable bool
 	XorgEnabled bool
@@ -47,7 +48,8 @@ func GlobalsNew (_executable string, _environment map[string]string) (*Globals, 
 	
 	_globals := & Globals {
 			
-			Mutex : & sync.Mutex {},
+			mutex : trylock.New (),
+			terminalMutex : trylock.New (),
 			
 			Stdin : os.Stdin,
 			Stdout : os.Stdout,
@@ -121,6 +123,36 @@ func GlobalsNew (_executable string, _environment map[string]string) (*Globals, 
 	_globals.EnvironmentList = _environmentList
 	
 	return _globals, nil
+}
+
+
+
+
+func (_globals *Globals) MutexLock () () {
+	_globals.mutex.Lock ()
+}
+
+func (_globals *Globals) MutexUnlock () () {
+	_globals.mutex.Unlock ()
+}
+
+func (_globals *Globals) MutexTryLock () (bool) {
+	return _globals.mutex.TryLock (nil)
+}
+
+
+
+
+func (_globals *Globals) TerminalMutexLock () () {
+	_globals.terminalMutex.Lock ()
+}
+
+func (_globals *Globals) TerminalMutexUnlock () () {
+	_globals.terminalMutex.Unlock ()
+}
+
+func (_globals *Globals) TerminalMutexTryLock () (bool) {
+	return _globals.terminalMutex.TryLock (nil)
 }
 
 

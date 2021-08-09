@@ -89,8 +89,8 @@ func (_handler *serverHandler) ServeHTTP (_response http.ResponseWriter, _reques
 
 func ServerHandle (_server *Server, _request *http.Request, _response http.ResponseWriter) (*Error) {
 	
-	_server.globals.Mutex.Lock ()
-	defer _server.globals.Mutex.Unlock ()
+	_server.globals.MutexLock ()
+	defer _server.globals.MutexUnlock ()
 	
 	if _request.Method != "GET" {
 		return errorw (0x7f32157c, nil)

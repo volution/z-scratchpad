@@ -122,6 +122,13 @@ func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName str
 
 func editSessionRun (_session *editSession) (*Error) {
 	
+	_globals := _session.globals
+	
+	if ! _globals.TerminalMutexTryLock () {
+		return errorw (0x5fcbecde, nil)
+	}
+	defer _globals.TerminalMutexUnlock ()
+	
 	logf ('d', 0x0edfabbf, "[editor-session]  launching editor for `%s`...", _session.path)
 	
 	_command, _error := EditorResolveEditCommand (_session.editor, _session.path)
@@ -196,8 +203,8 @@ func editSessionFinalize (_session *editSession) (*Error) {
 		return editSessionClose (_session)
 	}
 	
-	_session.globals.Mutex.Lock ()
-	defer _session.globals.Mutex.Unlock ()
+	_session.globals.MutexLock ()
+	defer _session.globals.MutexUnlock ()
 	
 	if _session.documentOld != nil {
 		
@@ -246,6 +253,11 @@ func EditorSelect (_editor *Editor, _options []string) ([]string, *Error) {
 	if !_globals.TerminalEnabled && !_globals.XorgEnabled {
 		return nil, errorw (0xdafc150d, nil)
 	}
+	
+	if ! _globals.TerminalMutexTryLock () {
+		return nil, errorw (0xcba65bc9, nil)
+	}
+	defer _globals.TerminalMutexUnlock ()
 	
 	_command := (*exec.Cmd) (nil)
 	if _command_0, _error := EditorResolveSelectCommand (_editor); _error == nil {
