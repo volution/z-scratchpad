@@ -26,10 +26,12 @@ type Globals struct {
 	StdioIsTty bool
 	
 	TerminalAvailable bool
+	TerminalEnabled bool
 	TerminalType string
 	TerminalTty *os.File
 	
 	XorgAvailable bool
+	XorgEnabled bool
 	
 	Executable string
 	Environment map[string]string
@@ -60,7 +62,9 @@ func GlobalsNew (_executable string, _environment map[string]string) (*Globals, 
 	_globals.StderrIsTty = isTerminal (_globals.Stderr)
 	_globals.StdioIsTty = _globals.StdinIsTty && _globals.StdoutIsTty && _globals.StderrIsTty
 	
-	// NOTE:  Setting these on false would disable usage of terminal / Xorg.
+	_globals.TerminalEnabled = true
+	_globals.XorgEnabled = true
+	
 	_globals.TerminalAvailable = true
 	_globals.XorgAvailable = true
 	
@@ -81,6 +85,7 @@ func GlobalsNew (_executable string, _environment map[string]string) (*Globals, 
 		}
 	}
 	if !_globals.TerminalAvailable {
+		_globals.TerminalEnabled = false
 		_globals.TerminalType = "dumb"
 		_globals.Environment["TERM"] = "dumb"
 	}
@@ -93,6 +98,7 @@ func GlobalsNew (_executable string, _environment map[string]string) (*Globals, 
 		}
 	}
 	if !_globals.XorgAvailable {
+		_globals.XorgEnabled = false
 		delete (_globals.Environment, "DISPLAY")
 	}
 	

@@ -46,7 +46,7 @@ func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document
 	
 	_globals := _editor.globals
 	
-	if !_globals.TerminalAvailable && !_globals.XorgAvailable {
+	if !_globals.TerminalEnabled && !_globals.XorgEnabled {
 		return errorw (0x0175c9ec, nil)
 	}
 	
@@ -85,7 +85,7 @@ func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName str
 	
 	_globals := _editor.globals
 	
-	if !_globals.TerminalAvailable && !_globals.XorgAvailable {
+	if !_globals.TerminalEnabled && !_globals.XorgEnabled {
 		return errorw (0x0175c9ec, nil)
 	}
 	
@@ -239,7 +239,7 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 	
 	_globals := _editor.globals
 	
-	if _globals.TerminalAvailable {
+	if _globals.TerminalEnabled {
 		
 		_executable := ""
 		_executableName := ""
@@ -286,7 +286,7 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 		
 		return _command, nil
 		
-	} else if _globals.XorgAvailable {
+	} else if _globals.XorgEnabled {
 		
 		_executable := ""
 		_executableName := ""

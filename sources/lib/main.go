@@ -95,7 +95,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		_buffer := bytes.NewBuffer (nil)
 		_parser.WriteHelp (_buffer)
 		if _log {
-			if _globals.StdioIsTty && _globals.TerminalAvailable {
+			if _globals.StdioIsTty && _globals.TerminalEnabled {
 				logf ('`', 0xa725b4bc, "\n%s\n", _buffer.String ())
 			}
 		} else {
@@ -402,6 +402,8 @@ func MainServer (_flags *ServerFlags, _globals *Globals, _index *Index, _editor 
 	if _error_0 != nil {
 		return errorw (0xedeea766, _error_0)
 	}
+	
+	_globals.TerminalEnabled = false
 	
 	_server, _error := ServerNew (_globals, _index, _editor, _listener)
 	if _error != nil {
