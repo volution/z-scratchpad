@@ -588,6 +588,7 @@ func mainListSelect (_options [][2]string, _editor *Editor) ([][2]string, *Error
 	for _, _option := range _options {
 		_label := _option[0]
 		_value := _option[1]
+		_label = stringTrimSpaces (_label)
 		_values_1 := map[string]bool (nil)
 		if _values_0, _exists := _values[_label]; _exists {
 			_values_1 = _values_0
