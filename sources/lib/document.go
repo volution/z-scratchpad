@@ -69,6 +69,8 @@ func DocumentResolveIdentifier (_document *Document, _perhapsUseFileName bool) (
 		return nil
 	}
 	
+//	logf ('d', 0xadfa2993, "%s", _document.Path)
+	
 	return errorf (0x1c58da80, "identifier unresolvable")
 }
 
@@ -143,6 +145,8 @@ func DocumentResolveFormat (_document *Document, _perhapsUseFileExtension bool) 
 			return _error
 		}
 	}
+	
+//	logf ('d', 0xff65fe47, "%s", _document.Path)
 	
 	return errorf (0xe5e1dd0f, "format unresolvable")
 }
