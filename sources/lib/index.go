@@ -57,6 +57,7 @@ func IndexDocumentInclude (_index *Index, _document *Document) (*Error) {
 		return errorw (0x4c68b8a9, nil)
 	}
 	if _, _exists := _index.documents[_document.Identifier]; _exists {
+		logf ('d', 0x83e5bd38, "%s", _document.Path)
 		return errorw (0x9c9f9c42, nil)
 	}
 	_index.documents[_document.Identifier] = _document

@@ -3,8 +3,6 @@
 package zscratchpad
 
 
-import "errors"
-import "io/fs"
 import "os"
 import "path/filepath"
 import "regexp"
@@ -127,7 +125,7 @@ func LibraryInitialize (_library *Library) (*Error) {
 	}
 	
 	_library.excludeGlobMatchers = make ([]glob.Glob, 0, len (_library.IncludeGlobPatterns))
-	for _, _pattern := range _library.IncludeGlobPatterns {
+	for _, _pattern := range _library.ExcludeGlobPatterns {
 		if _matcher, _error := glob.Compile (_pattern); _error == nil {
 			_library.excludeGlobMatchers = append (_library.excludeGlobMatchers, _matcher)
 		} else {
@@ -145,7 +143,7 @@ func LibraryInitialize (_library *Library) (*Error) {
 	}
 	
 	_library.excludeRegexMatchers = make ([]*regexp.Regexp, 0, len (_library.IncludeRegexPatterns))
-	for _, _pattern := range _library.IncludeRegexPatterns {
+	for _, _pattern := range _library.ExcludeRegexPatterns {
 		if _matcher, _error := regexp.Compile (_pattern); _error == nil {
 			_library.excludeRegexMatchers = append (_library.excludeRegexMatchers, _matcher)
 		} else {
@@ -207,26 +205,19 @@ func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([]string
 		_snapshotSuffix = "." + _library.SnapshotExtension
 	}
 	
-	_error_1 := (*Error) (nil)
-	
 	_documentPaths := make ([]string, 0, 1024)
+	_folderPaths := make ([]string, 0, 128)
 	
-	_walkQuit := errors.New ("")
-	_walk := func (_pathEntry string, _entry fs.DirEntry, _error error) (error) {
+	_walkFunc := func (_pathEntry string, _entry os.DirEntry) (*Error) {
 		
 //		logf ('d', 0x18d84756, "%s", _pathEntry)
-		
-		if _error != nil {
-			_error_1 = errorw (0x534f844f, _error)
-			return _walkQuit
-		}
 		
 		_name := _entry.Name ()
 		
 		if strings.HasPrefix (_name, ".") {
 			if _entry.IsDir () {
 //				logf ('d', 0xb53c5778, "%s", _pathEntry)
-				return filepath.SkipDir
+				return nil
 			} else {
 //				logf ('d', 0x63546fb2, "%s", _pathEntry)
 				return nil
@@ -234,11 +225,10 @@ func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([]string
 		}
 		
 		_stat := os.FileInfo (nil)
-		if _stat_0, _error_0 := os.Stat (_pathEntry); _error_0 == nil {
+		if _stat_0, _error := os.Stat (_pathEntry); _error == nil {
 			_stat = _stat_0
 		} else {
-			_error_1 = errorw (0xb00f4f21, _error_0)
-			return _walkQuit
+			return errorw (0xb00f4f21, _error)
 		}
 		
 		_mode := _stat.Mode ()
@@ -246,18 +236,17 @@ func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([]string
 			// NOP
 		} else if _mode.IsDir () {
 //			logf ('d', 0x47608981, "%s", _pathEntry)
+			_folderPaths = append (_folderPaths, _pathEntry)
 			return nil
 		} else {
-			_error_1 = errorf (0xb0cc4319, "invalid entry `%s`", _pathEntry)
-			return _walkQuit
+			return errorf (0xb0cc4319, "invalid entry `%s`", _pathEntry)
 		}
 		
 		_pathRelative := ""
-		if _pathRelative_0, _error_0 := filepath.Rel (_libraryPath, _pathEntry); _error_0 == nil {
+		if _pathRelative_0, _error := filepath.Rel (_libraryPath, _pathEntry); _error == nil {
 			_pathRelative = "/" + _pathRelative_0
 		} else {
-			_error_1 = errorw (0xacc84f2b, _error_0)
-			return _walkQuit
+			return errorw (0xacc84f2b, _error)
 		}
 		
 		if _snapshotSuffix != "" {
@@ -324,11 +313,20 @@ func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([]string
 		return nil
 	}
 	
-	if _error_2 := filepath.WalkDir (_libraryPath, _walk); (_error_2 != nil) && (_error_2 != _walkQuit) {
-		return nil, errorw (0xdc8ea9dd, _error_2)
-	}
-	if _error_1 != nil {
-		return nil, _error_1
+	_folderPaths = append (_folderPaths, _libraryPath)
+	
+	for _folderIndex := 0; _folderIndex < len (_folderPaths); _folderIndex += 1 {
+		_folderPath := _folderPaths[_folderIndex]
+		_folderEntries, _error := os.ReadDir (_folderPath)
+		if _error != nil {
+			return nil, errorw (0x28422546, _error)
+		}
+		for _, _folderEntry := range _folderEntries {
+			_folderEntryPath := filepath.Join (_folderPath, _folderEntry.Name ())
+			if _error := _walkFunc (_folderEntryPath, _folderEntry); _error != nil {
+				return nil, _error
+			}
+		}
 	}
 	
 	return _documentPaths, nil

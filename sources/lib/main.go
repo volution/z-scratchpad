@@ -787,6 +787,7 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 				Paths : []string { *_flags.Path },
 				UseFileNameAsIdentifier : flagBoolOrDefault (_flags.UseFileNameAsIdentifier, false),
 				UseFileExtensionAsFormat : flagBoolOrDefault (_flags.UseFileExtensionAsFormat, false),
+				ExcludeGlobPatterns : []string { "**/*.png", "**/*.jpg", "**/*.jpeg" },
 				EditEnabled : true,
 				CreateEnabled : true,
 				SnapshotEnabled : true,
