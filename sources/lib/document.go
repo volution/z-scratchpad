@@ -312,7 +312,7 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 	}
 	
 	_sourceFingerprint := fingerprintString (_source)
-	_bodyFingerprint := fingerprintStringLines (_body)
+	_bodyFingerprint := fingerprintStringLines (_bodyLines)
 	
 	_document := & Document {
 			Title : _title,

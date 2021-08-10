@@ -6,6 +6,7 @@ package zscratchpad
 import "crypto/sha256"
 import crand "crypto/rand"
 import "encoding/hex"
+import "io"
 
 
 
@@ -23,9 +24,10 @@ func fingerprintBytes (_value []byte) (string) {
 
 func fingerprintStringLines (_values []string) (string) {
 	_hasher := sha256.New ()
+	_separator := []byte { '\n' }
 	for _, _value := range _values {
-		_hasher.Write (_value)
-		_hasher.WriteByte ('\n')
+		io.WriteString (_hasher, _value)
+		_hasher.Write (_separator)
 	}
 	return hex.EncodeToString (_hasher.Sum (nil))
 }
