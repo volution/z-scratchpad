@@ -21,7 +21,7 @@ type GlobalFlags struct {
 }
 
 type LibraryFlags struct {
-	Path *string `long:"library-path" value-name:"{library-path}"`
+	Paths []string `long:"library-path" value-name:"{library-path}"`
 }
 
 type ServerFlags struct {
@@ -778,16 +778,17 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 	
 	_libraries := []*Library (nil)
 	
-	if _flags.Path != nil {
+	if len (_flags.Paths) > 0 {
 		_library := & Library {
 				Identifier : "library",
 				Name : "Library",
-				Paths : []string { *_flags.Path },
+				Paths : _flags.Paths,
 				UseFileNameAsIdentifier : false,
 				UseFileExtensionAsFormat : true,
 				IncludeGlobPatterns : []string { "**/*.{txt,md}" },
 				EditEnabled : true,
 				CreateEnabled : true,
+				CreatePath : _flags.Paths[0],
 				SnapshotEnabled : true,
 			}
 		_libraries = []*Library { _library }

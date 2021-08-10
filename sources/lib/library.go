@@ -56,6 +56,9 @@ func LibraryInitialize (_library *Library) (*Error) {
 	}
 	
 	for _index, _path := range _library.Paths {
+		if _path == "" {
+			return errorw (0x8b174330, nil)
+		}
 		if _path_0, _error := filepath.Abs (_path); _error == nil {
 			_path = _path_0
 		} else {
