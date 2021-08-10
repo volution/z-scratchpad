@@ -267,7 +267,7 @@ func MainEdit (_flags *EditFlags, _globals *Globals, _index *Index, _editor *Edi
 	if _flagSelect {
 		
 		_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
-		_options, _error := mainListOptionsAndSelect (_libraryIdentifier, "document", "identifier", "title", _index, _editor)
+		_options, _error := mainListOptionsAndSelect (_libraryIdentifier, "document", "title", "identifier", _index, _editor)
 		if _error != nil {
 			return _error
 		}
@@ -312,7 +312,7 @@ func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor 
 	_identifier := ""
 	if _flagSelect {
 		
-		_options, _error := mainListOptionsAndSelect ("", "library", "identifier", "title", _index, _editor)
+		_options, _error := mainListOptionsAndSelect ("", "library", "title", "identifier", _index, _editor)
 		if _error != nil {
 			return _error
 		}
@@ -786,6 +786,9 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 				Paths : []string { *_flags.Path },
 				UseFileNameAsIdentifier : flagBoolOrDefault (_flags.UseFileNameAsIdentifier, false),
 				UseFileExtensionAsFormat : flagBoolOrDefault (_flags.UseFileExtensionAsFormat, false),
+				EditEnabled : true,
+				CreateEnabled : true,
+				SnapshotEnabled : true,
 			}
 		_libraries = []*Library { _library }
 	}
@@ -796,19 +799,21 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 					Identifier : "inbox",
 					Name : "Inbox",
 					Paths : []string { "./examples/inbox" },
-					EditEnabled : true,
-					CreateEnabled : false,
 					UseFileNameAsIdentifier : true,
 					UseFileExtensionAsFormat : true,
+					EditEnabled : true,
+					CreateEnabled : true,
+					SnapshotEnabled : true,
 				},
 				{
 					Identifier : "tests",
 					Name : "Tests",
 					Paths : []string { "./examples/tests" },
-					EditEnabled : true,
-					CreateEnabled : true,
 					UseFileNameAsIdentifier : true,
 					UseFileExtensionAsFormat : true,
+					EditEnabled : true,
+					CreateEnabled : false,
+					SnapshotEnabled : false,
 				},
 			}
 	}
