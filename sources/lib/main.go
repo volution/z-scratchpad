@@ -842,6 +842,8 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 				_document.Library = _library.Identifier
 			}
 			
+			_document.EditEnabled = _library.EditEnabled
+			
 			_error = DocumentResolveIdentifier (_document, _library.UseFileNameAsIdentifier)
 			if _error != nil {
 				return _error

@@ -33,6 +33,8 @@ type Document struct {
 	
 	RenderHtml string
 	RenderText string
+	
+	EditEnabled bool
 }
 
 

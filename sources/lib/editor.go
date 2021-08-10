@@ -57,6 +57,9 @@ func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document
 	if !_library.EditEnabled {
 		return errorw (0xfefc63a0, nil)
 	}
+	if !_document.EditEnabled {
+		return errorw (0xaa64d776, nil)
+	}
 	
 	_path := _document.Path
 	if _path == "" {
