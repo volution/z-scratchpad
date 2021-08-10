@@ -4,6 +4,12 @@
 
 
 ::// go / ...
+::// watch / go / ...
+
+
+
+
+:: watch / go / build / main / debug :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: go / build / main / debug' "${@}"
 
 
 

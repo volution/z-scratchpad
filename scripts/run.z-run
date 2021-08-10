@@ -9,29 +9,27 @@
 
 
 
-<< run / version
-	test "${#}" -eq 0
-	exec -- "${ZRUN[@]}" ':: run / exec' --version
-!!
-
-<< run / sources
-	test "${#}" -eq 0
-	exec -- "${ZRUN[@]}" ':: run / exec' --sources
-!!
+:: watch / run / server :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / server' "${@}"
 
 
 
 
-++<< run / server
-	exec -- "${ZRUN[@]}" ':: run / exec' server "${@}"
-!!
-
-:: watch / run / server / watch :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / server' "${@}"
+:: run / version :: exec -- "${ZRUN[@]}" ':: run / exec' --version "${@}"
+:: run / sources :: exec -- "${ZRUN[@]}" ':: run / exec' --sources "${@}"
+:: run / help :: exec -- "${ZRUN[@]}" ':: run / exec' --help "${@}"
 
 
+:: run / server :: exec -- "${ZRUN[@]}" ':: run / exec' server "${@}"
+:: run / list :: exec -- "${ZRUN[@]}" ':: run / exec' list "${@}"
+:: run / select :: exec -- "${ZRUN[@]}" ':: run / exec' select "${@}"
+:: run / grep :: exec -- "${ZRUN[@]}" ':: run / exec' grep "${@}"
+:: run / edit :: exec -- "${ZRUN[@]}" ':: run / exec' edit "${@}"
+:: run / edit / select :: exec -- "${ZRUN[@]}" ':: run / exec' edit -s "${@}"
+:: run / create :: exec -- "${ZRUN[@]}" ':: run / exec' create "${@}"
+:: run / create / select :: exec -- "${ZRUN[@]}" ':: run / exec' create -s "${@}"
+:: run / export :: exec -- "${ZRUN[@]}" ':: run / exec' export "${@}"
+:: run / dump :: exec -- "${ZRUN[@]}" ':: run / exec' dump "${@}"
 
 
---<< run / exec
-	exec -- "${ZRUN[@]}" ':: go / execute / main / debug' "${@}"
-!!
+--:: run / exec :: exec -- "${ZRUN[@]}" ':: go / execute / main / debug' "${@}"
 
