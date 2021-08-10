@@ -7,17 +7,20 @@ import "bytes"
 import "encoding/json"
 import "fmt"
 import "net"
+import "os"
 import "sort"
 import "strings"
 
 
 import "github.com/jessevdk/go-flags"
+import "github.com/pelletier/go-toml"
 
 
 
 
 type GlobalFlags struct {
 	Help *bool `long:"help" short:"h"`
+	ConfigurationPath *string `long:"configuration" short:"c" value-name:"{configuration-path}"`
 }
 
 type LibraryFlags struct {
@@ -85,6 +88,11 @@ type MainFlags struct {
 }
 
 
+type MainConfiguration struct {
+	Libraries []Library `toml:"library"`
+}
+
+
 
 
 func Main (_executable string, _arguments []string, _environment map[string]string) (*Error) {
@@ -143,17 +151,36 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		return _help (false, nil)
 	}
 	
+	_configuration := & MainConfiguration {}
+	if _flags.Global.ConfigurationPath != nil {
+		_path := *_flags.Global.ConfigurationPath
+		if _path == "" {
+			return errorw (0x9a6f64a7, nil)
+		}
+		_data, _error := os.ReadFile (_path)
+		if _error != nil {
+			return errorw (0xf2be5f5f, _error)
+		}
+		_buffer := bytes.NewBuffer (_data)
+		_decoder := toml.NewDecoder (_buffer)
+		_decoder.Strict (true)
+		_error = _decoder.Decode (_configuration)
+		if _error != nil {
+			return errorw (0x93e9dab8, _error)
+		}
+	}
+	
 	if _parser.Active == nil {
 		return _help (true, errorw (0x4cae2ee5, nil))
 	}
 	
-	return MainWithFlags (_parser.Active.Name, _flags, _globals)
+	return MainWithFlags (_parser.Active.Name, _flags, _configuration, _globals)
 }
 
 
 
 
-func MainWithFlags (_command string, _flags *MainFlags, _globals *Globals) (*Error) {
+func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConfiguration, _globals *Globals) (*Error) {
 	
 	_index, _error := IndexNew (_globals)
 	if _error != nil {
@@ -165,7 +192,7 @@ func MainWithFlags (_command string, _flags *MainFlags, _globals *Globals) (*Err
 		return _error
 	}
 	
-	_error = MainLoadLibraries (_flags.Library, _globals, _index)
+	_error = MainLoadLibraries (_flags.Library, _configuration.Libraries, _globals, _index)
 	if _error != nil {
 		return _error
 	}
@@ -774,9 +801,13 @@ func MainDump (_flags *DumpFlags, _globals *Globals, _index *Index) (*Error) {
 
 
 
-func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) (*Error) {
+func MainLoadLibraries (_flags *LibraryFlags, _configuration []Library, _globals *Globals, _index *Index) (*Error) {
 	
-	_libraries := []*Library (nil)
+	if (len (_flags.Paths) > 0) && (len (_configuration) > 0) {
+		return errorw (0x374ece0f, nil)
+	}
+	
+	_libraries := make ([]*Library, 0, 16)
 	
 	if len (_flags.Paths) > 0 {
 		_library := & Library {
@@ -791,32 +822,19 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 				CreatePath : _flags.Paths[0],
 				SnapshotEnabled : true,
 			}
-		_libraries = []*Library { _library }
+		_libraries = append (_libraries, _library)
 	}
 	
-	if _libraries == nil {
-		_libraries = []*Library {
-				{
-					Identifier : "inbox",
-					Name : "Inbox",
-					Paths : []string { "./examples/inbox" },
-					UseFileNameAsIdentifier : true,
-					UseFileExtensionAsFormat : true,
-					EditEnabled : true,
-					CreateEnabled : true,
-					SnapshotEnabled : true,
-				},
-				{
-					Identifier : "tests",
-					Name : "Tests",
-					Paths : []string { "./examples/tests" },
-					UseFileNameAsIdentifier : true,
-					UseFileExtensionAsFormat : true,
-					EditEnabled : true,
-					CreateEnabled : false,
-					SnapshotEnabled : false,
-				},
-			}
+	if len (_configuration) > 0 {
+		for _, _library_0 := range _configuration {
+			_library := & Library {}
+			*_library = _library_0
+			_libraries = append (_libraries, _library)
+		}
+	}
+	
+	if len (_libraries) == 0 {
+		return errorw (0x00ea182b, nil)
 	}
 	
 	for _, _library := range _libraries {

@@ -16,34 +16,34 @@ import "github.com/gobwas/glob"
 
 type Library struct {
 	
-	Identifier string
-	Name string
+	Identifier string `toml:"identifier"`
+	Name string `toml:"name"`
 	
-	Paths []string
+	Paths []string `toml:"paths"`
 	
-	EditEnabled bool
+	EditEnabled bool `toml:"edit_enabled"`
 	
-	CreateEnabled bool
-	CreatePath string
-	CreateExtension string
+	CreateEnabled bool `toml:"create_enabled"`
+	CreatePath string `toml:"create_path"`
+	CreateExtension string `toml:"create_extension"`
 	
-	SnapshotEnabled bool
-	SnapshotExtension string
+	SnapshotEnabled bool `toml:"snapshot_enabled"`
+	SnapshotExtension string `toml:"snapshot_extension"`
 	
-	IncludeGlobPatterns []string
-	ExcludeGlobPatterns []string
+	IncludeGlobPatterns []string `toml:"include_glob"`
+	ExcludeGlobPatterns []string `toml:"exclude_glob"`
 	
-	IncludeRegexPatterns []string
-	ExcludeRegexPatterns []string
+	IncludeRegexPatterns []string `toml:"include_regex"`
+	ExcludeRegexPatterns []string `toml:"exclude_regex"`
 	
-	UseFileNameAsIdentifier bool
-	UseFileExtensionAsFormat bool
+	UseFileNameAsIdentifier bool `toml:"use_file_name_as_identifier"`
+	UseFileExtensionAsFormat bool `toml:"use_file_extension_as_format"`
 	
-	includeGlobMatchers []glob.Glob
-	excludeGlobMatchers []glob.Glob
+	includeGlobMatchers []glob.Glob `toml:"-"`
+	excludeGlobMatchers []glob.Glob `toml:"-"`
 	
-	includeRegexMatchers []*regexp.Regexp
-	excludeRegexMatchers []*regexp.Regexp
+	includeRegexMatchers []*regexp.Regexp `toml:"-"`
+	excludeRegexMatchers []*regexp.Regexp `toml:"-"`
 }
 
 
