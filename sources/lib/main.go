@@ -424,6 +424,7 @@ func mainListOptions (_libraryIdentifier string, _type string, _labelSource stri
 			for _, _library := range _libraries {
 				
 				_label := ""
+				_labels := make ([]string, 0, 16)
 				switch _labelSource {
 					case "identifier" :
 						_label = _library.Identifier
@@ -433,14 +434,18 @@ func mainListOptions (_libraryIdentifier string, _type string, _labelSource stri
 							_label = "[" + _library.Identifier + "]"
 						}
 					case "path" :
-						_label = _library.Path
+						_labels = _library.Paths
 					case "body" :
 						return nil, errorw (0x6aaf334b, nil)
 					default :
 						return nil, errorw (0xf0f17afb, nil)
 				}
+				if _label != "" {
+					_labels = append (_labels, _label)
+				}
 				
 				_value := ""
+				_values := make ([]string, 0, 16)
 				switch _valueSource {
 					case "identifier" :
 						_value = _library.Identifier
@@ -450,15 +455,26 @@ func mainListOptions (_libraryIdentifier string, _type string, _labelSource stri
 							_value = "[" + _library.Identifier + "]"
 						}
 					case "path" :
-						_value = _library.Path
+						_values = _library.Paths
 					case "body" :
 						return nil, errorw (0xabd3314f, nil)
 					default :
 						return nil, errorw (0x4fab7acb, nil)
 				}
+				if _value != "" {
+					_values = append (_values, _value)
+				}
 				
-				if (_label != "") && (_value != "") {
-					_options = append (_options, [2]string { _label, _value })
+				for _, _label := range _labels {
+					if _label == "" {
+						continue
+					}
+					for _, _value := range _values {
+						if _value == "" {
+							continue
+						}
+						_options = append (_options, [2]string { _label, _value })
+					}
 				}
 			}
 		
@@ -767,7 +783,7 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 		_library := & Library {
 				Identifier : "library",
 				Name : "Library",
-				Path : *_flags.Path,
+				Paths : []string { *_flags.Path },
 				UseFileNameAsIdentifier : flagBoolOrDefault (_flags.UseFileNameAsIdentifier, false),
 				UseFileExtensionAsFormat : flagBoolOrDefault (_flags.UseFileExtensionAsFormat, false),
 			}
@@ -779,18 +795,28 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 				{
 					Identifier : "inbox",
 					Name : "Inbox",
-					Path : "./examples/inbox",
+					Paths : []string { "./examples/inbox" },
+					EditEnabled : true,
+					CreateEnabled : false,
 					UseFileNameAsIdentifier : true,
 					UseFileExtensionAsFormat : true,
 				},
 				{
 					Identifier : "tests",
 					Name : "Tests",
-					Path : "./examples/tests",
+					Paths : []string { "./examples/tests" },
+					EditEnabled : true,
+					CreateEnabled : true,
 					UseFileNameAsIdentifier : true,
 					UseFileExtensionAsFormat : true,
 				},
 			}
+	}
+	
+	for _, _library := range _libraries {
+		if _error := LibraryInitialize (_library); _error != nil {
+			return _error
+		}
 	}
 	
 	for _, _library := range _libraries {

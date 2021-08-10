@@ -54,6 +54,10 @@ func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document
 		return errorw (0xa302fef3, nil)
 	}
 	
+	if !_library.EditEnabled {
+		return errorw (0xfefc63a0, nil)
+	}
+	
 	_path := _document.Path
 	if _path == "" {
 		return errorw (0xbdb59e67, nil)
@@ -93,7 +97,13 @@ func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName str
 		return errorw (0x0175c9ec, nil)
 	}
 	
-	_path := path.Join (_library.Path, _documentName) + ".txt"
+	if !_library.CreateEnabled {
+		return errorw (0x2752e1cc, nil)
+	}
+	_path := path.Join (_library.CreatePath, _documentName)
+	if _library.CreateExtension != "" {
+		_path = _path + "." + _library.CreateExtension
+	}
 	
 	logf ('d', 0x6292b948, "[editor-session]  creating file for `%s`...", _path)
 	
