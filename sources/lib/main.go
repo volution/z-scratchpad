@@ -22,8 +22,6 @@ type GlobalFlags struct {
 
 type LibraryFlags struct {
 	Path *string `long:"library-path" value-name:"{library-path}"`
-	UseFileNameAsIdentifier *bool `long:"library-use-file-name"`
-	UseFileExtensionAsFormat *bool `long:"library-use-file-ext"`
 }
 
 type ServerFlags struct {
@@ -785,8 +783,8 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 				Identifier : "library",
 				Name : "Library",
 				Paths : []string { *_flags.Path },
-				UseFileNameAsIdentifier : flagBoolOrDefault (_flags.UseFileNameAsIdentifier, false),
-				UseFileExtensionAsFormat : flagBoolOrDefault (_flags.UseFileExtensionAsFormat, false),
+				UseFileNameAsIdentifier : true,
+				UseFileExtensionAsFormat : true,
 				ExcludeGlobPatterns : []string { "**/*.png", "**/*.jpg", "**/*.jpeg" },
 				EditEnabled : true,
 				CreateEnabled : true,
