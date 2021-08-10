@@ -96,6 +96,7 @@ func LibraryInitialize (_library *Library) (*Error) {
 		if _library.CreateExtension == "" {
 			_library.CreateExtension = "txt"
 		}
+		_library.CreateExtension = strings.TrimLeft (_library.CreateExtension, ".")
 	} else {
 		if _library.CreatePath != "" {
 			return errorw (0x5b55e852, nil)
@@ -109,6 +110,7 @@ func LibraryInitialize (_library *Library) (*Error) {
 		if _library.SnapshotExtension == "" {
 			_library.SnapshotExtension = "snapshot"
 		}
+		_library.SnapshotExtension = strings.TrimLeft (_library.SnapshotExtension, ".")
 	} else {
 		if _library.SnapshotExtension != "" {
 			return errorw (0x3ede0dc5, nil)
@@ -200,40 +202,125 @@ func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([]string
 		return nil, errorw (0x83afc399, nil)
 	}
 	
+	_snapshotSuffix := ""
+	if _library.SnapshotEnabled && (_library.SnapshotExtension != "") {
+		_snapshotSuffix = "." + _library.SnapshotExtension
+	}
+	
 	_error_1 := (*Error) (nil)
 	
 	_documentPaths := make ([]string, 0, 1024)
 	
 	_walkQuit := errors.New ("")
-	_walk := func (_path string, _entry fs.DirEntry, _error error) (error) {
+	_walk := func (_pathEntry string, _entry fs.DirEntry, _error error) (error) {
+		
+//		logf ('d', 0x18d84756, "%s", _pathEntry)
+		
 		if _error != nil {
 			_error_1 = errorw (0x534f844f, _error)
 			return _walkQuit
 		}
-		if _path_0, _error_0 := filepath.Rel (_libraryPath, _path); _error_0 == nil {
-			_path = _path_0
+		
+		_name := _entry.Name ()
+		
+		if strings.HasPrefix (_name, ".") {
+			if _entry.IsDir () {
+//				logf ('d', 0xb53c5778, "%s", _pathEntry)
+				return filepath.SkipDir
+			} else {
+//				logf ('d', 0x63546fb2, "%s", _pathEntry)
+				return nil
+			}
+		}
+		
+		_stat := os.FileInfo (nil)
+		if _stat_0, _error_0 := os.Stat (_pathEntry); _error_0 == nil {
+			_stat = _stat_0
+		} else {
+			_error_1 = errorw (0xb00f4f21, _error_0)
+			return _walkQuit
+		}
+		
+		_mode := _stat.Mode ()
+		if _mode.IsRegular () {
+			// NOP
+		} else if _mode.IsDir () {
+//			logf ('d', 0x47608981, "%s", _pathEntry)
+			return nil
+		} else {
+			_error_1 = errorf (0xb0cc4319, "invalid entry `%s`", _pathEntry)
+			return _walkQuit
+		}
+		
+		_pathRelative := ""
+		if _pathRelative_0, _error_0 := filepath.Rel (_libraryPath, _pathEntry); _error_0 == nil {
+			_pathRelative = "/" + _pathRelative_0
 		} else {
 			_error_1 = errorw (0xacc84f2b, _error_0)
 			return _walkQuit
 		}
-		_name := _entry.Name ()
-		_mode := _entry.Type ()
-		if strings.HasPrefix (_name, ".") {
-			if _mode.IsDir () {
-				return filepath.SkipDir
-			} else {
+		
+		if _snapshotSuffix != "" {
+			if strings.HasSuffix (_name, _snapshotSuffix) {
+//				logf ('d', 0xeed5814c, "%s", _pathEntry)
 				return nil
 			}
 		}
-		if _mode.IsRegular () {
-			_documentPath := filepath.Join (_libraryPath, _path)
-			_documentPaths = append (_documentPaths, _documentPath)
-		} else if _mode.IsDir () {
-			// NOP
-		} else {
-			_error_1 = errorf (0xb0cc4319, "invalid entry `%s`", _path)
-			return _walkQuit
+		
+		_exclude := false
+		if !_exclude {
+			for _, _matcher := range _library.excludeGlobMatchers {
+				if _matcher.Match (_pathRelative) {
+					_exclude = true
+					break
+				}
+			}
 		}
+		if !_exclude {
+			for _, _matcher := range _library.excludeRegexMatchers {
+				if _matcher.MatchString (_pathRelative) {
+					_exclude = true
+					break
+				}
+			}
+		}
+		if _exclude {
+//			logf ('d', 0x71694f7f, "%s", _pathEntry)
+			return nil
+		}
+		
+		_include := false
+		if !_include {
+			for _, _matcher := range _library.includeGlobMatchers {
+				if _matcher.Match (_pathRelative) {
+					_include = true
+					break
+				}
+			}
+		}
+		if !_include {
+			for _, _matcher := range _library.includeRegexMatchers {
+				if _matcher.MatchString (_pathRelative) {
+					_include = true
+					break
+				}
+			}
+		}
+		if !_include {
+			if (len (_library.includeGlobMatchers) == 0) && (len (_library.includeRegexMatchers) == 0) {
+				_include = true
+			}
+		}
+		if !_include {
+//			logf ('d', 0x3da79eb9, "%s", _pathEntry)
+			return nil
+		}
+		
+//		logf ('d', 0xaa73f1ac, "%s", _pathEntry)
+		
+		_documentPath := filepath.Join (_libraryPath, _pathRelative[1:])
+		_documentPaths = append (_documentPaths, _documentPath)
+		
 		return nil
 	}
 	
