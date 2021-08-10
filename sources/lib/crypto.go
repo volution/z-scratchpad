@@ -21,6 +21,18 @@ func fingerprintBytes (_value []byte) (string) {
 }
 
 
+func fingerprintStringLines (_values []string) (string) {
+	_hasher := sha256.New ()
+	for _, _value := range _values {
+		_hasher.Write (_value)
+		_hasher.WriteByte ('\n')
+	}
+	return hex.EncodeToString (_hasher.Sum (nil))
+}
+
+
+
+
 func generateRandomToken () (string) {
 	var _data [128 / 8]byte
 	if _read, _error := crand.Read (_data[:]); _error == nil {

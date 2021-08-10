@@ -75,7 +75,7 @@ func (_block *SnippetEmptyBlock) RenderHtmlInto (_buffer *bytes.Buffer) (*Error)
 
 
 
-func parseAndRenderSnippetsToHtml (_source string) (string, *Error) {
+func parseAndRenderSnippetsToHtml (_source []string) (string, *Error) {
 	
 	var _blocks []SnippetBlock
 	if _blocks_0, _error := parseSnippets (_source); _error == nil {
@@ -99,9 +99,7 @@ func parseAndRenderSnippetsToHtml (_source string) (string, *Error) {
 
 
 
-func parseSnippets (_source string) ([]SnippetBlock, *Error) {
-	
-	_lines, _ := stringSplitLines (_source)
+func parseSnippets (_source []string) ([]SnippetBlock, *Error) {
 	
 	_blocks := []SnippetBlock (nil)
 	
@@ -121,7 +119,7 @@ func parseSnippets (_source string) ([]SnippetBlock, *Error) {
 		_blocks = append (_blocks, _block)
 	}
 	
-	for _, _line := range _lines {
+	for _, _line := range _source {
 		
 		_lineTrimmed := stringTrimSpaces (_line)
 		

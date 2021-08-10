@@ -33,11 +33,12 @@ func DocumentRenderToSource (_document *Document) (string, *Error) {
 		fmt.Fprintf (_buffer, "## -- format: %s\n", _document.Format)
 	}
 	
-	if _document.Body != "" {
-		fmt.Fprintf (_buffer, "\n\n")
-		_lines, _ := stringSplitLines (_document.Body)
-		for _, _line := range _lines {
-			fmt.Fprintf (_buffer, "%s\n", _line)
+	if !_document.BodyEmpty {
+		_buffer.WriteByte ('\n')
+		_buffer.WriteByte ('\n')
+		for _, _line := range _document.BodyLines {
+			_buffer.WriteString (_line)
+			_buffer.WriteByte ('\n')
 		}
 	}
 	

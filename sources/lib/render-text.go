@@ -3,6 +3,9 @@
 package zscratchpad
 
 
+import "bytes"
+
+
 
 
 func DocumentRenderToText (_document *Document) (string, *Error) {
@@ -23,13 +26,13 @@ func DocumentRenderToText (_document *Document) (string, *Error) {
 	switch _format {
 		
 		case "text" :
-			_render, _error = documentRenderTextToText (_document.Body)
+			_render, _error = documentRenderTextToText (_document.BodyLines)
 		
 		case "snippets" :
-			_render, _error = documentRenderSnippetsToText (_document.Body)
+			_render, _error = documentRenderSnippetsToText (_document.BodyLines)
 		
 		case "commonmark" :
-			_render, _error = documentRenderCommonMarkToText (_document.Body)
+			_render, _error = documentRenderCommonMarkToText (_document.BodyLines)
 		
 		default :
 			return "", errorf (0x215b1603, "format invalid `%s`", _document.Format)
@@ -47,18 +50,27 @@ func DocumentRenderToText (_document *Document) (string, *Error) {
 
 
 
-func documentRenderCommonMarkToText (_source string) (string, *Error) {
+func documentRenderCommonMarkToText (_source []string) (string, *Error) {
 	// FIXME:  Implement rendering to plain text!
-	return _source, nil
+	return documentRenderAnyToText (_source)
 }
 
-func documentRenderSnippetsToText (_source string) (string, *Error) {
+func documentRenderSnippetsToText (_source []string) (string, *Error) {
 	// FIXME:  Implement rendering to plain text!
-	return _source, nil
+	return documentRenderAnyToText (_source)
 }
 
-func documentRenderTextToText (_source string) (string, *Error) {
+func documentRenderTextToText (_source []string) (string, *Error) {
 	// FIXME:  Implement rendering to plain text!
-	return _source, nil
+	return documentRenderAnyToText (_source)
+}
+
+func documentRenderAnyToText (_source []string) (string, *Error) {
+	_buffer := bytes.NewBuffer (nil)
+	for _, _line := range _source {
+		_buffer.WriteString (_line)
+		_buffer.WriteByte ('\n')
+	}
+	return _buffer.String (), nil
 }
 

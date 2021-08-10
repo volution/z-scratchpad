@@ -28,6 +28,8 @@ type Document struct {
 	Format string
 	
 	Body string
+	BodyLines []string
+	BodyEmpty bool
 	BodyFingerprint string
 	
 	RenderHtml string
@@ -265,6 +267,29 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 		}
 	}
 	
+	_bodyLines_0, _ := stringSplitLines (_body)
+	_bodyLines := make ([]string, 0, len (_bodyLines_0))
+	_bodyLinesEmpty := 0
+	_bodyEmpty := true
+	for _, _line := range _bodyLines_0 {
+		_line = stringTrimSpacesRight (_line)
+		if _line != "" {
+			_bodyEmpty = false
+			_bodyLinesEmpty = 0
+		} else {
+			if len (_bodyLines) == 0 {
+				continue
+			} else {
+				_bodyLinesEmpty += 1
+			}
+		}
+		_bodyLines = append (_bodyLines, _line)
+	}
+	if _bodyLinesEmpty > 0 {
+		_bodyLines = _bodyLines[: len (_bodyLines) - _bodyLinesEmpty]
+	}
+	
+	
 	if _identifier != "" {
 		if _error := DocumentValidateIdentifier (_identifier); _error != nil {
 			return nil, _error
@@ -287,7 +312,7 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 	}
 	
 	_sourceFingerprint := fingerprintString (_source)
-	_bodyFingerprint := fingerprintString (_body)
+	_bodyFingerprint := fingerprintStringLines (_body)
 	
 	_document := & Document {
 			Title : _title,
@@ -297,6 +322,8 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 			Format : _format,
 			SourceFingerprint : _sourceFingerprint,
 			Body : _body,
+			BodyLines : _bodyLines,
+			BodyEmpty : _bodyEmpty,
 			BodyFingerprint : _bodyFingerprint,
 		}
 	
@@ -341,13 +368,12 @@ func DocumentDump (_stream io.Writer, _document *Document, _includeIdentifiers b
 		}
 	}
 	
-	if _document.Body == "" {
+	if _document.BodyEmpty {
 		fmt.Fprintf (_buffer, "-- body: empty\n")
 	} else if _includeBody {
 		fmt.Fprintf (_buffer, "-- body:\n")
 		fmt.Fprintf (_buffer, "~~~~~~~~\n")
-		_lines, _ := stringSplitLines (_document.Body)
-		for _, _line := range _lines {
+		for _, _line := range _document.BodyLines {
 			fmt.Fprintf (_buffer, "    %s\n", _line)
 		}
 		fmt.Fprintf (_buffer, "~~~~~~~~\n")

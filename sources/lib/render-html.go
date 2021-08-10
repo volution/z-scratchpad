@@ -27,10 +27,10 @@ func DocumentRenderToHtml (_document *Document) (string, *Error) {
 	switch _format {
 		
 		case "text" :
-			_render, _error = documentRenderTextToHtml (_document.Body)
+			_render, _error = documentRenderTextToHtml (_document.BodyLines)
 		
 		case "snippets" :
-			_render, _error = documentRenderSnippetsToHtml (_document.Body)
+			_render, _error = documentRenderSnippetsToHtml (_document.BodyLines)
 		
 		case "commonmark" :
 			_render, _error = documentRenderCommonMarkToHtml (_document.Body)
@@ -55,21 +55,19 @@ func documentRenderCommonMarkToHtml (_source string) (string, *Error) {
 	return parseAndRenderCommonMarkToHtml (_source)
 }
 
-func documentRenderSnippetsToHtml (_source string) (string, *Error) {
+func documentRenderSnippetsToHtml (_source []string) (string, *Error) {
 	return parseAndRenderSnippetsToHtml (_source)
 }
 
 
 
 
-func documentRenderTextToHtml (_source string) (string, *Error) {
-	
-	_lines, _ := stringSplitLines (_source)
+func documentRenderTextToHtml (_source []string) (string, *Error) {
 	
 	_buffer := bytes.NewBuffer (nil)
 	
 	_buffer.WriteString ("<pre>\n")
-	for _, _line := range _lines {
+	for _, _line := range _source {
 		_line = html.EscapeString (_line)
 		_buffer.WriteString (_line)
 		_buffer.WriteString ("\n")
