@@ -8,6 +8,13 @@ import _ "embed"
 
 
 
+//go:embed templates/home.html
+var HomeHtml string
+
+//go:embed templates/home.txt
+var HomeText string
+
+
 //go:embed templates/libraries-index.html
 var LibrariesIndexHtml string
 

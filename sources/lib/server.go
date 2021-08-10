@@ -105,6 +105,10 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 		return respondWithBuffer (_response, "text/plain", bytes.NewBufferString ("OK\n"))
 	}
 	
+	if _path == "/" {
+		return ServerHandleHome (_server, _response)
+	}
+	
 	if (_path == "/d") || (_path == "/d/") || (_path == "/documents") || (_path == "/documents/") {
 		return ServerHandleDocumentsIndex (_server, _response)
 	}
@@ -173,6 +177,12 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 }
 
 
+
+
+func ServerHandleHome (_server *Server, _response http.ResponseWriter) (*Error) {
+	_context := struct {} {}
+	return respondWithHtmlTemplate (_response, _server.templates.homeHtml, _context)
+}
 
 
 func ServerHandleLibrariesIndex (_server *Server, _response http.ResponseWriter) (*Error) {

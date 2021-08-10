@@ -17,6 +17,9 @@ import embedded "github.com/cipriancraciun/z-scratchpad/embedded"
 
 type Templates struct {
 	
+	homeHtml *html_template.Template
+	homeText *text_template.Template
+	
 	librariesIndexHtml *html_template.Template
 	librariesIndexText *text_template.Template
 	
@@ -46,6 +49,19 @@ func TemplatesNew () (*Templates, *Error) {
 	_templates := & Templates {
 			assets : embedded.Assets,
 		}
+	
+	
+	if _template, _error := html_template.New ("") .Parse (embedded.HomeHtml); _error == nil {
+		_templates.homeHtml = _template
+	} else {
+		return nil, errorw (0x2f22cfcf, _error)
+	}
+	
+	if _template, _error := text_template.New ("") .Parse (embedded.HomeText); _error == nil {
+		_templates.homeText = _template
+	} else {
+		return nil, errorw (0xc165205e, _error)
+	}
 	
 	
 	if _template, _error := html_template.New ("") .Parse (embedded.LibrariesIndexHtml); _error == nil {
@@ -127,6 +143,7 @@ func TemplatesNew () (*Templates, *Error) {
 	
 	
 	for _, _topTemplate := range []*html_template.Template {
+			_templates.homeHtml,
 			_templates.librariesIndexHtml,
 			_templates.documentsIndexHtml,
 			_templates.libraryViewHtml,
