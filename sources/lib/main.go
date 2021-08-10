@@ -800,12 +800,12 @@ func MainLoadLibraries (_flags *LibraryFlags, _globals *Globals, _index *Index) 
 			return _error
 		}
 		
-		_documentPaths, _error := libraryDocumentsWalk (_library.Path)
+		_documentPaths, _error := libraryDocumentsWalk (_library)
 		if _error != nil {
 			return _error
 		}
 		
-		_documents, _error := libraryDocumentsLoad (_library.Path, _documentPaths)
+		_documents, _error := libraryDocumentsLoad (_library, _documentPaths)
 		if _error != nil {
 			return _error
 		}

@@ -25,7 +25,12 @@ type Library struct {
 
 
 
-func libraryDocumentsLoad (_libraryPath string, _documentPaths []string) ([]*Document, *Error) {
+func libraryDocumentsLoad (_library *Library, _documentPaths []string) ([]*Document, *Error) {
+	
+	_libraryPath := _library.Path
+	if _libraryPath == "" {
+		return nil, errorw (0x6d778a9a, nil)
+	}
 	
 	_documents := make ([]*Document, 0, len (_documentPaths))
 	
@@ -44,7 +49,12 @@ func libraryDocumentsLoad (_libraryPath string, _documentPaths []string) ([]*Doc
 
 
 
-func libraryDocumentsWalk (_libraryPath string) ([]string, *Error) {
+func libraryDocumentsWalk (_library *Library) ([]string, *Error) {
+	
+	_libraryPath := _library.Path
+	if _libraryPath == "" {
+		return nil, errorw (0x83afc399, nil)
+	}
 	
 	_error_1 := (*Error) (nil)
 	

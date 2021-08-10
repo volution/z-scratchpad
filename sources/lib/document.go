@@ -27,7 +27,6 @@ type Document struct {
 	
 	Format string
 	
-	Body string
 	BodyLines []string
 	BodyEmpty bool
 	BodyFingerprint string
@@ -321,7 +320,6 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 			Library : _library,
 			Format : _format,
 			SourceFingerprint : _sourceFingerprint,
-			Body : _body,
 			BodyLines : _bodyLines,
 			BodyEmpty : _bodyEmpty,
 			BodyFingerprint : _bodyFingerprint,

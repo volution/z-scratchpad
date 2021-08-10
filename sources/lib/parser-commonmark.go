@@ -12,9 +12,14 @@ import goldmark_text "github.com/yuin/goldmark/text"
 
 
 
-func parseAndRenderCommonMarkToHtml (_source string) (string, *Error) {
+func parseAndRenderCommonMarkToHtml (_sourceLines []string) (string, *Error) {
 	
-	_sourceBytes := []byte (_source)
+	_sourceBuffer := bytes.NewBuffer (nil)
+	for _, _line := range _sourceLines {
+		_sourceBuffer.WriteString (_line)
+		_sourceBuffer.WriteByte ('\n')
+	}
+	_sourceBytes := _sourceBuffer.Bytes ()
 	
 	_parser := goldmark.DefaultParser ()
 	_renderer := goldmark.DefaultRenderer ()
