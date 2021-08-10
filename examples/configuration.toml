@@ -1,0 +1,19 @@
+
+[[library]]
+identifier = "tests"
+name = "Tests"
+paths = ["./examples/tests"]
+edit_enabled = true
+create_enabled = false
+use_file_name_as_identifier = true
+use_file_extension_as_format = true
+
+[[library]]
+identifier = "inbox"
+name = "Inbox"
+paths = ["./examples/inbox"]
+edit_enabled = true
+create_enabled = false
+use_file_name_as_identifier = true
+use_file_extension_as_format = true
+
