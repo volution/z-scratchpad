@@ -23,6 +23,7 @@ use_library_as_identifier_prefix = false
 use_file_name_as_identifier = true
 use_file_extension_as_format = true
 
+
 [globals]
 terminal_enabled = true
 xorg_enabled = true
@@ -40,6 +41,7 @@ endpoint_port = 8080
 edit_enabled = true
 create_enabled = true
 
+
 [[menu]]
 identifier = "default"
 label = "Default"
@@ -49,11 +51,18 @@ commands = [
 	{label = "edit / ...", command = "edit", arguments = ["--select"]},
 	{label = "edit / tests", command = "edit", arguments = ["--library", "tests", "--select"]},
 	{label = "edit / inbox", command = "edit", arguments = ["--library", "inbox", "--select"]},
+	{label = "search / ...", command = "search", arguments = ["--action", "edit", "--how", "body"]},
+	{label = "search / tests", command = "search", arguments = ["--library", "tests", "--action", "edit", "--how", "body"]},
+	{label = "search / inbox", command = "search", arguments = ["--library", "inbox", "--action", "edit", "--how", "body"]},
+	{label = "create ->", command = "menu", arguments = ["--menu", "create"]},
+]
+
+[[menu]]
+identifier = "create"
+label = "Create"
+commands = [
 	{label = "create / ...", command = "create", arguments = ["--select"]},
 	{label = "create / tests", command = "create", arguments = ["--library", "tests"]},
 	{label = "create / inbox", command = "create", arguments = ["--library", "inbox"]},
-	{label = "search / ...", command = "select", arguments = ["--action", "edit", "--how", "body"]},
-	{label = "search / tests", command = "select", arguments = ["--library", "tests", "--action", "edit", "--how", "body"]},
-	{label = "search / inbox", command = "select", arguments = ["--library", "inbox", "--action", "edit", "--how", "body"]},
 ]
 
