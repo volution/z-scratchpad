@@ -186,6 +186,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 				{ ".", "", ".scratchpad.toml" },
 				{ ".", "", ".z-scratchpad" },
 				{ ".", "", ".z-scratchpad.toml" },
+				{ ".", "", "default.toml" },
 				{ _homeStore, "", ".scratchpad" },
 				{ _homeStore, "", ".scratchpad.toml" },
 				{ _homeStore, ".scratchpad", "default.toml" },
