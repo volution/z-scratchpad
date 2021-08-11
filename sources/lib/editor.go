@@ -277,8 +277,10 @@ func EditorSelect (_editor *Editor, _options []string) ([]string, *Error) {
 	defer _globals.TerminalMutexUnlock ()
 	
 	_command := (*exec.Cmd) (nil)
-	if _command_0, _error := EditorResolveSelectCommand (_editor); _error == nil {
+	_okExitCodes := []int (nil)
+	if _command_0, _okExitCodes_0, _error := EditorResolveSelectCommand (_editor); _error == nil {
 		_command = _command_0
+		_okExitCodes = _okExitCodes_0
 	} else {
 		return nil, _error
 	}
@@ -351,7 +353,21 @@ func EditorSelect (_editor *Editor, _options []string) ([]string, *Error) {
 	_waiter.Wait ()
 	
 	if _error := _command.Wait (); _error != nil {
-		return nil, errorw (0xe7d64749, _error)
+		if _error, _isExitError := _error.(*exec.ExitError); _isExitError {
+			_exitCode := _error.ExitCode ()
+			_ignore := false
+			for _, _okExitCode := range _okExitCodes {
+				if _exitCode == _okExitCode {
+					_ignore = true
+					break
+				}
+			}
+			if !_ignore {
+				return nil, errorw (0x2117e0b8, _error)
+			}
+		} else {
+			return nil, errorw (0xe7d64749, _error)
+		}
 	}
 	
 	if _stdinError != nil {
@@ -468,7 +484,7 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 
 
 
-func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, *Error) {
+func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 	
 	_globals := _editor.globals
 	
@@ -486,11 +502,12 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, *Error) {
 			}
 		}
 		if _executable == "" {
-			return nil, errorw (0x10e4bef3, nil)
+			return nil, nil, errorw (0x10e4bef3, nil)
 		}
 		
 		_arguments := make ([]string, 0, 32)
 		_arguments = append (_arguments, _executable)
+		_okExitCodes := []int (nil)
 		switch _executableName {
 			case "z-scratchpad--select", "x-select" :
 				// NOP
@@ -501,6 +518,7 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, *Error) {
 						"--tiebreak", "begin,length,index",
 						"--no-mouse", "--no-color", "--no-bold",
 					)
+				_okExitCodes = []int { 1, 130 }
 			default :
 				// NOP
 		}
@@ -512,7 +530,7 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, *Error) {
 				Stderr : _globals.TerminalTty,
 			}
 		
-		return _command, nil
+		return _command, _okExitCodes, nil
 		
 	} else if _globals.XorgEnabled {
 		
@@ -528,18 +546,21 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, *Error) {
 			}
 		}
 		if _executable == "" {
-			return nil, errorw (0xcdb975c1, nil)
+			return nil, nil, errorw (0xcdb975c1, nil)
 		}
 		
 		_arguments := make ([]string, 0, 32)
 		_arguments = append (_arguments, _executable)
+		_okExitCodes := []int (nil)
 		switch _executableName {
 			case "z-scratchpad--select", "x-select" :
 				// NOP
 			case "rofi" :
 				_arguments = append (_arguments, "-dmenu", "-p", "", "-i", "-no-custom", "-matching-negate-char", "\\x0")
+				_okExitCodes = []int { 1 }
 			case "dmenu" :
 				_arguments = append (_arguments, "-p", "", "-l", "16", "-i")
+				_okExitCodes = []int { 1 }
 			default :
 				// NOP
 		}
@@ -551,11 +572,11 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, *Error) {
 				Stderr : _globals.DevNull,
 			}
 		
-		return _command, nil
+		return _command, _okExitCodes, nil
 		
 	} else {
 		
-		return nil, errorw (0xdced1bf6, nil)
+		return nil, nil, errorw (0xdced1bf6, nil)
 	}
 }
 
