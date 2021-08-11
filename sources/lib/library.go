@@ -7,6 +7,7 @@ import "os"
 import "path/filepath"
 import "regexp"
 import "strings"
+import "sort"
 
 
 import "github.com/gobwas/glob"
@@ -78,6 +79,7 @@ func LibraryInitialize (_library *Library) (*Error) {
 		}
 		_library.Paths[_index] = _path
 	}
+	sort.Strings (_library.Paths)
 	
 	if _library.CreateEnabled {
 		if _library.CreatePath == "" {
@@ -98,6 +100,18 @@ func LibraryInitialize (_library *Library) (*Error) {
 			}
 		} else {
 			return errorw (0x98ade3fc, _error)
+		}
+		{
+			_createPathFound := false
+			for _, _importPath := range _library.Paths {
+				if _library.CreatePath == _importPath {
+					_createPathFound = true
+					break
+				}
+			}
+			if !_createPathFound {
+				return errorw (0x8c05b979, nil)
+			}
 		}
 		if _library.CreateExtension == "" {
 			_library.CreateExtension = "txt"
@@ -137,6 +151,11 @@ func LibraryInitialize (_library *Library) (*Error) {
 			return errorw (0x3ede0dc5, nil)
 		}
 	}
+	
+	sort.Strings (_library.IncludeGlobPatterns)
+	sort.Strings (_library.ExcludeGlobPatterns)
+	sort.Strings (_library.IncludeRegexPatterns)
+	sort.Strings (_library.ExcludeRegexPatterns)
 	
 	_library.includeGlobMatchers = make ([]glob.Glob, 0, len (_library.IncludeGlobPatterns))
 	for _, _pattern := range _library.IncludeGlobPatterns {

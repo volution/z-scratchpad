@@ -9,6 +9,7 @@ import "io"
 import "os"
 import "path"
 import "regexp"
+import "sort"
 import "strings"
 import "unicode/utf8"
 
@@ -351,6 +352,8 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 				return nil, errorf (0x32158fbf, "format invalid `%s`", _format)
 		}
 	}
+	
+	sort.Strings (_titles)
 	
 	_sourceFingerprint := fingerprintString (_source)
 	_bodyFingerprint := fingerprintStringLines (_bodyLines)
