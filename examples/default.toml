@@ -52,5 +52,8 @@ commands = [
 	{label = "create / ...", command = "create", arguments = ["--select"]},
 	{label = "create / tests", command = "create", arguments = ["--library", "tests"]},
 	{label = "create / inbox", command = "create", arguments = ["--library", "inbox"]},
+	{label = "search / ...", command = "select", arguments = ["--action", "edit", "--how", "body"]},
+	{label = "search / tests", command = "select", arguments = ["--library", "tests", "--action", "edit", "--how", "body"]},
+	{label = "search / inbox", command = "select", arguments = ["--library", "inbox", "--action", "edit", "--how", "body"]},
 ]
 

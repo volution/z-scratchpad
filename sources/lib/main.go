@@ -55,6 +55,7 @@ type SelectFlags struct {
 	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path"`
 	How *string `long:"how" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
+	Action *string `long:"action" short:"a" chouce:"output" choice:"edit"`
 }
 
 type GrepFlags struct {
@@ -63,6 +64,7 @@ type GrepFlags struct {
 	Where *string `long:"where" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json" choice:"context"`
 	Terms []string `long:"term" short:"t" value-name:"{term}"`
+	Action *string `long:"action" short:"a" chouce:"output" choice:"edit"`
 }
 
 type ExportFlags struct {
@@ -555,13 +557,50 @@ func MainSelect (_flags *SelectFlags, _globals *Globals, _index *Index, _editor 
 	_what := flagStringOrDefault (_flags.What, "identifier")
 	_how := flagStringOrDefault (_flags.How, "title")
 	_format := flagStringOrDefault (_flags.Format, "text")
+	_action := flagStringOrDefault (_flags.Action, "output")
 	
-	_options, _error := mainListOptionsAndSelect (_libraryIdentifier, _type, _how, _what, _index, _editor)
+	switch _action {
+		case "output" :
+			// NOP
+		case "edit" :
+			if _flags.Type != nil {
+				return errorw (0x8133f4ab, nil)
+			}
+			if _flags.What != nil {
+				return errorw (0xf998d0d9, nil)
+			}
+			if _flags.Format != nil {
+				return errorw (0x304ff173, nil)
+			}
+		default :
+			return errorw (0x332d42c3, nil)
+	}
+	
+	_selection, _error := mainListOptionsAndSelect (_libraryIdentifier, _type, _how, _what, _index, _editor)
 	if _error != nil {
 		return _error
 	}
 	
-	return mainListOutput (_options, _format, _globals)
+	switch _action {
+		
+		case "output" :
+			return mainListOutput (_selection, _format, _globals)
+		
+		case "edit" :
+			_identifier := ""
+			switch len (_selection) {
+				case 0 :
+					return nil
+				case 1 :
+					_identifier = _selection[0][1]
+				case 2 :
+					return errorw (0xea0431aa, nil)
+			}
+			return WorkflowDocumentEdit (_identifier, _index, _editor, true)
+		
+		default :
+			return errorw (0xe611caea, nil)
+	}
 }
 
 
@@ -865,6 +904,21 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 	_what := flagStringOrDefault (_flags.What, "identifier")
 	_where := flagStringOrDefault (_flags.Where, "title")
 	_format := flagStringOrDefault (_flags.Format, "text")
+	_action := flagStringOrDefault (_flags.Action, "output")
+	
+	switch _action {
+		case "output" :
+			// NOP
+		case "edit" :
+			if _flags.What != nil {
+				return errorw (0x966bbfc4, nil)
+			}
+			if _flags.Format != nil {
+				return errorw (0x92252a21, nil)
+			}
+		default :
+			return errorw (0x4b4f9c3b, nil)
+	}
 	
 	_terms := make ([]string, 0, len (_flags.Terms))
 	for _, _term := range _flags.Terms {
@@ -899,7 +953,26 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 		}
 	}
 	
-	return mainListOutput (_selection, _format, _globals)
+	switch _action {
+		
+		case "output" :
+			return mainListOutput (_selection, _format, _globals)
+		
+		case "edit" :
+			_identifier := ""
+			switch len (_selection) {
+				case 0 :
+					return nil
+				case 1 :
+					_identifier = _selection[0][1]
+				case 2 :
+					return errorw (0x1e4d02e6, nil)
+			}
+			return WorkflowDocumentEdit (_identifier, _index, _editor, true)
+		
+		default :
+			return errorw (0x1217cd0b, nil)
+	}
 }
 
 
@@ -1024,7 +1097,7 @@ func MainMenu (_flags *MenuFlags, _menus []*Menu, _configuration *MainConfigurat
 			case 0 :
 				return nil
 			case 1 :
-				_selected = _selection[0][0]
+				_selected = _selection[0][1]
 			default :
 				return errorw (0xde0c52f4, nil)
 		}
@@ -1065,6 +1138,12 @@ func MainCommand (_command string, _arguments []string, _configuration *MainConf
 			_flags_0 = _flags
 			_execute = func () (*Error) {
 					return MainCreate (_flags, _globals, _index, _editor)
+				}
+		case "select" :
+			_flags := & SelectFlags {}
+			_flags_0 = _flags
+			_execute = func () (*Error) {
+					return MainSelect (_flags, _globals, _index, _editor)
 				}
 		case "menu" :
 			_flags := & MenuFlags {}
