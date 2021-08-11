@@ -68,8 +68,10 @@ type GrepFlags struct {
 }
 
 type ExportFlags struct {
-	Document *string `long:"document" short:"d" required:"-" value-name:"{identifier}"`
+	Library *string `long:"library" short:"l" value-name:"{identifier}"`
+	Document *string `long:"document" short:"d" value-name:"{identifier}"`
 	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html"`
+	Select *bool `long:"select" short:"s"`
 }
 
 type EditFlags struct {
@@ -373,7 +375,7 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 			return MainGrep (_flags.Grep, _globals, _index, _editor)
 		
 		case "export" :
-			return MainExport (_flags.Export, _globals, _index)
+			return MainExport (_flags.Export, _globals, _index, _editor)
 		
 		case "edit" :
 			return MainEdit (_flags.Edit, _globals, _index, _editor)
@@ -398,12 +400,44 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 
 
 
-func MainExport (_flags *ExportFlags, _globals *Globals, _index *Index) (*Error) {
+func MainExport (_flags *ExportFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
-	if _flags.Document == nil {
-		return errorw (0x1826914a, nil)
+	_flagSelect := flagBoolOrDefault (_flags.Select, false)
+	if _flagSelect && (_flags.Document != nil) {
+		return errorw (0xaf2210a5, nil)
 	}
-	_document, _error := WorkflowDocumentResolve (*_flags.Document, _index)
+	
+	_identifier := ""
+	if _flagSelect {
+		
+		_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
+		_options, _error := mainListOptionsAndSelect (_libraryIdentifier, "document", "title", "identifier", _index, _editor)
+		if _error != nil {
+			return _error
+		}
+		switch len (_options) {
+			case 0 :
+				return nil
+			case 1 :
+				_identifier = _options[0][1]
+			default :
+				return errorw (0x43982abc, nil)
+		}
+		
+	} else {
+		
+		if _library, _document, _error := mainMergeLibraryAndDocumentIdentifiers (_flags.Library, _flags.Document); _error != nil {
+			return _error
+		} else if _document != "" {
+			_identifier = _document
+		} else if _library != "" {
+			return errorw (0x20457235, nil)
+		} else {
+			return errorw (0x0684c89e, nil)
+		}
+	}
+	
+	_document, _error := WorkflowDocumentResolve (_identifier, _index)
 	if _error != nil {
 		return _error
 	}
