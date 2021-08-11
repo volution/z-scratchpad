@@ -3,9 +3,14 @@
 package zscratchpad
 
 
+import "time"
+
+
 
 
 func WorkflowDocumentCreate (_identifierUnsafe string, _index *Index, _editor *Editor, _synchronous bool) (*Error) {
+	
+	_timestamp := time.Now ()
 	
 	_libraryIdentifier := ""
 	_documentName := ""
@@ -32,8 +37,50 @@ func WorkflowDocumentCreate (_identifierUnsafe string, _index *Index, _editor *E
 	if _libraryIdentifier == "" {
 		return errorw (0x4f21b7fb, nil)
 	}
+	
+	_library, _error := IndexLibraryResolve (_index, _libraryIdentifier)
+	if _error != nil {
+		return _error
+	}
+	if _library == nil {
+		return errorw (0x5e581595, nil)
+	}
+	
 	if _documentName == "" {
-		_documentName = generateRandomToken ()
+		if _library.CreateNameTimestampLength > 0 {
+			_format := ""
+			switch _library.CreateNameTimestampLength {
+				case 1 :
+					_format = "2006"
+				case 2 :
+					_format = "2006-01"
+				case 3 :
+					_format = "2006-01-02"
+				case 4 :
+					_format = "2006-01-02-15"
+				case 5 :
+					_format = "2006-01-02-15-04"
+				case 6 :
+					_format = "2006-01-02-15-04-05"
+				default :
+					return errorw (0x770836aa, nil)
+			}
+			_token := _timestamp.Format (_format)
+			if _documentName == "" {
+				_documentName = _token
+			} else {
+				_documentName = _documentName + "--" + _token
+			}
+		}
+		if _library.CreateNameRandomLength > 0 {
+			_token := generateRandomToken ()
+			_token = _token[: _library.CreateNameRandomLength]
+			if _documentName == "" {
+				_documentName = _token
+			} else {
+				_documentName = _documentName + "--" + _token
+			}
+		}
 	}
 	
 	_identifier, _error := DocumentFormatIdentifier (_libraryIdentifier, _documentName)
@@ -49,16 +96,6 @@ func WorkflowDocumentCreate (_identifierUnsafe string, _index *Index, _editor *E
 		return errorw (0x538cfbae, nil)
 	}
 	
-	if _libraryIdentifier == "" {
-		return errorw (0x2b40ce32, nil)
-	}
-	_library, _error := IndexLibraryResolve (_index, _libraryIdentifier)
-	if _error != nil {
-		return _error
-	}
-	if _library == nil {
-		return errorw (0x5e581595, nil)
-	}
 	
 	return EditorDocumentCreate (_editor, _library, _documentName, _synchronous)
 }

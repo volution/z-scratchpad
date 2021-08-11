@@ -25,6 +25,8 @@ type Library struct {
 	
 	CreateEnabled bool `toml:"create_enabled"`
 	CreatePath string `toml:"create_path"`
+	CreateNameTimestampLength uint `toml:"create_name_timestamp_length"`
+	CreateNameRandomLength uint `toml:"create_name_random_length"`
 	CreateExtension string `toml:"create_extension"`
 	
 	SnapshotEnabled bool `toml:"snapshot_enabled"`
@@ -101,12 +103,27 @@ func LibraryInitialize (_library *Library) (*Error) {
 			_library.CreateExtension = "txt"
 		}
 		_library.CreateExtension = strings.TrimLeft (_library.CreateExtension, ".")
+		if (_library.CreateNameTimestampLength == 0) && (_library.CreateNameRandomLength == 0) {
+			_library.CreateNameRandomLength = 16
+		}
+		if _library.CreateNameTimestampLength > 6 {
+			return errorw (0x56c7f2da, nil)
+		}
+		if _library.CreateNameRandomLength > 64 {
+			return errorw (0xa6aa3809, nil)
+		}
 	} else {
 		if _library.CreatePath != "" {
 			return errorw (0x5b55e852, nil)
 		}
 		if _library.CreateExtension != "" {
 			return errorw (0x2ffc3bf4, nil)
+		}
+		if _library.CreateNameTimestampLength > 0 {
+			return errorw (0x8113bbd1, nil)
+		}
+		if _library.CreateNameRandomLength > 0 {
+			return errorw (0x1a39f5d8, nil)
 		}
 	}
 	
