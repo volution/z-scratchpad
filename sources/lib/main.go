@@ -103,14 +103,36 @@ type MainFlags struct {
 	Create *CreateFlags `command:"create"`
 	Server *ServerFlags `command:"server"`
 	Dump *DumpFlags `command:"dump"`
+	Menu *MenuFlags `command:"menu"`
 }
 
 
 type MainConfiguration struct {
 	Global *GlobalConfiguration `toml:"globals"`
 	Editor *EditorConfiguration `toml:"editor"`
-	Libraries []Library `toml:"library"`
+	Libraries []*Library `toml:"library"`
 	Server *ServerFlags `toml:"server"`
+	Menus []*Menu `toml:"menu"`
+}
+
+
+type MenuFlags struct {
+	Menu *string `long:"menu" short:"m" value-name:"{identifier}"`
+	Loop *bool `long:"loop" short:"L"`
+}
+
+type Menu struct {
+	Identifier string `toml:"identifier"`
+	Label string `toml:"label"`
+	Commands []*MenuCommand `toml:"commands"`
+	Default bool `toml:"default"`
+	Loop bool `toml:"loop"`
+}
+
+type MenuCommand struct {
+	Label string `toml:"label"`
+	Command string `toml:"command"`
+	Arguments []string `toml:"arguments"`
 }
 
 
@@ -129,6 +151,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			Create : & CreateFlags {},
 			Server : & ServerFlags {},
 			Dump : & DumpFlags {},
+			Menu : & MenuFlags {},
 		}
 	
 	_configuration := & MainConfiguration {
@@ -328,6 +351,14 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 		return _error
 	}
 	
+	return MainWithFlagsAndContext (_command, _flags, _configuration, _globals, _index, _editor)
+}
+
+
+
+
+func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration *MainConfiguration, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
 	switch _command {
 		
 		case "list" :
@@ -353,6 +384,9 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 		
 		case "dump" :
 			return MainDump (_flags.Dump, _globals, _index)
+		
+		case "menu" :
+			return MainMenu (_flags.Menu, _configuration.Menus, _configuration, _globals, _index, _editor)
 		
 		default :
 			return errorw (0xaca17bb9, nil)
@@ -429,7 +463,7 @@ func MainEdit (_flags *EditFlags, _globals *Globals, _index *Index, _editor *Edi
 		}
 		switch len (_options) {
 			case 0 :
-				return errorw (0x2b83fe67, nil)
+				return nil
 			case 1 :
 				_identifier = _options[0][1]
 			default :
@@ -474,7 +508,7 @@ func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor 
 		}
 		switch len (_options) {
 			case 0 :
-				return errorw (0x29abcd02, nil)
+				return nil
 			case 1 :
 				_identifier = _options[0][1]
 			default :
@@ -936,7 +970,130 @@ func MainDump (_flags *DumpFlags, _globals *Globals, _index *Index) (*Error) {
 
 
 
-func MainLoadLibraries (_flags *LibraryFlags, _configuration []Library, _globals *Globals, _index *Index) (*Error) {
+func MainMenu (_flags *MenuFlags, _menus []*Menu, _configuration *MainConfiguration, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
+	_menuIdentifier := flagStringOrDefault (_flags.Menu, "")
+	if _menuIdentifier == "" {
+		for _, _menu := range _menus {
+			// NOTE:  We select the first default menu...
+			if (_menu.Identifier != "") && _menu.Default {
+				_menuIdentifier = _menu.Identifier
+				break
+			}
+		}
+	}
+	if _menuIdentifier == "" {
+		return errorw (0x876f0980, nil)
+	}
+	
+	_menu := (*Menu) (nil)
+	for _, _menu_0 := range _menus {
+		if _menu_0.Identifier == _menuIdentifier {
+			_menu = _menu_0
+			break
+		}
+	}
+	
+	_options := make ([][2]string, 0, len (_menu.Commands))
+	_commands := make (map[string]*MenuCommand, len (_menu.Commands))
+	for _, _command := range _menu.Commands {
+		if _command.Label == "" {
+			return errorw (0x854ba0ab, nil)
+		}
+		if _command.Command == "" {
+			return errorw (0xdd4d0687, nil)
+		}
+		if _, _exists := _commands[_command.Label]; _exists {
+			return errorw (0x6c32847a, nil)
+		}
+		_options = append (_options, [2]string { _command.Label, _command.Label })
+		_commands[_command.Label] = _command
+	}
+	
+	_loop := flagBoolOrDefault (_flags.Loop, _menu.Loop)
+	
+	for {
+		
+		_selection, _error := mainListSelect (_options, _editor)
+		if _error != nil {
+			return _error
+		}
+		
+		_selected := ""
+		switch len (_selection) {
+			case 0 :
+				return nil
+			case 1 :
+				_selected = _selection[0][0]
+			default :
+				return errorw (0xde0c52f4, nil)
+		}
+		
+		_command, _ := _commands[_selected]
+		if _command == nil {
+			return errorw (0x2f57b12e, nil)
+		}
+		
+		if _error := MainCommand (_command.Command, _command.Arguments, _configuration, _globals, _index, _editor); _error != nil {
+			return _error
+		}
+		
+		if !_loop {
+			break
+		}
+	}
+	
+	return nil
+}
+
+
+
+func MainCommand (_command string, _arguments []string, _configuration *MainConfiguration, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
+	_flags_0 := interface{} (nil)
+	_execute := (func () (*Error)) (nil)
+	
+	switch _command {
+		case "edit" :
+			_flags := & EditFlags {}
+			_flags_0 = _flags
+			_execute = func () (*Error) {
+					return MainEdit (_flags, _globals, _index, _editor)
+				}
+		case "create" :
+			_flags := & CreateFlags {}
+			_flags_0 = _flags
+			_execute = func () (*Error) {
+					return MainCreate (_flags, _globals, _index, _editor)
+				}
+		case "menu" :
+			_flags := & MenuFlags {}
+			_flags_0 = _flags
+			_execute = func () (*Error) {
+					return MainMenu (_flags, _configuration.Menus, _configuration, _globals, _index, _editor)
+				}
+		default :
+			return errorw (0xbd997a82, nil)
+	}
+	
+	_parser := flags.NewNamedParser (_command, flags.PassDoubleDash)
+	if _, _error := _parser.AddGroup ("", "", _flags_0); _error != nil {
+		return errorw (0x8d45cee0, _error)
+	}
+	
+	if _argumentsRest, _error := _parser.ParseArgs (_arguments); _error != nil {
+		return errorw (0x0ddaf31b, _error)
+	} else if len (_argumentsRest) != 0 {
+		return errorw (0xdc656ded, nil)
+	}
+	
+	return _execute ()
+}
+
+
+
+
+func MainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _globals *Globals, _index *Index) (*Error) {
 	
 	if (len (_flags.Paths) > 0) && (len (_configuration) > 0) {
 		return errorw (0x374ece0f, nil)
@@ -963,7 +1120,7 @@ func MainLoadLibraries (_flags *LibraryFlags, _configuration []Library, _globals
 	if len (_configuration) > 0 {
 		for _, _library_0 := range _configuration {
 			_library := & Library {}
-			*_library = _library_0
+			*_library = *_library_0
 			_libraries = append (_libraries, _library)
 		}
 	}

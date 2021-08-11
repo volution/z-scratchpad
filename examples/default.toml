@@ -40,3 +40,17 @@ endpoint_port = 8080
 edit_enabled = true
 create_enabled = true
 
+[[menu]]
+identifier = "default"
+label = "Default"
+default = true
+loop = true
+commands = [
+	{label = "edit / ...", command = "edit", arguments = ["--select"]},
+	{label = "edit / tests", command = "edit", arguments = ["--library", "tests", "--select"]},
+	{label = "edit / inbox", command = "edit", arguments = ["--library", "inbox", "--select"]},
+	{label = "create / ...", command = "create", arguments = ["--select"]},
+	{label = "create / tests", command = "create", arguments = ["--library", "tests"]},
+	{label = "create / inbox", command = "create", arguments = ["--library", "inbox"]},
+]
+
