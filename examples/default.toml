@@ -16,10 +16,15 @@ name = "Inbox"
 paths = ["./inbox"]
 edit_enabled = true
 create_enabled = true
+create_name_timestamp_length = 3
+create_name_random_length = 16
 snapshot_enabled = true
 use_library_as_identifier_prefix = false
 use_file_name_as_identifier = true
 use_file_extension_as_format = true
+
+[editor]
+default_create_library = "inbox"
 
 [server]
 endpoint_ip = "127.9.212.148"
