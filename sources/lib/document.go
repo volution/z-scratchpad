@@ -11,6 +11,7 @@ import "path"
 import "regexp"
 import "sort"
 import "strings"
+import "time"
 import "unicode/utf8"
 
 
@@ -38,6 +39,7 @@ type Document struct {
 	RenderText string
 	
 	EditEnabled bool
+	Timestamp time.Time
 }
 
 
@@ -215,6 +217,22 @@ var DocumentIdentifierRegex *regexp.Regexp = regexp.MustCompile (`^` + DocumentI
 
 func DocumentLoadFromPath (_path string) (*Document, *Error) {
 	
+	var _file *os.File
+	if _file_0, _error := os.OpenFile (_path, os.O_RDONLY, 0); _error == nil {
+		_file = _file_0
+	} else {
+		return nil, errorw (0xc1e080d9, _error)
+	}
+	
+	var _stat os.FileInfo
+	if _stat_0, _error := _file.Stat (); _error == nil {
+		_stat = _stat_0
+	} else {
+		return nil, errorw (0xe18c3be5, _error)
+	}
+	
+	_timestamp := _stat.ModTime ()
+	
 	var _sourceBytes []byte
 	if _bytes, _error := os.ReadFile (_path); _error == nil {
 		_sourceBytes = _bytes
@@ -236,6 +254,7 @@ func DocumentLoadFromPath (_path string) (*Document, *Error) {
 	}
 	
 	_document.Path = _path
+	_document.Timestamp = _timestamp
 	
 	return _document, nil
 }
@@ -296,6 +315,8 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 				_format_0 := _header[7:]
 				_format_0 = stringTrimSpaces (_format_0)
 				_format = _format_0
+			} else if strings.HasPrefix (_header, "timestamp:") {
+				// NOTE:  Ignore timestamps from file.
 			} else {
 				return nil, errorf (0xc5ccdc9e, "metadata invalid `%s`", _header)
 			}
@@ -402,6 +423,9 @@ func DocumentDump (_stream io.Writer, _document *Document, _includeIdentifiers b
 		}
 		if _document.Path != "" {
 			fmt.Fprintf (_buffer, "-- path: `%s`\n", _document.Path)
+		}
+		if ! _document.Timestamp.IsZero () {
+			fmt.Fprintf (_buffer, "-- timestamp: `%s`\n", _document.Timestamp.Format ("2006-01-02 15:04:05"))
 		}
 		if _document.SourceFingerprint != "" {
 			fmt.Fprintf (_buffer, "-- source fingerprint: `%s`\n", _document.SourceFingerprint)

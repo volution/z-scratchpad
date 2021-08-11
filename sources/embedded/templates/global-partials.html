@@ -52,6 +52,9 @@
 	{{- else -}}
 		<h1>[{{ .Identifier }}]</h1>
 	{{- end -}}
+	{{- if .Timestamp.IsZero | not -}}
+		<h2>({{ .Timestamp.Format "2006-01-02 15:04:05" }})</h2>
+	{{- end -}}
 {{- end }}
 
 

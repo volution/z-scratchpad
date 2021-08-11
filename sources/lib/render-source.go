@@ -32,6 +32,9 @@ func DocumentRenderToSource (_document *Document) (string, *Error) {
 	if _document.Format != "" {
 		fmt.Fprintf (_buffer, "## -- format: %s\n", _document.Format)
 	}
+	if ! _document.Timestamp.IsZero () {
+		fmt.Fprintf (_buffer, "## -- timestamp: %s\n", _document.Timestamp.Format ("2006-01-02 15:04:05"))
+	}
 	
 	if !_document.BodyEmpty {
 		_buffer.WriteByte ('\n')
