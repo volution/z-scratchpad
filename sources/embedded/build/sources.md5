@@ -31,7 +31,7 @@ ccb4536deb65e3d7b72c64914b34bad1 *lib/editor.go
 ad208f51cae08fd86fe0fbaacc1f46f4 *lib/globals.go
 5baedbac808251ccdcaaf5fa4ff5b803 *lib/index.go
 af2deb2441e88db99b1b0e77175d662f *lib/library.go
-36020615dad879b177eae4c709d160d5 *lib/main.go
+3d9db98219c79c2b1dc190c533930854 *lib/main.go
 1eda90712c28eed65f1c947c5e5dd8f3 *lib/parser-commonmark.go
 06316230933c70c61bac6a71764ebae8 *lib/parser-snippets.go
 c67ffe68ccb6db3cb86af13bcbcb67e3 *lib/premain.go
