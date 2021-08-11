@@ -15,12 +15,17 @@ import text_template "text/template"
 
 
 type Server struct {
+	
 	index *Index
 	editor *Editor
 	templates *Templates
 	listener net.Listener
 	http *http.Server
 	globals *Globals
+	
+	EditEnabled bool
+	CreateEnabled bool
+	
 }
 
 
@@ -317,6 +322,9 @@ func ServerHandleDocumentCreate (_server *Server, _identifierUnsafe string, _res
 	if _server.editor == nil {
 		return errorw (0x14317f29, nil)
 	}
+	if !_server.CreateEnabled {
+		return errorw (0x744d1a48, nil)
+	}
 	if _error := WorkflowDocumentCreate (_identifierUnsafe, _server.index, _server.editor, false); _error != nil {
 		return _error
 	}
@@ -328,6 +336,9 @@ func ServerHandleDocumentCreate (_server *Server, _identifierUnsafe string, _res
 func ServerHandleDocumentEdit (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
 	if _server.editor == nil {
 		return errorw (0xee28afb6, nil)
+	}
+	if !_server.EditEnabled {
+		return errorw (0x664c252f, nil)
 	}
 	if _error := WorkflowDocumentEdit (_identifierUnsafe, _server.index, _server.editor, false); _error != nil {
 		return _error

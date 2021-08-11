@@ -37,4 +37,6 @@ xorg_select_command = ["rofi", "-dmenu", "-p", "", "-i", "-no-custom"]
 [server]
 endpoint_ip = "127.9.212.148"
 endpoint_port = 8080
+edit_enabled = true
+create_enabled = true
 

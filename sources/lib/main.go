@@ -38,6 +38,8 @@ type LibraryFlags struct {
 type ServerFlags struct {
 	EndpointIp *string `long:"server-ip" value-name:"{ip}" toml:"endpoint_ip"`
 	EndpointPort *uint16 `long:"server-port" value-name:"{port}" toml:"endpoint_port"`
+	EditEnabled *bool `long:"server-edit-enabled" toml:"edit_enabled"`
+	CreateEnabled *bool `long:"server-create-enabled" toml:"create_enabled"`
 }
 
 type ListFlags struct {
@@ -874,6 +876,9 @@ func MainServer (_flags *ServerFlags, _configuration *ServerFlags, _globals *Glo
 	_endpointIp := flag2StringOrDefault (_flags.EndpointIp, _configuration.EndpointIp, "127.0.0.1")
 	_endpointPort := flag2Uint16OrDefault (_flags.EndpointPort, _configuration.EndpointPort, 49894)
 	
+	_editEnabled := flag2BoolOrDefault (_flags.EditEnabled, _configuration.EditEnabled, false)
+	_createEnabled := flag2BoolOrDefault (_flags.CreateEnabled, _configuration.CreateEnabled, false)
+	
 	_endpoint := fmt.Sprintf ("%s:%d", _endpointIp, _endpointPort)
 	
 	logf ('i', 0x210494be, "[server]  listening on `%s`...", _endpoint)
@@ -889,6 +894,9 @@ func MainServer (_flags *ServerFlags, _configuration *ServerFlags, _globals *Glo
 	if _error != nil {
 		return _error
 	}
+	
+	_server.EditEnabled = _editEnabled
+	_server.CreateEnabled = _createEnabled
 	
 	_error = ServerRun (_server)
 	if _error != nil {
