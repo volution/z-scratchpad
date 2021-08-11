@@ -5,6 +5,7 @@
 
 
 && _/run.z-run
+&& _/examples.z-run
 
 && _/workspace.z-run
 && _/sources.z-run

@@ -1,0 +1,37 @@
+#!/dev/null
+
+
+
+
+::// examples / ...
+::// watch / examples / ...
+
+
+
+
+:: watch / examples / server :: exec -- "${ZRUN[@]}" ':: watch / examples / exec' server "${@}"
+:: watch / examples / menu :: exec -- "${ZRUN[@]}" ':: watch / examples / exec' menu "${@}"
+
+--:: watch / examples / exec :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: examples / exec' "${@}"
+
+
+
+
+:: examples / menu :: exec -- "${ZRUN[@]}" ':: examples / exec' menu "${@}"
+:: examples / server :: exec -- "${ZRUN[@]}" ':: examples / exec' server "${@}"
+:: examples / list :: exec -- "${ZRUN[@]}" ':: examples / exec' list "${@}"
+:: examples / search :: exec -- "${ZRUN[@]}" ':: examples / exec' search "${@}"
+:: examples / search / body :: exec -- "${ZRUN[@]}" ':: examples / exec' search -W body "${@}"
+:: examples / grep :: exec -- "${ZRUN[@]}" ':: examples / exec' grep "${@}"
+:: examples / grep / body :: exec -- "${ZRUN[@]}" ':: examples / exec' grep -W body "${@}"
+:: examples / edit :: exec -- "${ZRUN[@]}" ':: examples / exec' edit "${@}"
+:: examples / edit / select :: exec -- "${ZRUN[@]}" ':: examples / exec' edit -s "${@}"
+:: examples / create :: exec -- "${ZRUN[@]}" ':: examples / exec' create "${@}"
+:: examples / create / select :: exec -- "${ZRUN[@]}" ':: examples / exec' create -s "${@}"
+:: examples / export :: exec -- "${ZRUN[@]}" ':: examples / exec' export "${@}"
+:: examples / export / select :: exec -- "${ZRUN[@]}" ':: examples / exec' export -s "${@}"
+:: examples / dump :: exec -- "${ZRUN[@]}" ':: examples / exec' dump "${@}"
+
+
+--:: examples / exec :: exec -- "${ZRUN[@]}" ':: go / execute / main / debug' -C ./examples "${@}"
+

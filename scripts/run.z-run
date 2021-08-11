@@ -9,7 +9,10 @@
 
 
 
-:: watch / run / server :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / server' "${@}"
+:: watch / run / server :: exec -- "${ZRUN[@]}" ':: watch / run / exec' server "${@}"
+:: watch / run / menu :: exec -- "${ZRUN[@]}" ':: watch / run / exec' menu "${@}"
+
+--:: watch / run / exec :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / exec' "${@}"
 
 
 
@@ -19,15 +22,19 @@
 :: run / help :: exec -- "${ZRUN[@]}" ':: run / exec' --help "${@}"
 
 
+:: run / menu :: exec -- "${ZRUN[@]}" ':: run / exec' menu "${@}"
 :: run / server :: exec -- "${ZRUN[@]}" ':: run / exec' server "${@}"
 :: run / list :: exec -- "${ZRUN[@]}" ':: run / exec' list "${@}"
-:: run / select :: exec -- "${ZRUN[@]}" ':: run / exec' select "${@}"
+:: run / search :: exec -- "${ZRUN[@]}" ':: run / exec' search "${@}"
+:: run / search / body :: exec -- "${ZRUN[@]}" ':: run / exec' search -W body "${@}"
 :: run / grep :: exec -- "${ZRUN[@]}" ':: run / exec' grep "${@}"
+:: run / grep / body :: exec -- "${ZRUN[@]}" ':: run / exec' grep -W body "${@}"
 :: run / edit :: exec -- "${ZRUN[@]}" ':: run / exec' edit "${@}"
 :: run / edit / select :: exec -- "${ZRUN[@]}" ':: run / exec' edit -s "${@}"
 :: run / create :: exec -- "${ZRUN[@]}" ':: run / exec' create "${@}"
 :: run / create / select :: exec -- "${ZRUN[@]}" ':: run / exec' create -s "${@}"
 :: run / export :: exec -- "${ZRUN[@]}" ':: run / exec' export "${@}"
+:: run / export / select :: exec -- "${ZRUN[@]}" ':: run / exec' export -s "${@}"
 :: run / dump :: exec -- "${ZRUN[@]}" ':: run / exec' dump "${@}"
 
 
