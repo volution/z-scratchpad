@@ -1,11 +1,12 @@
 
-
 [[library]]
 identifier = "tests"
 name = "Tests"
 paths = ["./examples/tests"]
 edit_enabled = true
 create_enabled = false
+snapshot_enabled = true
+use_library_as_identifier_prefix = true
 use_file_name_as_identifier = true
 use_file_extension_as_format = true
 
@@ -15,9 +16,10 @@ name = "Inbox"
 paths = ["./examples/inbox"]
 edit_enabled = true
 create_enabled = false
+snapshot_enabled = true
+use_library_as_identifier_prefix = false
 use_file_name_as_identifier = true
 use_file_extension_as_format = true
-
 
 [server]
 endpoint_ip = "127.9.212.148"

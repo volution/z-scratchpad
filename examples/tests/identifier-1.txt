@@ -1,0 +1,4 @@
+## document with identifier
+## -- identifier: explicit-identifier
+
+some text
