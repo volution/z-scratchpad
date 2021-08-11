@@ -197,17 +197,11 @@ func editSessionFinalize (_session *editSession) (*Error) {
 		_session.documentNew.Library = _session.library.Identifier
 	}
 	
-	_useFileNameAsIdentifier := false
-	_useFileExtensionAsFormat := false
-	if _session.library != nil {
-		_useFileNameAsIdentifier = _session.library.UseFileNameAsIdentifier
-		_useFileExtensionAsFormat = _session.library.UseFileExtensionAsFormat
-	}
-	if _error := DocumentResolveIdentifier (_session.documentNew, _useFileNameAsIdentifier); _error != nil {
+	if _error := DocumentInitializeIdentifier (_session.documentNew, _session.library); _error != nil {
 		_session.error = _error
 		return editSessionClose (_session)
 	}
-	if _error := DocumentResolveFormat (_session.documentNew, _useFileExtensionAsFormat); _error != nil {
+	if _error := DocumentInitializeFormat (_session.documentNew, _session.library); _error != nil {
 		_session.error = _error
 		return editSessionClose (_session)
 	}

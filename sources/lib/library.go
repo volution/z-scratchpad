@@ -36,7 +36,10 @@ type Library struct {
 	IncludeRegexPatterns []string `toml:"include_regex"`
 	ExcludeRegexPatterns []string `toml:"exclude_regex"`
 	
+	UseLibraryAsIdentifierPrefix bool `toml:"use_library_as_identifier_prefix"`
+	UsePathInLibraryAsIdentifier bool `toml:"use_path_in_library_as_identifier"`
 	UseFileNameAsIdentifier bool `toml:"use_file_name_as_identifier"`
+	UsePathFingerprintAsIdentifier bool `toml:"use_path_fingerprint_as_identifier"`
 	UseFileExtensionAsFormat bool `toml:"use_file_extension_as_format"`
 	
 	includeGlobMatchers []glob.Glob `toml:"-"`
@@ -160,12 +163,13 @@ func LibraryInitialize (_library *Library) (*Error) {
 
 
 
-func libraryDocumentsLoad (_library *Library, _documentPaths []string) ([]*Document, *Error) {
+func libraryDocumentsLoad (_library *Library, _documentPaths [][2]string) ([]*Document, *Error) {
 	
 	_documents := make ([]*Document, 0, len (_documentPaths))
 	
 	for _, _documentPath := range _documentPaths {
-		if _document, _error := DocumentLoadFromPath (_documentPath); _error == nil {
+		if _document, _error := DocumentLoadFromPath (_documentPath[0]); _error == nil {
+			_document.PathInLibrary = _documentPath[1]
 			_documents = append (_documents, _document)
 		} else {
 			return nil, _error
@@ -178,9 +182,9 @@ func libraryDocumentsLoad (_library *Library, _documentPaths []string) ([]*Docum
 
 
 
-func libraryDocumentsWalk (_library *Library) ([]string, *Error) {
+func libraryDocumentsWalk (_library *Library) ([][2]string, *Error) {
 	
-	_documentPaths := []string (nil)
+	_documentPaths := [][2]string (nil)
 	for _, _libraryPath := range _library.Paths {
 		if _documentPaths_0, _error := libraryDocumentsWalkPath (_library, _libraryPath); _error == nil {
 			if _documentPaths == nil {
@@ -197,7 +201,7 @@ func libraryDocumentsWalk (_library *Library) ([]string, *Error) {
 }
 
 
-func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([]string, *Error) {
+func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([][2]string, *Error) {
 	
 	if _libraryPath == "" {
 		return nil, errorw (0x83afc399, nil)
@@ -208,7 +212,7 @@ func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([]string
 		_snapshotSuffix = "." + _library.SnapshotExtension
 	}
 	
-	_documentPaths := make ([]string, 0, 1024)
+	_documentPaths := make ([][2]string, 0, 1024)
 	_folderPaths := make ([]string, 0, 128)
 	
 	_walkFunc := func (_pathEntry string, _entry os.DirEntry) (*Error) {
@@ -310,7 +314,7 @@ func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([]string
 		
 //		logf ('d', 0xaa73f1ac, "%s", _pathEntry)
 		
-		_documentPath := filepath.Join (_libraryPath, _pathRelative[1:])
+		_documentPath := [2]string { filepath.Join (_libraryPath, _pathRelative[1:]), _pathRelative[1:] }
 		_documentPaths = append (_documentPaths, _documentPath)
 		
 		return nil

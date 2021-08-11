@@ -871,12 +871,12 @@ func MainLoadLibraries (_flags *LibraryFlags, _configuration []Library, _globals
 			
 			_document.EditEnabled = _library.EditEnabled
 			
-			_error = DocumentResolveIdentifier (_document, _library.UseFileNameAsIdentifier)
+			_error = DocumentInitializeIdentifier (_document, _library)
 			if _error != nil {
 				return _error
 			}
 			
-			_error = DocumentResolveFormat (_document, _library.UseFileExtensionAsFormat)
+			_error = DocumentInitializeFormat (_document, _library)
 			if _error != nil {
 				return _error
 			}

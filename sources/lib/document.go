@@ -7,6 +7,7 @@ import "bytes"
 import "fmt"
 import "io"
 import "os"
+import "path"
 import "regexp"
 import "strings"
 import "unicode/utf8"
@@ -19,6 +20,7 @@ type Document struct {
 	Identifier string
 	Library string
 	Path string
+	PathInLibrary string
 	
 	Title string
 	TitleAlternatives []string
@@ -40,38 +42,126 @@ type Document struct {
 
 
 
-func DocumentResolveIdentifier (_document *Document, _perhapsUseFileName bool) (*Error) {
+func DocumentInitializeIdentifier (_document *Document, _library *Library) (*Error) {
+	if (_library != nil) && (_document.Library != _library.Identifier) {
+		return errorw (0x767046ec, nil)
+	}
+	_useLibraryPrefix := false
+	_usePathInLibrary := false
+	_useFileName := false
+	_usePathFingerprint := true
+	if _library != nil {
+		_useLibraryPrefix = _library.UseLibraryAsIdentifierPrefix
+		_usePathInLibrary = _library.UsePathInLibraryAsIdentifier
+		_useFileName = _library.UseFileNameAsIdentifier
+		_usePathFingerprint = _library.UsePathFingerprintAsIdentifier
+	}
+	return DocumentInitializeIdentifier_0 (_document, _useLibraryPrefix, _usePathInLibrary, _useFileName, _usePathFingerprint)
+}
+
+
+func DocumentInitializeIdentifier_0 (_document *Document, _useLibraryPrefix bool, _usePathInLibrary bool, _useFileName bool, _usePathFingerprint bool) (*Error) {
 	
-	if _document.Identifier != "" {
+	_libraryIdentifier := ""
+	if (_document.Library != "") && _useLibraryPrefix {
+		_libraryIdentifier = _document.Library
+	}
+	
+	_documentName := ""
+	
+	if (_document.Identifier != "") {
+		_documentName = _document.Identifier
+		goto _resolve
+	}
+	
+	if (_document.PathInLibrary != "") && _usePathInLibrary {
+		_folderPath, _fileName := path.Split (_document.PathInLibrary)
+		if _documentName_0, _, _error := pathSplitFileNameAndExtension (_fileName); _error == nil {
+			if _folderPath != "" {
+				_folderPath = _folderPath[: len(_folderPath) - 1]
+			}
+			if _folderPath != "" {
+				_documentName = strings.ReplaceAll (_folderPath, "/", "~~") + "~~" + _documentName_0
+			} else {
+				_documentName = _documentName_0
+			}
+			goto _resolve
+		} else {
+			return _error
+		}
+	}
+	
+	if (_document.Path != "") && _useFileName {
+		if _documentName_0, _, _error := pathSplitFileNameAndExtension (_document.Path); _error == nil {
+			_documentName = _documentName_0
+			goto _resolve
+		} else {
+			return _error
+		}
+	}
+	
+	if (_document.Path != "") && _usePathFingerprint {
+		_fingerprint := fingerprintString (_document.Path)
+		_documentName = _fingerprint[:32]
+		goto _resolve
+	}
+	
+//	logf ('d', 0xadfa2993, "%s", _document.Path)
+	
+	return errorf (0x1c58da80, "identifier unresolvable")
+	
+	_resolve :
+	
+	if _identifier, _error := DocumentFormatIdentifier (_libraryIdentifier, _documentName); _error == nil {
+		_document.Identifier = _identifier
+		return nil
+	} else {
+		return _error
+	}
+}
+
+
+
+
+func DocumentInitializeFormat (_document *Document, _library *Library) (*Error) {
+	if (_library != nil) && (_document.Library != _library.Identifier) {
+		return errorw (0xc8a19353, nil)
+	}
+	_useFileExtension := true
+	if _library != nil {
+		_useFileExtension = _library.UseFileExtensionAsFormat
+	}
+	return DocumentInitializeFormat_0 (_document, _useFileExtension)
+}
+
+
+func DocumentInitializeFormat_0 (_document *Document, _useFileExtension bool) (*Error) {
+	
+	if _document.Format != "" {
 		return nil
 	}
 	
-	if (_document.Path != "") && _perhapsUseFileName {
-		if _documentName, _, _error := pathSplitFileNameAndExtension (_document.Path); _error == nil {
-			_libraryIdentifier := ""
-			if _document.Library != "" {
-				_libraryIdentifier = _document.Library
+	if (_document.Path != "") && _useFileExtension {
+		if _, _extension, _error := pathSplitFileNameAndExtension (_document.Path); _error == nil {
+			_format := ""
+			switch _extension {
+				case "md" :
+					_format = "commonmark"
+				case "txt" :
+					_format = "text"
 			}
-			if _identifier, _error := DocumentFormatIdentifier (_libraryIdentifier, _documentName); _error == nil {
-				_document.Identifier = _identifier
+			if _format != "" {
+				_document.Format = _format
 				return nil
-			} else {
-				return _error
 			}
 		} else {
 			return _error
 		}
 	}
 	
-	if _document.Path != "" {
-		_fingerprint := fingerprintString (_document.Path)
-		_document.Identifier = _fingerprint[:32]
-		return nil
-	}
+//	logf ('d', 0xff65fe47, "%s", _document.Path)
 	
-//	logf ('d', 0xadfa2993, "%s", _document.Path)
-	
-	return errorf (0x1c58da80, "identifier unresolvable")
+	return errorf (0xe5e1dd0f, "format unresolvable")
 }
 
 
@@ -113,43 +203,11 @@ func DocumentFormatIdentifier (_libraryIdentifier string, _documentName string) 
 }
 
 
-var DocumentIdentifierWithoutLibraryRegexToken string = `(?:(?:[a-z0-9]+)(?:[_-]+[a-z0-9]+)*)`
+var DocumentIdentifierWithoutLibraryRegexToken string = `(?:(?:[a-z0-9]+)(?:(?:[_-]{1,2}|~~)[a-z0-9]+)*)`
 var DocumentIdentifierWithoutLibraryRegex *regexp.Regexp = regexp.MustCompile (`^` + DocumentIdentifierWithoutLibraryRegexToken + `$`)
 var DocumentIdentifierWithLibraryRegexToken string = `(?:` + LibraryIdentifierRegexToken + `:` + DocumentIdentifierWithoutLibraryRegexToken + `)`
 var DocumentIdentifierRegexToken string = `(?:` + DocumentIdentifierWithoutLibraryRegexToken + `|` + DocumentIdentifierWithLibraryRegexToken + `)`
 var DocumentIdentifierRegex *regexp.Regexp = regexp.MustCompile (`^` + DocumentIdentifierRegexToken + `$`)
-
-
-
-
-func DocumentResolveFormat (_document *Document, _perhapsUseFileExtension bool) (*Error) {
-	
-	if _document.Format != "" {
-		return nil
-	}
-	
-	if (_document.Path != "") && _perhapsUseFileExtension {
-		if _, _extension, _error := pathSplitFileNameAndExtension (_document.Path); _error == nil {
-			_format := ""
-			switch _extension {
-				case "md" :
-					_format = "commonmark"
-				case "txt" :
-					_format = "text"
-			}
-			if _format != "" {
-				_document.Format = _format
-				return nil
-			}
-		} else {
-			return _error
-		}
-	}
-	
-//	logf ('d', 0xff65fe47, "%s", _document.Path)
-	
-	return errorf (0xe5e1dd0f, "format unresolvable")
-}
 
 
 
