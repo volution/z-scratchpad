@@ -78,6 +78,10 @@ type CreateFlags struct {
 	Select *bool `long:"select" short:"s"`
 }
 
+type EditorConfiguration struct {
+	DefaultCreateLibrary *string `toml:"default_create_library"`
+}
+
 type DumpFlags struct {}
 
 type MainFlags struct {
@@ -96,6 +100,7 @@ type MainFlags struct {
 
 type MainConfiguration struct {
 	Global *GlobalConfiguration `toml:"globals"`
+	Editor *EditorConfiguration `toml:"editor"`
 	Libraries []Library `toml:"library"`
 	Server *ServerFlags `toml:"server"`
 }
@@ -120,6 +125,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	
 	_configuration := & MainConfiguration {
 			Global : & GlobalConfiguration {},
+			Editor : & EditorConfiguration {},
 			Server : & ServerFlags {},
 		}
 	
@@ -266,6 +272,14 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 	_editor, _error := EditorNew (_globals, _index)
 	if _error != nil {
 		return _error
+	}
+	
+	if _configuration.Editor.DefaultCreateLibrary != nil {
+		_library := *_configuration.Editor.DefaultCreateLibrary
+		if _library == "" {
+			return errorw (0xd3b3131d, nil)
+		}
+		_editor.DefaultCreateLibrary = _library
 	}
 	
 	_error = MainLoadLibraries (_flags.Library, _configuration.Libraries, _globals, _index)
@@ -434,8 +448,6 @@ func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor 
 			_identifier = _document
 		} else if _library != "" {
 			_identifier = _library
-		} else {
-			return errorw (0x22cc7dea, nil)
 		}
 	}
 	

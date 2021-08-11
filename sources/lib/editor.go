@@ -15,8 +15,12 @@ import "sync"
 
 
 type Editor struct {
+	
 	globals *Globals
 	index *Index
+	
+	DefaultCreateLibrary string
+	
 }
 
 type editSession struct {

@@ -7,13 +7,17 @@ package zscratchpad
 
 func WorkflowDocumentCreate (_identifierUnsafe string, _index *Index, _editor *Editor, _synchronous bool) (*Error) {
 	
-	if _identifierUnsafe == "" {
-		// FIXME:  Add support for random document creation!
-		return errorw (0x19f48aa6, nil)
-	}
-	
 	_libraryIdentifier := ""
 	_documentName := ""
+	if _libraryIdentifier == "" {
+		if _identifierUnsafe == "" {
+			if _editor.DefaultCreateLibrary != "" {
+				_libraryIdentifier = _editor.DefaultCreateLibrary
+			} else {
+				return errorw (0x19f48aa6, nil)
+			}
+		}
+	}
 	if _libraryIdentifier == "" {
 		if _libraryIdentifier_0, _error := LibraryParseIdentifier (_identifierUnsafe); _error == nil {
 			_libraryIdentifier = _libraryIdentifier_0
