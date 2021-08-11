@@ -21,6 +21,11 @@ import "github.com/pelletier/go-toml"
 type GlobalFlags struct {
 	Help *bool `long:"help" short:"h"`
 	ConfigurationPath *string `long:"configuration" short:"c" value-name:"{configuration-path}"`
+	WorkingDirectory *string `long:"chdir" short:"C" value-name:"{working-directory-path}"`
+}
+
+type GlobalConfiguration struct {
+	WorkingDirectory *string `toml:"working_directory"`
 }
 
 type LibraryFlags struct {
@@ -89,6 +94,7 @@ type MainFlags struct {
 
 
 type MainConfiguration struct {
+	Global *GlobalConfiguration `toml:"globals"`
 	Libraries []Library `toml:"library"`
 	Server *ServerFlags `toml:"server"`
 }
@@ -153,6 +159,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	}
 	
 	_configuration := & MainConfiguration {
+			Global : & GlobalConfiguration {},
 			Server : & ServerFlags {},
 		}
 	if _flags.Global.ConfigurationPath != nil {
@@ -184,6 +191,16 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 
 
 func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConfiguration, _globals *Globals) (*Error) {
+	
+	if (_flags.Global.WorkingDirectory != nil) || (_configuration.Global.WorkingDirectory != nil) {
+		_workingDirectory := flag2StringOrDefault (_flags.Global.WorkingDirectory, _configuration.Global.WorkingDirectory, "")
+		if _workingDirectory == "" {
+			return errorw (0xe7c58968, nil)
+		}
+		if _error := os.Chdir (_workingDirectory); _error != nil {
+			return errorw (0x5aae8d30, _error)
+		}
+	}
 	
 	_index, _error := IndexNew (_globals)
 	if _error != nil {
