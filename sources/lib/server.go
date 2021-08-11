@@ -185,7 +185,11 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 
 
 func ServerHandleHome (_server *Server, _response http.ResponseWriter) (*Error) {
-	_context := struct {} {}
+	_context := struct {
+			Server *Server
+		} {
+			_server,
+		}
 	return respondWithHtmlTemplate (_response, _server.templates.homeHtml, _context)
 }
 
@@ -195,7 +199,13 @@ func ServerHandleLibrariesIndex (_server *Server, _response http.ResponseWriter)
 	if _error != nil {
 		return _error
 	}
-	_context := struct { Libraries []*Library } { _libraries }
+	_context := struct {
+			Server *Server
+			Libraries []*Library
+		} {
+			_server,
+			_libraries,
+		}
 	return respondWithHtmlTemplate (_response, _server.templates.librariesIndexHtml, _context)
 }
 
@@ -205,7 +215,13 @@ func ServerHandleDocumentsIndex (_server *Server, _response http.ResponseWriter)
 	if _error != nil {
 		return _error
 	}
-	_context := struct { Documents []*Document } { _documents }
+	_context := struct {
+			Server *Server
+			Documents []*Document
+		} {
+			_server,
+			_documents,
+		}
 	return respondWithHtmlTemplate (_response, _server.templates.documentsIndexHtml, _context)
 }
 
@@ -222,9 +238,11 @@ func ServerHandleLibraryView (_server *Server, _identifierUnsafe string, _respon
 		return _error
 	}
 	_context := struct {
+			Server *Server
 			Library *Library
 			Documents []*Document
 		} {
+			_server,
 			_library,
 			_documents,
 		}
@@ -244,10 +262,12 @@ func ServerHandleDocumentView (_server *Server, _identifierUnsafe string, _respo
 		return _error
 	}
 	_context := struct {
+			Server *Server
 			Library *Library
 			Document *Document
 			DocumentHtml html_template.HTML
 		} {
+			_server,
 			_library,
 			_document,
 			html_template.HTML (_documentHtml),
@@ -266,9 +286,11 @@ func ServerHandleDocumentExportHtml (_server *Server, _identifierUnsafe string, 
 		return _error
 	}
 	_context := struct {
+			Server *Server
 			Document *Document
 			DocumentHtml html_template.HTML
 		} {
+			_server,
 			_document,
 			html_template.HTML (_documentHtml),
 		}
@@ -286,9 +308,11 @@ func ServerHandleDocumentExportText (_server *Server, _identifierUnsafe string, 
 		return _error
 	}
 	_context := struct {
+			Server *Server
 			Document *Document
 			DocumentText string
 		} {
+			_server,
 			_document,
 			_documentText,
 		}
@@ -306,9 +330,11 @@ func ServerHandleDocumentExportSource (_server *Server, _identifierUnsafe string
 		return _error
 	}
 	_context := struct {
+			Server *Server
 			Document *Document
 			DocumentSource string
 		} {
+			_server,
 			_document,
 			_documentSource,
 		}
