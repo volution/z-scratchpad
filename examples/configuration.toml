@@ -1,4 +1,5 @@
 
+
 [[library]]
 identifier = "tests"
 name = "Tests"
@@ -16,4 +17,9 @@ edit_enabled = true
 create_enabled = false
 use_file_name_as_identifier = true
 use_file_extension_as_format = true
+
+
+[server]
+endpoint_ip = "127.9.212.148"
+endpoint_port = 8080
 

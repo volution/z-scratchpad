@@ -28,8 +28,8 @@ type LibraryFlags struct {
 }
 
 type ServerFlags struct {
-	EndpointIp *string `long:"server-ip" value-name:"{ip}"`
-	EndpointPort *uint16 `long:"server-port" value-name:"{port}"`
+	EndpointIp *string `long:"server-ip" value-name:"{ip}" toml:"endpoint_ip"`
+	EndpointPort *uint16 `long:"server-port" value-name:"{port}" toml:"endpoint_port"`
 }
 
 type ListFlags struct {
@@ -90,6 +90,7 @@ type MainFlags struct {
 
 type MainConfiguration struct {
 	Libraries []Library `toml:"library"`
+	Server *ServerFlags `toml:"server"`
 }
 
 
@@ -151,7 +152,9 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		return _help (false, nil)
 	}
 	
-	_configuration := & MainConfiguration {}
+	_configuration := & MainConfiguration {
+			Server : & ServerFlags {},
+		}
 	if _flags.Global.ConfigurationPath != nil {
 		_path := *_flags.Global.ConfigurationPath
 		if _path == "" {
@@ -218,7 +221,7 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 			return MainCreate (_flags.Create, _globals, _index, _editor)
 		
 		case "server" :
-			return MainServer (_flags.Server, _globals, _index, _editor)
+			return MainServer (_flags.Server, _configuration.Server, _globals, _index, _editor)
 		
 		case "dump" :
 			return MainDump (_flags.Dump, _globals, _index)
@@ -742,10 +745,10 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 
 
 
-func MainServer (_flags *ServerFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+func MainServer (_flags *ServerFlags, _configuration *ServerFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
-	_endpointIp := flagStringOrDefault (_flags.EndpointIp, "127.13.160.195")
-	_endpointPort := flagUint16OrDefault (_flags.EndpointPort, 8080)
+	_endpointIp := flag2StringOrDefault (_flags.EndpointIp, _configuration.EndpointIp, "127.13.160.195")
+	_endpointPort := flag2Uint16OrDefault (_flags.EndpointPort, _configuration.EndpointPort, 8080)
 	
 	_endpoint := fmt.Sprintf ("%s:%d", _endpointIp, _endpointPort)
 	
@@ -944,23 +947,54 @@ func mainMergeLibraryAndDocumentIdentifiers (_library *string, _document *string
 
 
 func flagBoolOrDefault (_value *bool, _default bool) (bool) {
-	if _value == nil {
-		return _default
+	if _value != nil {
+		return *_value
 	}
-	return *_value
+	return _default
 }
 
 func flagUint16OrDefault (_value *uint16, _default uint16) (uint16) {
-	if _value == nil {
-		return _default
+	if _value != nil {
+		return *_value
 	}
-	return *_value
+	return _default
 }
 
 func flagStringOrDefault (_value *string, _default string) (string) {
-	if _value == nil {
-		return _default
+	if _value != nil {
+		return *_value
 	}
-	return *_value
+	return _default
+}
+
+
+func flag2BoolOrDefault (_value_1 *bool, _value_2 *bool, _default bool) (bool) {
+	if _value_1 != nil {
+		return *_value_1
+	}
+	if _value_2 != nil {
+		return *_value_2
+	}
+	return _default
+}
+
+func flag2Uint16OrDefault (_value_1 *uint16, _value_2 *uint16, _default uint16) (uint16) {
+	if _value_1 != nil {
+		return *_value_1
+	}
+	if _value_2 != nil {
+		return *_value_2
+	}
+	return _default
+}
+
+func flag2StringOrDefault (_value_1 *string, _value_2 *string, _default string) (string) {
+	if _value_1 != nil {
+		return *_value_1
+	}
+	if _value_2 != nil {
+		return *_value_2
+	}
+	return _default
 }
 
