@@ -66,7 +66,7 @@ func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document
 		return errorw (0xbdb59e67, nil)
 	}
 	
-	logf ('d', 0x226a3cbd, "[editor-session]  opening file for `%s`...", _path)
+//	logf ('d', 0x226a3cbd, "[editor-session]  opening file for `%s`...", _path)
 	
 	_file, _error := os.OpenFile (_path, os.O_RDWR, 0)
 	if _error != nil {
@@ -108,7 +108,7 @@ func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName str
 		_path = _path + "." + _library.CreateExtension
 	}
 	
-	logf ('d', 0x6292b948, "[editor-session]  creating file for `%s`...", _path)
+//	logf ('d', 0x6292b948, "[editor-session]  creating file for `%s`...", _path)
 	
 	_file, _error := os.OpenFile (_path, os.O_RDWR | os.O_CREATE | os.O_EXCL, 0o640)
 	if _error != nil {
@@ -142,7 +142,7 @@ func editSessionRun (_session *editSession) (*Error) {
 	}
 	defer _globals.TerminalMutexUnlock ()
 	
-	logf ('d', 0x0edfabbf, "[editor-session]  launching editor for `%s`...", _session.path)
+//	logf ('d', 0x0edfabbf, "[editor-session]  launching editor for `%s`...", _session.path)
 	
 	_command, _error := EditorResolveEditCommand (_session.editor, _session.path)
 	if _error != nil {
@@ -157,7 +157,7 @@ func editSessionRun (_session *editSession) (*Error) {
 	
 	_session.command = _command
 	
-	logf ('d', 0xff9ec344, "[editor-session]  waiting editor for `%s`...", _session.path)
+//	logf ('d', 0xff9ec344, "[editor-session]  waiting editor for `%s`...", _session.path)
 	
 	if _error := _session.command.Wait (); _error != nil {
 		_session.error = errorw (0xe877f161, _error)
@@ -172,7 +172,7 @@ func editSessionFinalize (_session *editSession) (*Error) {
 	
 	if _session.documentOld != nil {
 		
-		logf ('d', 0x48f7d5f5, "[editor-session]  reloading document for `%s`...", _session.path)
+//		logf ('d', 0x48f7d5f5, "[editor-session]  reloading document for `%s`...", _session.path)
 		
 		if _document_0, _error := DocumentReload (_session.documentOld); _error == nil {
 			_session.documentNew = _document_0
@@ -183,7 +183,7 @@ func editSessionFinalize (_session *editSession) (*Error) {
 		
 	} else {
 		
-		logf ('d', 0xff9b1d5d, "[editor-session]  loading document for `%s`...", _session.path)
+//		logf ('d', 0xff9b1d5d, "[editor-session]  loading document for `%s`...", _session.path)
 		
 		if _document_0, _error := DocumentLoadFromPath (_session.path); _error == nil {
 			_session.documentNew = _document_0
@@ -221,7 +221,7 @@ func editSessionFinalize (_session *editSession) (*Error) {
 	
 	if _session.documentOld != nil {
 		
-		logf ('d', 0x44c67acc, "[editor-session]  reindexing document for `%s`...", _session.path)
+//		logf ('d', 0x44c67acc, "[editor-session]  reindexing document for `%s`...", _session.path)
 		
 		if _error := IndexDocumentUpdate (_session.editor.index, _session.documentNew, _session.documentOld); _error != nil {
 			_session.error = _error
@@ -230,7 +230,7 @@ func editSessionFinalize (_session *editSession) (*Error) {
 		
 	} else {
 		
-		logf ('d', 0x5ee2c034, "[editor-session]  indexing document for `%s`...", _session.path)
+//		logf ('d', 0x5ee2c034, "[editor-session]  indexing document for `%s`...", _session.path)
 		
 		if _error := IndexDocumentInclude (_session.editor.index, _session.documentNew); _error != nil {
 			_session.error = _error
@@ -251,7 +251,7 @@ func editSessionClose (_session *editSession) (*Error) {
 		return _session.error
 	}
 	
-	logf ('d', 0x42c39bbe, "[editor-session]  succeeded for `%s`;", _session.path)
+//	logf ('d', 0x42c39bbe, "[editor-session]  succeeded for `%s`;", _session.path)
 	
 	return nil
 }

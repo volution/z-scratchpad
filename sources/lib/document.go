@@ -245,7 +245,7 @@ func DocumentLoadFromPath (_path string) (*Document, *Error) {
 	}
 	
 	if ! utf8.Valid (_sourceBytes) {
-		logf ('d', 0x742720c2, "%s", _path)
+//		logf ('d', 0x742720c2, "%s", _path)
 		return nil, errorf (0xa24965ce, "invalid UTF-8 source")
 	}
 	_source := string (_sourceBytes)
