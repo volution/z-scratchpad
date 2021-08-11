@@ -193,8 +193,14 @@ func editSessionFinalize (_session *editSession) (*Error) {
 		}
 	}
 	
-	if (_session.documentNew.Library == "") && (_session.library != nil) {
-		_session.documentNew.Library = _session.library.Identifier
+	if _session.documentOld != nil {
+		_session.documentNew.Library = _session.documentOld.Library
+		_session.documentNew.PathInLibrary = _session.documentOld.PathInLibrary
+		_session.documentNew.EditEnabled = _session.documentOld.EditEnabled
+	} else {
+		if _session.library != nil {
+			_session.documentNew.Library = _session.library.Identifier
+		}
 	}
 	
 	if _error := DocumentInitializeIdentifier (_session.documentNew, _session.library); _error != nil {
