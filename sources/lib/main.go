@@ -49,13 +49,13 @@ type ListFlags struct {
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
 }
 
-type SelectFlags struct {
+type SearchFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Type *string `long:"type" short:"t" choice:"library" choice:"document"`
 	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path"`
 	How *string `long:"how" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
-	Action *string `long:"action" short:"a" chouce:"output" choice:"edit"`
+	Action *string `long:"action" short:"a" chouce:"output" choice:"edit" choice:"export"`
 }
 
 type GrepFlags struct {
@@ -64,7 +64,7 @@ type GrepFlags struct {
 	Where *string `long:"where" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json" choice:"context"`
 	Terms []string `long:"term" short:"t" value-name:"{term}"`
-	Action *string `long:"action" short:"a" chouce:"output" choice:"edit"`
+	Action *string `long:"action" short:"a" chouce:"output" choice:"edit" choice:"export"`
 }
 
 type ExportFlags struct {
@@ -100,7 +100,7 @@ type MainFlags struct {
 	Global *GlobalFlags `group:"Global options"`
 	Library *LibraryFlags `group:"Library options"`
 	List *ListFlags `command:"list"`
-	Select *SelectFlags `command:"select"`
+	Search *SearchFlags `command:"search"`
 	Grep *GrepFlags `command:"grep"`
 	Export *ExportFlags `command:"export"`
 	Edit *EditFlags `command:"edit"`
@@ -148,7 +148,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			Global : & GlobalFlags {},
 			Library : & LibraryFlags {},
 			List : & ListFlags {},
-			Select : & SelectFlags {},
+			Search : & SearchFlags {},
 			Grep : & GrepFlags {},
 			Export : & ExportFlags {},
 			Edit : & EditFlags {},
@@ -368,8 +368,8 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 		case "list" :
 			return MainList (_flags.List, _globals, _index)
 		
-		case "select" :
-			return MainSelect (_flags.Select, _globals, _index, _editor)
+		case "search" :
+			return MainSearch (_flags.Search, _globals, _index, _editor)
 		
 		case "grep" :
 			return MainGrep (_flags.Grep, _globals, _index, _editor)
@@ -437,12 +437,18 @@ func MainExport (_flags *ExportFlags, _globals *Globals, _index *Index, _editor 
 		}
 	}
 	
+	_format := flagStringOrDefault (_flags.Format, "source")
+	
+	return mainExportOutput (_identifier, _format, _globals, _index)
+}
+
+
+func mainExportOutput (_identifier string, _format string, _globals *Globals, _index *Index) (*Error) {
+	
 	_document, _error := WorkflowDocumentResolve (_identifier, _index)
 	if _error != nil {
 		return _error
 	}
-	
-	_format := flagStringOrDefault (_flags.Format, "source")
 	
 	_buffer := (*bytes.Buffer) (nil)
 	switch _format {
@@ -584,7 +590,7 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 }
 
 
-func MainSelect (_flags *SelectFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
 	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
 	_type := flagStringOrDefault (_flags.Type, "document")
@@ -596,7 +602,7 @@ func MainSelect (_flags *SelectFlags, _globals *Globals, _index *Index, _editor 
 	switch _action {
 		case "output" :
 			// NOP
-		case "edit" :
+		case "edit", "export" :
 			if _flags.Type != nil {
 				return errorw (0x8133f4ab, nil)
 			}
@@ -620,7 +626,7 @@ func MainSelect (_flags *SelectFlags, _globals *Globals, _index *Index, _editor 
 		case "output" :
 			return mainListOutput (_selection, _format, _globals)
 		
-		case "edit" :
+		case "edit", "export" :
 			_identifier := ""
 			switch len (_selection) {
 				case 0 :
@@ -630,7 +636,14 @@ func MainSelect (_flags *SelectFlags, _globals *Globals, _index *Index, _editor 
 				case 2 :
 					return errorw (0xea0431aa, nil)
 			}
-			return WorkflowDocumentEdit (_identifier, _index, _editor, true)
+			if _action == "edit" {
+				return WorkflowDocumentEdit (_identifier, _index, _editor, true)
+			} else if _action == "export" {
+				// FIXME:  Add support for other formats!
+				return mainExportOutput (_identifier, "source", _globals, _index)
+			} else {
+				return errorw (0xaf7a3532, nil)
+			}
 		
 		default :
 			return errorw (0xe611caea, nil)
@@ -943,7 +956,7 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 	switch _action {
 		case "output" :
 			// NOP
-		case "edit" :
+		case "edit", "export" :
 			if _flags.What != nil {
 				return errorw (0x966bbfc4, nil)
 			}
@@ -992,7 +1005,7 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 		case "output" :
 			return mainListOutput (_selection, _format, _globals)
 		
-		case "edit" :
+		case "edit", "export" :
 			_identifier := ""
 			switch len (_selection) {
 				case 0 :
@@ -1002,7 +1015,14 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 				case 2 :
 					return errorw (0x1e4d02e6, nil)
 			}
-			return WorkflowDocumentEdit (_identifier, _index, _editor, true)
+			if _action == "edit" {
+				return WorkflowDocumentEdit (_identifier, _index, _editor, true)
+			} else if _action == "export" {
+				// FIXME:  Add support for other formats!
+				return mainExportOutput (_identifier, "source", _globals, _index)
+			} else {
+				return errorw (0xb5fa0b59, nil)
+			}
 		
 		default :
 			return errorw (0x1217cd0b, nil)
@@ -1173,11 +1193,11 @@ func MainCommand (_command string, _arguments []string, _configuration *MainConf
 			_execute = func () (*Error) {
 					return MainCreate (_flags, _globals, _index, _editor)
 				}
-		case "select" :
-			_flags := & SelectFlags {}
+		case "search" :
+			_flags := & SearchFlags {}
 			_flags_0 = _flags
 			_execute = func () (*Error) {
-					return MainSelect (_flags, _globals, _index, _editor)
+					return MainSearch (_flags, _globals, _index, _editor)
 				}
 		case "menu" :
 			_flags := & MenuFlags {}
