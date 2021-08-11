@@ -27,6 +27,8 @@ type GlobalFlags struct {
 
 type GlobalConfiguration struct {
 	WorkingDirectory *string `toml:"working_directory"`
+	TerminalEnabled *bool `toml:"terminal_enabled"`
+	XorgEnabled *bool `toml:"xorg_enabled"`
 }
 
 type LibraryFlags struct {
@@ -80,6 +82,10 @@ type CreateFlags struct {
 
 type EditorConfiguration struct {
 	DefaultCreateLibrary *string `toml:"default_create_library"`
+	TerminalEditCommand *[]string `toml:"terminal_edit_command"`
+	XorgEditCommand *[]string `toml:"xorg_edit_command"`
+	TerminalSelectCommand *[]string `toml:"terminal_select_command"`
+	XorgSelectCommand *[]string `toml:"xorg_select_command"`
 }
 
 type DumpFlags struct {}
@@ -264,6 +270,9 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 		}
 	}
 	
+	_globals.TerminalEnabled = _globals.TerminalEnabled && flagBoolOrDefault (_configuration.Global.TerminalEnabled, true)
+	_globals.XorgEnabled = _globals.XorgEnabled && flagBoolOrDefault (_configuration.Global.XorgEnabled, true)
+	
 	_index, _error := IndexNew (_globals)
 	if _error != nil {
 		return _error
@@ -280,6 +289,36 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 			return errorw (0xd3b3131d, nil)
 		}
 		_editor.DefaultCreateLibrary = _library
+	}
+	
+	if _configuration.Editor.TerminalEditCommand != nil {
+		_command := *_configuration.Editor.TerminalEditCommand
+		if len (_command) == 0 {
+			return errorw (0x28e59c3d, nil)
+		}
+		_editor.TerminalEditCommand = _command
+	}
+	if _configuration.Editor.XorgEditCommand != nil {
+		_command := *_configuration.Editor.XorgEditCommand
+		if len (_command) == 0 {
+			return errorw (0x7fd5d86e, nil)
+		}
+		_editor.XorgEditCommand = _command
+	}
+	
+	if _configuration.Editor.TerminalSelectCommand != nil {
+		_command := *_configuration.Editor.TerminalSelectCommand
+		if len (_command) == 0 {
+			return errorw (0xe9ff3646, nil)
+		}
+		_editor.TerminalSelectCommand = _command
+	}
+	if _configuration.Editor.XorgSelectCommand != nil {
+		_command := *_configuration.Editor.XorgSelectCommand
+		if len (_command) == 0 {
+			return errorw (0x8b6b008b, nil)
+		}
+		_editor.XorgSelectCommand = _command
 	}
 	
 	_error = MainLoadLibraries (_flags.Library, _configuration.Libraries, _globals, _index)

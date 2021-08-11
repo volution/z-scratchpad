@@ -9,6 +9,7 @@ import "io"
 import "os"
 import "os/exec"
 import "path"
+import "strings"
 import "sync"
 
 
@@ -20,6 +21,11 @@ type Editor struct {
 	index *Index
 	
 	DefaultCreateLibrary string
+	
+	TerminalEditCommand []string
+	XorgEditCommand []string
+	TerminalSelectCommand []string
+	XorgSelectCommand []string
 	
 }
 
@@ -152,9 +158,23 @@ func editSessionRun (_session *editSession) (*Error) {
 	
 //	logf ('d', 0x0edfabbf, "[editor-session]  launching editor for `%s`...", _session.path)
 	
-	_command, _error := EditorResolveEditCommand (_session.editor, _session.path)
+	_command, _error := EditorResolveEditCommand (_session.editor)
 	if _error != nil {
 		_session.error = _error
+		return editSessionClose (_session)
+	}
+	
+	_argumentPathReplaced := false
+	for _argumentIndex, _argument := range _command.Args {
+		if _argument == "{{path}}" {
+			_command.Args[_argumentIndex] = _session.path
+			_argumentPathReplaced = true
+		} else if strings.Contains (_argument, "{{path}}") {
+			_command.Args[_argumentIndex] = strings.ReplaceAll (_argument, "{{path}}", _session.path)
+		}
+	}
+	if !_argumentPathReplaced {
+		_session.error = errorw (0xf15a16c4, nil)
 		return editSessionClose (_session)
 	}
 	
@@ -378,7 +398,7 @@ func EditorSelect (_editor *Editor, _options []string) ([]string, *Error) {
 
 
 
-func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error) {
+func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, *Error) {
 	
 	_globals := _editor.globals
 	
@@ -386,12 +406,30 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 		
 		_executable := ""
 		_executableName := ""
-		if _executableName_0, _ := _globals.Environment["EDITOR"]; _executableName_0 != "" {
-			if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
-				_executable = _executable_0
-				_executableName = _executableName_0
-			} else {
-				return nil, errorw (0xccba26a3, _error)
+		_argumentsUseCommand := false
+		if _executable == "" {
+			if len (_editor.TerminalEditCommand) > 0 {
+				_executableName_0 := _editor.TerminalEditCommand[0]
+				if _executableName_0 == "" {
+					return nil, errorw (0xf517eea1, nil)
+				}
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					_argumentsUseCommand = true
+				} else {
+					return nil, errorw (0x174df49e, _error)
+				}
+			}
+		}
+		if _executable == "" {
+			if _executableName_0, _ := _globals.Environment["EDITOR"]; _executableName_0 != "" {
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+				} else {
+					return nil, errorw (0xccba26a3, _error)
+				}
 			}
 		}
 		if _executable == "" {
@@ -409,13 +447,17 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 		
 		_arguments := make ([]string, 0, 16)
 		_arguments = append (_arguments, _executable)
-		switch _executableName {
-			case "z-scratchpad--edit", "x-edit" :
-				_arguments = append (_arguments, _path)
-			case "nano", "vim", "emacs" :
-				_arguments = append (_arguments, "--", _path)
-			default :
-				_arguments = append (_arguments, _path)
+		if _argumentsUseCommand {
+			_arguments = append (_arguments, _editor.TerminalEditCommand[1:] ...)
+		} else {
+			switch _executableName {
+				case "z-scratchpad--edit", "x-edit" :
+					_arguments = append (_arguments, "{{path}}")
+				case "nano", "vim", "emacs" :
+					_arguments = append (_arguments, "--", "{{path}}")
+				default :
+					_arguments = append (_arguments, "{{path}}")
+			}
 		}
 		
 		_command := & exec.Cmd {
@@ -433,6 +475,22 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 		
 		_executable := ""
 		_executableName := ""
+		_argumentsUseCommand := false
+		if _executable == "" {
+			if len (_editor.XorgEditCommand) > 0 {
+				_executableName_0 := _editor.XorgEditCommand[0]
+				if _executableName_0 == "" {
+					return nil, errorw (0x4977d8c3, nil)
+				}
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					_argumentsUseCommand = true
+				} else {
+					return nil, errorw (0xeff7203a, _error)
+				}
+			}
+		}
 		if _executable == "" {
 			for _, _executableName_0 := range []string { "z-scratchpad--edit", "x-edit", "howl", "sublime_text", "gvim", "emacs-gtk", "emacs-x11" } {
 				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
@@ -448,15 +506,19 @@ func EditorResolveEditCommand (_editor *Editor, _path string) (*exec.Cmd, *Error
 		
 		_arguments := make ([]string, 0, 16)
 		_arguments = append (_arguments, _executable)
-		switch _executableName {
-			case "z-scratchpad--edit", "x-edit" :
-				_arguments = append (_arguments, _path)
-			case "howl", "gvim", "emacs-gtk", "emacs-x11" :
-				_arguments = append (_arguments, "--", _path)
-			case "sublime_text" :
-				_arguments = append (_arguments, "--new-window", "--wait", "--", _path)
-			default :
-				_arguments = append (_arguments, _path)
+		if _argumentsUseCommand {
+			_arguments = append (_arguments, _editor.XorgEditCommand[1:] ...)
+		} else {
+			switch _executableName {
+				case "z-scratchpad--edit", "x-edit" :
+					_arguments = append (_arguments, "{{path}}")
+				case "howl", "gvim", "emacs-gtk", "emacs-x11" :
+					_arguments = append (_arguments, "--", "{{path}}")
+				case "sublime_text" :
+					_arguments = append (_arguments, "--new-window", "--wait", "--", "{{path}}")
+				default :
+					_arguments = append (_arguments, "{{path}}")
+			}
 		}
 		
 		_command := & exec.Cmd {
@@ -487,6 +549,22 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 		
 		_executable := ""
 		_executableName := ""
+		_argumentsUseCommand := false
+		if _executable == "" {
+			if len (_editor.TerminalSelectCommand) > 0 {
+				_executableName_0 := _editor.TerminalSelectCommand[0]
+				if _executableName_0 == "" {
+					return nil, nil, errorw (0xb15447e5, nil)
+				}
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					_argumentsUseCommand = true
+				} else {
+					return nil, nil, errorw (0x7aa9de14, _error)
+				}
+			}
+		}
 		if _executable == "" {
 			for _, _executableName_0 := range []string { "z-scratchpad--select", "x-select", "fzf" } {
 				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
@@ -502,17 +580,29 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 		
 		_arguments := make ([]string, 0, 32)
 		_arguments = append (_arguments, _executable)
+		if _argumentsUseCommand {
+			_arguments = append (_arguments, _editor.TerminalSelectCommand[1:] ...)
+		} else {
+			switch _executableName {
+				case "z-scratchpad--select", "x-select" :
+					// NOP
+				case "fzf" :
+					_arguments = append (_arguments,
+							"--prompt", ": ",
+							"-e", "-x", "-i",
+							"--tiebreak", "begin,length,index",
+							"--no-mouse", "--no-color", "--no-bold",
+						)
+				default :
+					// NOP
+			}
+		}
+		
 		_okExitCodes := []int (nil)
 		switch _executableName {
 			case "z-scratchpad--select", "x-select" :
 				// NOP
 			case "fzf" :
-				_arguments = append (_arguments,
-						"--prompt", ": ",
-						"-e", "-x", "-i",
-						"--tiebreak", "begin,length,index",
-						"--no-mouse", "--no-color", "--no-bold",
-					)
 				_okExitCodes = []int { 1, 130 }
 			default :
 				// NOP
@@ -531,6 +621,22 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 		
 		_executable := ""
 		_executableName := ""
+		_argumentsUseCommand := false
+		if _executable == "" {
+			if len (_editor.XorgSelectCommand) > 0 {
+				_executableName_0 := _editor.XorgSelectCommand[0]
+				if _executableName_0 == "" {
+					return nil, nil, errorw (0x269b47dc, nil)
+				}
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					_argumentsUseCommand = true
+				} else {
+					return nil, nil, errorw (0x0fa998a3, _error)
+				}
+			}
+		}
 		if _executable == "" {
 			for _, _executableName_0 := range []string { "z-scratchpad--select", "x-select", "rofi", "dmenu" } {
 				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
@@ -546,15 +652,28 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 		
 		_arguments := make ([]string, 0, 32)
 		_arguments = append (_arguments, _executable)
+		if _argumentsUseCommand {
+			_arguments = append (_arguments, _editor.XorgSelectCommand[1:] ...)
+		} else {
+			switch _executableName {
+				case "z-scratchpad--select", "x-select" :
+					// NOP
+				case "rofi" :
+					_arguments = append (_arguments, "-dmenu", "-p", "", "-i", "-no-custom", "-matching-negate-char", "\\x0")
+				case "dmenu" :
+					_arguments = append (_arguments, "-p", "", "-l", "16", "-i")
+				default :
+					// NOP
+			}
+		}
+		
 		_okExitCodes := []int (nil)
 		switch _executableName {
 			case "z-scratchpad--select", "x-select" :
 				// NOP
 			case "rofi" :
-				_arguments = append (_arguments, "-dmenu", "-p", "", "-i", "-no-custom", "-matching-negate-char", "\\x0")
 				_okExitCodes = []int { 1 }
 			case "dmenu" :
-				_arguments = append (_arguments, "-p", "", "-l", "16", "-i")
 				_okExitCodes = []int { 1 }
 			default :
 				// NOP

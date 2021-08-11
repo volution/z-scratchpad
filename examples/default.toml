@@ -23,8 +23,16 @@ use_library_as_identifier_prefix = false
 use_file_name_as_identifier = true
 use_file_extension_as_format = true
 
+[globals]
+terminal_enabled = true
+xorg_enabled = true
+
 [editor]
 default_create_library = "inbox"
+terminal_edit_command = ["nano", "--", "{{path}}"]
+xorg_edit_command = ["howl", "--", "{{path}}"]
+terminal_select_command = ["fzf", "--prompt", ": ", "-e", "-x", "-i"]
+xorg_select_command = ["rofi", "-dmenu", "-p", "", "-i", "-no-custom"]
 
 [server]
 endpoint_ip = "127.9.212.148"
