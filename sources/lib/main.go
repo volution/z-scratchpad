@@ -8,6 +8,7 @@ import "encoding/json"
 import "fmt"
 import "net"
 import "os"
+import "path"
 import "sort"
 import "strings"
 
@@ -104,11 +105,6 @@ type MainConfiguration struct {
 
 func Main (_executable string, _arguments []string, _environment map[string]string) (*Error) {
 	
-	_globals, _error := GlobalsNew (_executable, _environment)
-	if _error != nil {
-		return _error
-	}
-	
 	_flags := & MainFlags {
 			Global : & GlobalFlags {},
 			Library : & LibraryFlags {},
@@ -121,6 +117,16 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			Server : & ServerFlags {},
 			Dump : & DumpFlags {},
 		}
+	
+	_configuration := & MainConfiguration {
+			Global : & GlobalConfiguration {},
+			Server : & ServerFlags {},
+		}
+	
+	_globals, _error := GlobalsNew (_executable, _environment)
+	if _error != nil {
+		return _error
+	}
 	
 	_parser := flags.NewNamedParser ("z-scratchpad", flags.PassDoubleDash)
 	_parser.SubcommandsOptional = true
@@ -158,12 +164,56 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		return _help (false, nil)
 	}
 	
-	_configuration := & MainConfiguration {
-			Global : & GlobalConfiguration {},
-			Server : & ServerFlags {},
+	if _flags.Global.WorkingDirectory != nil {
+		_path := *_flags.Global.WorkingDirectory
+		if _path == "" {
+			return errorw (0x2289141b, nil)
 		}
-	if _flags.Global.ConfigurationPath != nil {
-		_path := *_flags.Global.ConfigurationPath
+		if _error := os.Chdir (_path); _error != nil {
+			return errorw (0x6fe4c660, _error)
+		}
+	}
+	
+	_configurationPath := (*string) (nil)
+	if (_configurationPath == nil) && (_flags.Global.ConfigurationPath != nil) {
+		_configurationPath = _flags.Global.ConfigurationPath
+	}
+	if _configurationPath == nil {
+		_homeStore, _ := os.UserHomeDir ()
+		_configStore, _ := os.UserConfigDir ()
+		for _, _storeAndFolderAndFile := range [][3]string {
+				{ ".", "", ".scratchpad" },
+				{ ".", "", ".scratchpad.toml" },
+				{ ".", "", ".z-scratchpad" },
+				{ ".", "", ".z-scratchpad.toml" },
+				{ _homeStore, "", ".scratchpad" },
+				{ _homeStore, "", ".scratchpad.toml" },
+				{ _homeStore, ".scratchpad", "default.toml" },
+				{ _homeStore, "", ".z-scratchpad" },
+				{ _homeStore, "", ".z-scratchpad.toml" },
+				{ _homeStore, ".z-scratchpad", "default.toml" },
+				{ _configStore, "z-scratchpad", "default.toml" },
+		} {
+			if _storeAndFolderAndFile[0] == "" {
+				continue
+			}
+			_path := path.Join (_storeAndFolderAndFile[0], _storeAndFolderAndFile[1], _storeAndFolderAndFile[2])
+			if _stat, _error := os.Stat (_path); _error == nil {
+				if _storeAndFolderAndFile[1] == "" {
+					if _stat.IsDir () {
+						continue
+					}
+				}
+				_configurationPath = &_path
+				break
+			} else if ! os.IsNotExist (_error) {
+				return errorw (0xbb4d9103, _error)
+			}
+		}
+	}
+	
+	if _configurationPath != nil {
+		_path := *_configurationPath
 		if _path == "" {
 			return errorw (0x9a6f64a7, nil)
 		}
@@ -180,6 +230,11 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		}
 	}
 	
+	if _flags.Global.WorkingDirectory != nil {
+		_flags.Global.WorkingDirectory = nil
+		_configuration.Global.WorkingDirectory = nil
+	}
+	
 	if _parser.Active == nil {
 		return _help (true, errorw (0x4cae2ee5, nil))
 	}
@@ -193,11 +248,11 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConfiguration, _globals *Globals) (*Error) {
 	
 	if (_flags.Global.WorkingDirectory != nil) || (_configuration.Global.WorkingDirectory != nil) {
-		_workingDirectory := flag2StringOrDefault (_flags.Global.WorkingDirectory, _configuration.Global.WorkingDirectory, "")
-		if _workingDirectory == "" {
+		_path := flag2StringOrDefault (_flags.Global.WorkingDirectory, _configuration.Global.WorkingDirectory, "")
+		if _path == "" {
 			return errorw (0xe7c58968, nil)
 		}
-		if _error := os.Chdir (_workingDirectory); _error != nil {
+		if _error := os.Chdir (_path); _error != nil {
 			return errorw (0x5aae8d30, _error)
 		}
 	}
