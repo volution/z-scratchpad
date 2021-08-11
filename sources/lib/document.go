@@ -212,29 +212,6 @@ var DocumentIdentifierRegex *regexp.Regexp = regexp.MustCompile (`^` + DocumentI
 
 
 
-func DocumentReload (_old *Document) (*Document, *Error) {
-	
-	_new, _error := DocumentLoadFromPath (_old.Path)
-	if _error != nil {
-		return nil, _error
-	}
-	
-	if _new.Identifier == "" {
-		_new.Identifier = _old.Identifier
-	}
-	if _new.Format == "" {
-		_new.Format = _old.Format
-	}
-	if _new.Library == "" {
-		_new.Library = _old.Library
-	}
-	
-	return _new, nil
-}
-
-
-
-
 func DocumentLoadFromPath (_path string) (*Document, *Error) {
 	
 	var _sourceBytes []byte
@@ -355,8 +332,8 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 	
 	
 	if _identifier != "" {
-		if _error := DocumentValidateIdentifier (_identifier); _error != nil {
-			return nil, _error
+		if ! DocumentIdentifierWithoutLibraryRegex.MatchString (_identifier) {
+			return nil, errorw (0x31e50aa1, nil)
 		}
 	}
 	if _library != "" {

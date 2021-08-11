@@ -30,6 +30,7 @@ type editSession struct {
 	documentOld *Document
 	documentNew *Document
 	path string
+	pathInLibrary string
 	file *os.File
 	command *exec.Cmd
 	synchronous bool
@@ -107,10 +108,12 @@ func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName str
 	if !_library.CreateEnabled {
 		return errorw (0x2752e1cc, nil)
 	}
-	_path := path.Join (_library.CreatePath, _documentName)
+	
+	_pathInLibrary := _documentName
 	if _library.CreateExtension != "" {
-		_path = _path + "." + _library.CreateExtension
+		_pathInLibrary = _pathInLibrary + "." + _library.CreateExtension
 	}
+	_path := path.Join (_library.CreatePath, _pathInLibrary)
 	
 //	logf ('d', 0x6292b948, "[editor-session]  creating file for `%s`...", _path)
 	
@@ -124,6 +127,7 @@ func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName str
 			editor : _editor,
 			library : _library,
 			path : _path,
+			pathInLibrary : _pathInLibrary,
 			file : _file,
 			synchronous : _synchronous,
 		}
@@ -174,36 +178,27 @@ func editSessionRun (_session *editSession) (*Error) {
 
 func editSessionFinalize (_session *editSession) (*Error) {
 	
-	if _session.documentOld != nil {
-		
-//		logf ('d', 0x48f7d5f5, "[editor-session]  reloading document for `%s`...", _session.path)
-		
-		if _document_0, _error := DocumentReload (_session.documentOld); _error == nil {
-			_session.documentNew = _document_0
-		} else {
-			_session.error = _error
-			return editSessionClose (_session)
-		}
-		
+//	logf ('d', 0x48f7d5f5, "[editor-session]  reloading document for `%s`...", _session.path)
+	
+	if _document_0, _error := DocumentLoadFromPath (_session.path); _error == nil {
+		_session.documentNew = _document_0
 	} else {
-		
-//		logf ('d', 0xff9b1d5d, "[editor-session]  loading document for `%s`...", _session.path)
-		
-		if _document_0, _error := DocumentLoadFromPath (_session.path); _error == nil {
-			_session.documentNew = _document_0
-		} else {
-			_session.error = _error
-			return editSessionClose (_session)
-		}
+		_session.error = _error
+		return editSessionClose (_session)
 	}
 	
 	if _session.documentOld != nil {
 		_session.documentNew.Library = _session.documentOld.Library
 		_session.documentNew.PathInLibrary = _session.documentOld.PathInLibrary
 		_session.documentNew.EditEnabled = _session.documentOld.EditEnabled
+		if _session.documentNew.Format == "" {
+			_session.documentNew.Format = _session.documentOld.Format
+		}
 	} else {
 		if _session.library != nil {
 			_session.documentNew.Library = _session.library.Identifier
+			_session.documentNew.PathInLibrary = _session.pathInLibrary
+			_session.documentNew.EditEnabled = _session.library.EditEnabled
 		}
 	}
 	
