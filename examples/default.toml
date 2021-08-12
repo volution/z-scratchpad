@@ -41,6 +41,10 @@ endpoint_port = 8080
 edit_enabled = true
 create_enabled = true
 
+[browser]
+terminal_open_command = ["x-www", "guest:*", "open", "{{url}}"]
+xorg_open_command = ["x-www", "guest:*", "open", "{{url}}"]
+
 
 [[menu]]
 identifier = "default"
@@ -48,12 +52,23 @@ label = "Default"
 default = true
 loop = true
 commands = [
+	
 	{label = "edit / ...", command = "edit", arguments = ["--select"]},
 	{label = "edit / tests", command = "edit", arguments = ["--library", "tests", "--select"]},
 	{label = "edit / inbox", command = "edit", arguments = ["--library", "inbox", "--select"]},
-	{label = "search / ...", command = "search", arguments = ["--action", "edit", "--how", "body"]},
-	{label = "search / tests", command = "search", arguments = ["--library", "tests", "--action", "edit", "--how", "body"]},
-	{label = "search / inbox", command = "search", arguments = ["--library", "inbox", "--action", "edit", "--how", "body"]},
+	
+	{label = "open / ...", command = "browse", arguments = ["--select"]},
+	{label = "open / tests", command = "browse", arguments = ["--library", "tests", "--select"]},
+	{label = "open / inbox", command = "browse", arguments = ["--library", "inbox", "--select"]},
+	
+	{label = "search / edit / ...", command = "search", arguments = ["--action", "edit", "--how", "body", "--multiple"]},
+	{label = "search / edit / tests", command = "search", arguments = ["--library", "tests", "--action", "edit", "--how", "body", "--multiple"]},
+	{label = "search / edit / inbox", command = "search", arguments = ["--library", "inbox", "--action", "edit", "--how", "body", "--multiple"]},
+	
+	{label = "search / open / ...", command = "search", arguments = ["--action", "browse", "--how", "body", "--multiple"]},
+	{label = "search / open / tests", command = "search", arguments = ["--library", "tests", "--action", "browse", "--how", "body", "--multiple"]},
+	{label = "search / open / inbox", command = "search", arguments = ["--library", "inbox", "--action", "browse", "--how", "body", "--multiple"]},
+	
 	{label = "create ->", command = "menu", arguments = ["--menu", "create"]},
 ]
 
