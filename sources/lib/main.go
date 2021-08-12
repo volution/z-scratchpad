@@ -35,12 +35,14 @@ type LibraryFlags struct {
 	Paths []string `long:"library-path" value-name:"{library-path}"`
 }
 
-type ServerFlags struct {
-	EndpointIp *string `long:"server-ip" value-name:"{ip}" toml:"endpoint_ip"`
-	EndpointPort *uint16 `long:"server-port" value-name:"{port}" toml:"endpoint_port"`
-	EditEnabled *bool `long:"server-edit-enabled" toml:"edit_enabled"`
-	CreateEnabled *bool `long:"server-create-enabled" toml:"create_enabled"`
+type EditorConfiguration struct {
+	DefaultCreateLibrary *string `toml:"default_create_library"`
+	TerminalEditCommand *[]string `toml:"terminal_edit_command"`
+	XorgEditCommand *[]string `toml:"xorg_edit_command"`
+	TerminalSelectCommand *[]string `toml:"terminal_select_command"`
+	XorgSelectCommand *[]string `toml:"xorg_select_command"`
 }
+
 
 type ListFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
@@ -67,10 +69,10 @@ type GrepFlags struct {
 	Action *string `long:"action" short:"a" chouce:"output" choice:"edit" choice:"export"`
 }
 
-type ExportFlags struct {
+
+type CreateFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Document *string `long:"document" short:"d" value-name:"{identifier}"`
-	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html"`
 	Select *bool `long:"select" short:"s"`
 }
 
@@ -80,36 +82,41 @@ type EditFlags struct {
 	Select *bool `long:"select" short:"s"`
 }
 
-type CreateFlags struct {
+type ExportFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Document *string `long:"document" short:"d" value-name:"{identifier}"`
+	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html"`
 	Select *bool `long:"select" short:"s"`
-}
-
-type EditorConfiguration struct {
-	DefaultCreateLibrary *string `toml:"default_create_library"`
-	TerminalEditCommand *[]string `toml:"terminal_edit_command"`
-	XorgEditCommand *[]string `toml:"xorg_edit_command"`
-	TerminalSelectCommand *[]string `toml:"terminal_select_command"`
-	XorgSelectCommand *[]string `toml:"xorg_select_command"`
 }
 
 type DumpFlags struct {}
 
+
+type ServerFlags struct {
+	EndpointIp *string `long:"server-ip" value-name:"{ip}" toml:"endpoint_ip"`
+	EndpointPort *uint16 `long:"server-port" value-name:"{port}" toml:"endpoint_port"`
+	EditEnabled *bool `long:"server-edit-enabled" toml:"edit_enabled"`
+	CreateEnabled *bool `long:"server-create-enabled" toml:"create_enabled"`
+}
+
+
 type MainFlags struct {
+	
 	Global *GlobalFlags `group:"Global options"`
 	Library *LibraryFlags `group:"Library options"`
+	
 	List *ListFlags `command:"list"`
 	Search *SearchFlags `command:"search"`
 	Grep *GrepFlags `command:"grep"`
-	Export *ExportFlags `command:"export"`
-	Edit *EditFlags `command:"edit"`
+	
 	Create *CreateFlags `command:"create"`
-	Server *ServerFlags `command:"server"`
+	Edit *EditFlags `command:"edit"`
+	Export *ExportFlags `command:"export"`
 	Dump *DumpFlags `command:"dump"`
+	
+	Server *ServerFlags `command:"server"`
 	Menu *MenuFlags `command:"menu"`
 }
-
 
 type MainConfiguration struct {
 	Global *GlobalConfiguration `toml:"globals"`
@@ -145,16 +152,20 @@ type MenuCommand struct {
 func Main (_executable string, _arguments []string, _environment map[string]string) (*Error) {
 	
 	_flags := & MainFlags {
+			
 			Global : & GlobalFlags {},
 			Library : & LibraryFlags {},
+			
 			List : & ListFlags {},
 			Search : & SearchFlags {},
 			Grep : & GrepFlags {},
-			Export : & ExportFlags {},
-			Edit : & EditFlags {},
+			
 			Create : & CreateFlags {},
-			Server : & ServerFlags {},
+			Edit : & EditFlags {},
+			Export : & ExportFlags {},
 			Dump : & DumpFlags {},
+			
+			Server : & ServerFlags {},
 			Menu : & MenuFlags {},
 		}
 	
@@ -350,7 +361,7 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 		_editor.XorgSelectCommand = _command
 	}
 	
-	_error = MainLoadLibraries (_flags.Library, _configuration.Libraries, _globals, _index)
+	_error = mainLoadLibraries (_flags.Library, _configuration.Libraries, _globals, _index)
 	if _error != nil {
 		return _error
 	}
@@ -365,6 +376,7 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 	
 	switch _command {
 		
+		
 		case "list" :
 			return MainList (_flags.List, _globals, _index)
 		
@@ -374,27 +386,236 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 		case "grep" :
 			return MainGrep (_flags.Grep, _globals, _index, _editor)
 		
-		case "export" :
-			return MainExport (_flags.Export, _globals, _index, _editor)
-		
-		case "edit" :
-			return MainEdit (_flags.Edit, _globals, _index, _editor)
 		
 		case "create" :
 			return MainCreate (_flags.Create, _globals, _index, _editor)
 		
-		case "server" :
-			return MainServer (_flags.Server, _configuration.Server, _globals, _index, _editor)
+		case "edit" :
+			return MainEdit (_flags.Edit, _globals, _index, _editor)
+		
+		case "export" :
+			return MainExport (_flags.Export, _globals, _index, _editor)
 		
 		case "dump" :
 			return MainDump (_flags.Dump, _globals, _index)
 		
+		
+		case "server" :
+			return MainServer (_flags.Server, _configuration.Server, _globals, _index, _editor)
+		
 		case "menu" :
 			return MainMenu (_flags.Menu, _configuration.Menus, _configuration, _globals, _index, _editor)
+		
 		
 		default :
 			return errorw (0xaca17bb9, nil)
 	}
+}
+
+
+
+
+func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
+	
+	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
+	_type := flagStringOrDefault (_flags.Type, "document")
+	_what := flagStringOrDefault (_flags.What, "identifier")
+	_format := flagStringOrDefault (_flags.Format, "text")
+	
+	_options, _error := mainListOptions (_libraryIdentifier, _type, "identifier", _what, _index)
+	if _error != nil {
+		return _error
+	}
+	
+	return mainListOutput (_options, _format, _globals)
+}
+
+
+
+
+func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
+	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
+	_type := flagStringOrDefault (_flags.Type, "document")
+	_what := flagStringOrDefault (_flags.What, "identifier")
+	_how := flagStringOrDefault (_flags.How, "title")
+	_format := flagStringOrDefault (_flags.Format, "text")
+	_action := flagStringOrDefault (_flags.Action, "output")
+	
+	switch _action {
+		case "output" :
+			// NOP
+		case "edit", "export" :
+			if _flags.Type != nil {
+				return errorw (0x8133f4ab, nil)
+			}
+			if _flags.What != nil {
+				return errorw (0xf998d0d9, nil)
+			}
+			if _flags.Format != nil {
+				return errorw (0x304ff173, nil)
+			}
+		default :
+			return errorw (0x332d42c3, nil)
+	}
+	
+	_selection, _error := mainListOptionsAndSelect (_libraryIdentifier, _type, _how, _what, _index, _editor)
+	if _error != nil {
+		return _error
+	}
+	
+	switch _action {
+		
+		case "output" :
+			return mainListOutput (_selection, _format, _globals)
+		
+		case "edit", "export" :
+			_identifier := ""
+			switch len (_selection) {
+				case 0 :
+					return nil
+				case 1 :
+					_identifier = _selection[0][1]
+				case 2 :
+					return errorw (0xea0431aa, nil)
+			}
+			if _action == "edit" {
+				return WorkflowDocumentEdit (_identifier, _index, _editor, true)
+			} else if _action == "export" {
+				// FIXME:  Add support for other formats!
+				return mainExportOutput (_identifier, "source", _globals, _index)
+			} else {
+				return errorw (0xaf7a3532, nil)
+			}
+		
+		default :
+			return errorw (0xe611caea, nil)
+	}
+}
+
+
+
+
+func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
+	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
+	_what := flagStringOrDefault (_flags.What, "identifier")
+	_where := flagStringOrDefault (_flags.Where, "title")
+	_format := flagStringOrDefault (_flags.Format, "text")
+	_action := flagStringOrDefault (_flags.Action, "output")
+	
+	switch _action {
+		case "output" :
+			// NOP
+		case "edit", "export" :
+			if _flags.What != nil {
+				return errorw (0x966bbfc4, nil)
+			}
+			if _flags.Format != nil {
+				return errorw (0x92252a21, nil)
+			}
+		default :
+			return errorw (0x4b4f9c3b, nil)
+	}
+	
+	_terms := make ([]string, 0, len (_flags.Terms))
+	for _, _term := range _flags.Terms {
+		if _term == "" {
+			continue
+		}
+		_terms = append (_terms, _term)
+	}
+	if len (_terms) == 0 {
+		return errorw (0xa95cd520, nil)
+	}
+	
+	_options, _error := mainListOptions (_libraryIdentifier, "document", _where, _what, _index)
+	if _error != nil {
+		return _error
+	}
+	
+	_selection := make ([][2]string, 0, len (_options) / 2)
+	for _, _option := range _options {
+		_contents := _option[0]
+		_matched := false
+		if !_matched {
+			for _, _term := range _terms {
+				if strings.Index (_contents, _term) != -1 {
+					_matched = true
+					break
+				}
+			}
+		}
+		if _matched {
+			_selection = append (_selection, _option)
+		}
+	}
+	
+	switch _action {
+		
+		case "output" :
+			return mainListOutput (_selection, _format, _globals)
+		
+		case "edit", "export" :
+			_identifier := ""
+			switch len (_selection) {
+				case 0 :
+					return nil
+				case 1 :
+					_identifier = _selection[0][1]
+				case 2 :
+					return errorw (0x1e4d02e6, nil)
+			}
+			if _action == "edit" {
+				return WorkflowDocumentEdit (_identifier, _index, _editor, true)
+			} else if _action == "export" {
+				// FIXME:  Add support for other formats!
+				return mainExportOutput (_identifier, "source", _globals, _index)
+			} else {
+				return errorw (0xb5fa0b59, nil)
+			}
+		
+		default :
+			return errorw (0x1217cd0b, nil)
+	}
+}
+
+
+
+
+func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
+	_identifier := ""
+	_error := (*Error) (nil)
+	if _flags.Document != nil {
+		_identifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
+	} else {
+		_identifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.Select, _index, _editor)
+	}
+	if _error != nil {
+		return _error
+	}
+	if _identifier == "" {
+		return nil
+	}
+	
+	return WorkflowDocumentCreate (_identifier, _index, _editor, true)
+}
+
+
+
+
+func MainEdit (_flags *EditFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
+	_identifier, _error := mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
+	if _error != nil {
+		return _error
+	}
+	if _identifier == "" {
+		return nil
+	}
+	
+	return WorkflowDocumentEdit (_identifier, _index, _editor, true)
 }
 
 
@@ -461,118 +682,28 @@ func mainExportOutput (_identifier string, _format string, _globals *Globals, _i
 
 
 
-func MainEdit (_flags *EditFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+func MainDump (_flags *DumpFlags, _globals *Globals, _index *Index) (*Error) {
 	
-	_identifier, _error := mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
-	if _error != nil {
-		return _error
-	}
-	if _identifier == "" {
-		return nil
-	}
-	
-	return WorkflowDocumentEdit (_identifier, _index, _editor, true)
-}
-
-
-
-
-func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
-	
-	_identifier := ""
-	_error := (*Error) (nil)
-	if _flags.Document != nil {
-		_identifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
-	} else {
-		_identifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.Select, _index, _editor)
-	}
-	if _error != nil {
-		return _error
-	}
-	if _identifier == "" {
-		return nil
-	}
-	
-	return WorkflowDocumentCreate (_identifier, _index, _editor, true)
-}
-
-
-
-
-func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
-	
-	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
-	_type := flagStringOrDefault (_flags.Type, "document")
-	_what := flagStringOrDefault (_flags.What, "identifier")
-	_format := flagStringOrDefault (_flags.Format, "text")
-	
-	_options, _error := mainListOptions (_libraryIdentifier, _type, "identifier", _what, _index)
+	_documents, _error := IndexDocumentsSelectAll (_index)
 	if _error != nil {
 		return _error
 	}
 	
-	return mainListOutput (_options, _format, _globals)
-}
-
-
-func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
-	
-	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
-	_type := flagStringOrDefault (_flags.Type, "document")
-	_what := flagStringOrDefault (_flags.What, "identifier")
-	_how := flagStringOrDefault (_flags.How, "title")
-	_format := flagStringOrDefault (_flags.Format, "text")
-	_action := flagStringOrDefault (_flags.Action, "output")
-	
-	switch _action {
-		case "output" :
-			// NOP
-		case "edit", "export" :
-			if _flags.Type != nil {
-				return errorw (0x8133f4ab, nil)
-			}
-			if _flags.What != nil {
-				return errorw (0xf998d0d9, nil)
-			}
-			if _flags.Format != nil {
-				return errorw (0x304ff173, nil)
-			}
-		default :
-			return errorw (0x332d42c3, nil)
+	_buffer := bytes.NewBuffer (nil)
+	for _, _document := range _documents {
+		_buffer.WriteString ("\n")
+		_error = DocumentDump (_buffer, _document, true, false, false)
+		if _error != nil {
+			return _error
+		}
+		_buffer.WriteString ("\n")
 	}
 	
-	_selection, _error := mainListOptionsAndSelect (_libraryIdentifier, _type, _how, _what, _index, _editor)
-	if _error != nil {
-		return _error
+	if _, _error := _buffer.WriteTo (_globals.Stdout); _error != nil {
+		return errorw (0xbf6a449c, _error)
 	}
 	
-	switch _action {
-		
-		case "output" :
-			return mainListOutput (_selection, _format, _globals)
-		
-		case "edit", "export" :
-			_identifier := ""
-			switch len (_selection) {
-				case 0 :
-					return nil
-				case 1 :
-					_identifier = _selection[0][1]
-				case 2 :
-					return errorw (0xea0431aa, nil)
-			}
-			if _action == "edit" {
-				return WorkflowDocumentEdit (_identifier, _index, _editor, true)
-			} else if _action == "export" {
-				// FIXME:  Add support for other formats!
-				return mainExportOutput (_identifier, "source", _globals, _index)
-			} else {
-				return errorw (0xaf7a3532, nil)
-			}
-		
-		default :
-			return errorw (0xe611caea, nil)
-	}
+	return nil
 }
 
 
@@ -660,6 +791,39 @@ func mainResolveDocumentIdentifier (_libraryFlag *string, _documentFlag *string,
 	}
 	
 	return _identifier, nil
+}
+
+
+func mainMergeLibraryAndDocumentIdentifiers (_library *string, _document *string) (string, string, *Error) {
+	
+	if _library != nil {
+		
+		if _document != nil {
+			if _identifier, _error := DocumentFormatIdentifier (*_library, *_document); _error == nil {
+				return "", _identifier, nil
+			} else {
+				return "", "", _error
+			}
+		} else {
+			if _identifier, _error := LibraryParseIdentifier (*_library); _error == nil {
+				return _identifier, "", nil
+			} else {
+				return "", "", _error
+			}
+		}
+		
+	} else if _document != nil {
+		
+		if _identifier, _, _, _error := DocumentParseIdentifier (*_document); _error == nil {
+			return "", _identifier, nil
+		} else {
+			return "", "", _error
+		}
+		
+	} else {
+		
+		return "", "", nil
+	}
 }
 
 
@@ -959,93 +1123,6 @@ func mainListOutput (_options [][2]string, _format string, _globals *Globals) (*
 
 
 
-func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
-	
-	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
-	_what := flagStringOrDefault (_flags.What, "identifier")
-	_where := flagStringOrDefault (_flags.Where, "title")
-	_format := flagStringOrDefault (_flags.Format, "text")
-	_action := flagStringOrDefault (_flags.Action, "output")
-	
-	switch _action {
-		case "output" :
-			// NOP
-		case "edit", "export" :
-			if _flags.What != nil {
-				return errorw (0x966bbfc4, nil)
-			}
-			if _flags.Format != nil {
-				return errorw (0x92252a21, nil)
-			}
-		default :
-			return errorw (0x4b4f9c3b, nil)
-	}
-	
-	_terms := make ([]string, 0, len (_flags.Terms))
-	for _, _term := range _flags.Terms {
-		if _term == "" {
-			continue
-		}
-		_terms = append (_terms, _term)
-	}
-	if len (_terms) == 0 {
-		return errorw (0xa95cd520, nil)
-	}
-	
-	_options, _error := mainListOptions (_libraryIdentifier, "document", _where, _what, _index)
-	if _error != nil {
-		return _error
-	}
-	
-	_selection := make ([][2]string, 0, len (_options) / 2)
-	for _, _option := range _options {
-		_contents := _option[0]
-		_matched := false
-		if !_matched {
-			for _, _term := range _terms {
-				if strings.Index (_contents, _term) != -1 {
-					_matched = true
-					break
-				}
-			}
-		}
-		if _matched {
-			_selection = append (_selection, _option)
-		}
-	}
-	
-	switch _action {
-		
-		case "output" :
-			return mainListOutput (_selection, _format, _globals)
-		
-		case "edit", "export" :
-			_identifier := ""
-			switch len (_selection) {
-				case 0 :
-					return nil
-				case 1 :
-					_identifier = _selection[0][1]
-				case 2 :
-					return errorw (0x1e4d02e6, nil)
-			}
-			if _action == "edit" {
-				return WorkflowDocumentEdit (_identifier, _index, _editor, true)
-			} else if _action == "export" {
-				// FIXME:  Add support for other formats!
-				return mainExportOutput (_identifier, "source", _globals, _index)
-			} else {
-				return errorw (0xb5fa0b59, nil)
-			}
-		
-		default :
-			return errorw (0x1217cd0b, nil)
-	}
-}
-
-
-
-
 func MainServer (_flags *ServerFlags, _configuration *ServerFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
 	_endpointIp := flag2StringOrDefault (_flags.EndpointIp, _configuration.EndpointIp, "127.0.0.1")
@@ -1076,33 +1153,6 @@ func MainServer (_flags *ServerFlags, _configuration *ServerFlags, _globals *Glo
 	_error = ServerRun (_server)
 	if _error != nil {
 		return _error
-	}
-	
-	return nil
-}
-
-
-
-
-func MainDump (_flags *DumpFlags, _globals *Globals, _index *Index) (*Error) {
-	
-	_documents, _error := IndexDocumentsSelectAll (_index)
-	if _error != nil {
-		return _error
-	}
-	
-	_buffer := bytes.NewBuffer (nil)
-	for _, _document := range _documents {
-		_buffer.WriteString ("\n")
-		_error = DocumentDump (_buffer, _document, true, false, false)
-		if _error != nil {
-			return _error
-		}
-		_buffer.WriteString ("\n")
-	}
-	
-	if _, _error := _buffer.WriteTo (_globals.Stdout); _error != nil {
-		return errorw (0xbf6a449c, _error)
 	}
 	
 	return nil
@@ -1240,7 +1290,7 @@ func MainCommand (_command string, _arguments []string, _configuration *MainConf
 
 
 
-func MainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _globals *Globals, _index *Index) (*Error) {
+func mainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _globals *Globals, _index *Index) (*Error) {
 	
 	if (len (_flags.Paths) > 0) && (len (_configuration) > 0) {
 		return errorw (0x374ece0f, nil)
@@ -1341,41 +1391,6 @@ func MainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _global
 	}
 	
 	return nil
-}
-
-
-
-
-func mainMergeLibraryAndDocumentIdentifiers (_library *string, _document *string) (string, string, *Error) {
-	
-	if _library != nil {
-		
-		if _document != nil {
-			if _identifier, _error := DocumentFormatIdentifier (*_library, *_document); _error == nil {
-				return "", _identifier, nil
-			} else {
-				return "", "", _error
-			}
-		} else {
-			if _identifier, _error := LibraryParseIdentifier (*_library); _error == nil {
-				return _identifier, "", nil
-			} else {
-				return "", "", _error
-			}
-		}
-		
-	} else if _document != nil {
-		
-		if _identifier, _, _, _error := DocumentParseIdentifier (*_document); _error == nil {
-			return "", _identifier, nil
-		} else {
-			return "", "", _error
-		}
-		
-	} else {
-		
-		return "", "", nil
-	}
 }
 
 
