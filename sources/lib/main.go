@@ -402,39 +402,12 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 
 func MainExport (_flags *ExportFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
-	_flagSelect := flagBoolOrDefault (_flags.Select, false)
-	if _flagSelect && (_flags.Document != nil) {
-		return errorw (0xaf2210a5, nil)
+	_identifier, _error := mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
+	if _error != nil {
+		return _error
 	}
-	
-	_identifier := ""
-	if _flagSelect {
-		
-		_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
-		_options, _error := mainListOptionsAndSelect (_libraryIdentifier, "document", "title", "identifier", _index, _editor)
-		if _error != nil {
-			return _error
-		}
-		switch len (_options) {
-			case 0 :
-				return nil
-			case 1 :
-				_identifier = _options[0][1]
-			default :
-				return errorw (0x43982abc, nil)
-		}
-		
-	} else {
-		
-		if _library, _document, _error := mainMergeLibraryAndDocumentIdentifiers (_flags.Library, _flags.Document); _error != nil {
-			return _error
-		} else if _document != "" {
-			_identifier = _document
-		} else if _library != "" {
-			return errorw (0x20457235, nil)
-		} else {
-			return errorw (0x0684c89e, nil)
-		}
+	if _identifier == "" {
+		return nil
 	}
 	
 	_format := flagStringOrDefault (_flags.Format, "source")
@@ -490,39 +463,12 @@ func mainExportOutput (_identifier string, _format string, _globals *Globals, _i
 
 func MainEdit (_flags *EditFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
-	_flagSelect := flagBoolOrDefault (_flags.Select, false)
-	if _flagSelect && (_flags.Document != nil) {
-		return errorw (0x17114913, nil)
+	_identifier, _error := mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
+	if _error != nil {
+		return _error
 	}
-	
-	_identifier := ""
-	if _flagSelect {
-		
-		_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
-		_options, _error := mainListOptionsAndSelect (_libraryIdentifier, "document", "title", "identifier", _index, _editor)
-		if _error != nil {
-			return _error
-		}
-		switch len (_options) {
-			case 0 :
-				return nil
-			case 1 :
-				_identifier = _options[0][1]
-			default :
-				return errorw (0x979cfe4c, nil)
-		}
-		
-	} else {
-		
-		if _library, _document, _error := mainMergeLibraryAndDocumentIdentifiers (_flags.Library, _flags.Document); _error != nil {
-			return _error
-		} else if _document != "" {
-			_identifier = _document
-		} else if _library != "" {
-			return errorw (0xdbe83c6c, nil)
-		} else {
-			return errorw (0xa0fc749c, nil)
-		}
+	if _identifier == "" {
+		return nil
 	}
 	
 	return WorkflowDocumentEdit (_identifier, _index, _editor, true)
@@ -533,39 +479,18 @@ func MainEdit (_flags *EditFlags, _globals *Globals, _index *Index, _editor *Edi
 
 func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
-	_flagSelect := flagBoolOrDefault (_flags.Select, false)
-	if _flagSelect && (_flags.Document != nil) {
-		return errorw (0x2a0a4328, nil)
-	}
-	if _flagSelect && (_flags.Library != nil) {
-		return errorw (0x4d3444df, nil)
-	}
-	
 	_identifier := ""
-	if _flagSelect {
-		
-		_options, _error := mainListOptionsAndSelect ("", "library", "title", "identifier", _index, _editor)
-		if _error != nil {
-			return _error
-		}
-		switch len (_options) {
-			case 0 :
-				return nil
-			case 1 :
-				_identifier = _options[0][1]
-			default :
-				return errorw (0x22d4ddbe, nil)
-		}
-		
+	_error := (*Error) (nil)
+	if _flags.Document != nil {
+		_identifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
 	} else {
-		
-		if _library, _document, _error := mainMergeLibraryAndDocumentIdentifiers (_flags.Library, _flags.Document); _error != nil {
-			return _error
-		} else if _document != "" {
-			_identifier = _document
-		} else if _library != "" {
-			_identifier = _library
-		}
+		_identifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.Select, _index, _editor)
+	}
+	if _error != nil {
+		return _error
+	}
+	if _identifier == "" {
+		return nil
 	}
 	
 	return WorkflowDocumentCreate (_identifier, _index, _editor, true)
@@ -649,6 +574,95 @@ func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor 
 			return errorw (0xe611caea, nil)
 	}
 }
+
+
+
+
+func mainResolveLibraryIdentifier (_libraryFlag *string, _selectFlag *bool, _index *Index, _editor *Editor) (string, *Error) {
+	
+	_select := flagBoolOrDefault (_selectFlag, false)
+	if _select && (_libraryFlag != nil) {
+		return "", errorw (0x4d3444df, nil)
+	}
+	
+	_identifier := ""
+	
+	if _select {
+		
+		_options, _error := mainListOptionsAndSelect ("", "library", "title", "identifier", _index, _editor)
+		if _error != nil {
+			return "", _error
+		}
+		
+		switch len (_options) {
+			case 0 :
+				return "", nil
+			case 1 :
+				_identifier = _options[0][1]
+			default :
+				return "", errorw (0x22d4ddbe, nil)
+		}
+		
+	} else {
+		
+		if _libraryFlag == nil {
+			return "", errorw (0x302d616d, nil)
+		}
+		
+		if _library, _error := LibraryParseIdentifier (*_libraryFlag); _error == nil {
+			_identifier = _library
+		} else {
+			return "", _error
+		}
+	}
+	
+	return _identifier, nil
+}
+
+
+func mainResolveDocumentIdentifier (_libraryFlag *string, _documentFlag *string, _selectFlag *bool, _index *Index, _editor *Editor) (string, *Error) {
+	
+	_select := flagBoolOrDefault (_selectFlag, false)
+	if _select && (_documentFlag != nil) {
+		return "", errorw (0xaf2210a5, nil)
+	}
+	
+	_identifier := ""
+	
+	if _select {
+		
+		_libraryIdentifier := flagStringOrDefault (_libraryFlag, "")
+		_options, _error := mainListOptionsAndSelect (_libraryIdentifier, "document", "title", "identifier", _index, _editor)
+		if _error != nil {
+			return "", _error
+		}
+		
+		switch len (_options) {
+			case 0 :
+				return "", nil
+			case 1 :
+				_identifier = _options[0][1]
+			default :
+				return "", errorw (0x43982abc, nil)
+		}
+		
+	} else {
+		
+		if _library, _document, _error := mainMergeLibraryAndDocumentIdentifiers (_libraryFlag, _documentFlag); _error != nil {
+			return "", _error
+		} else if _document != "" {
+			_identifier = _document
+		} else if _library != "" {
+			return "", errorw (0x20457235, nil)
+		} else {
+			return "", errorw (0x0684c89e, nil)
+		}
+	}
+	
+	return _identifier, nil
+}
+
+
 
 
 func mainListOptionsAndSelect (_libraryIdentifier string, _type string, _labelSource string, _valueSource string, _index *Index, _editor *Editor) ([][2]string, *Error) {
