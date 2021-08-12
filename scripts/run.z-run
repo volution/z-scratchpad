@@ -12,7 +12,7 @@
 :: watch / run / server :: exec -- "${ZRUN[@]}" ':: watch / run / exec' server "${@}"
 :: watch / run / menu :: exec -- "${ZRUN[@]}" ':: watch / run / exec' menu "${@}"
 
---:: watch / run / exec :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / exec' "${@}"
+:: watch / run / exec :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / exec' "${@}"
 
 
 
@@ -40,6 +40,5 @@
 :: run / export / select :: exec -- "${ZRUN[@]}" ':: run / exec' export -s "${@}"
 :: run / dump :: exec -- "${ZRUN[@]}" ':: run / exec' dump "${@}"
 
-
---:: run / exec :: exec -- "${ZRUN[@]}" ':: go / execute / main / debug' "${@}"
+:: run / exec :: exec -- "${ZRUN[@]}" ':: go / execute / main / debug' "${@}"
 
