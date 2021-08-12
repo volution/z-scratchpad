@@ -1,0 +1,80 @@
+#!/dev/null
+
+
+
+
+::// readme / ...
+
+
+
+
+<< readme / html / open
+	test "${#}" -eq 0
+	exec -- x-www guest:cmark-gfm open file:"$( exec -- readlink -e -- ./readme.html )"
+!!
+
+
+<< readme / html / render / watch
+	test "${#}" -eq 0
+	exec -- watchexec \
+			--watch=./documentation \
+			--no-shell \
+			-- \
+			"${ZRUN[@]}" ':: readme / html / render' \
+	#
+!!
+
+
+<< readme / html / render
+	test "${#}" -eq 0
+	printf -- '[ii]  rendering readme...\n' >&2
+	_html="$( exec -- cmark-gfm --validate-utf8 --to html < ./readme.md )"
+	test -n "${_html}"
+	cat >| ./readme.html.tmp << EOS
+	<!doctype html>
+	<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.css" />
+		<style>
+			body {
+				background: hsl(0, 0%, 5%);
+			}
+			.markdown-body {
+				background: hsl(0, 0%, 100%);
+				border: 1px solid hsl(0, 0%, 5%);
+				box-sizing: border-box;
+				min-width: 200px;
+				max-width: 980px;
+				margin: 0 auto;
+				padding: 45px;
+			}
+			@media (max-width: 767px) {
+				.markdown-body {
+				padding: 15px;
+				}
+			}
+		</style>
+		<script>
+			(function () {
+				"use strict";
+				function _reload () {
+					if (window.history.scrollRestoration !== undefined) {
+						window.history.scrollRestoration = "auto";
+					}
+					window.history.go ();
+				}
+				window.setTimeout (_reload, 1000);
+			} ());
+		</script>
+	</head>
+	<body>
+	<main class="markdown-body">
+	${_html}
+	</main>
+	</body>
+	</html>
+	EOS
+	mv -T -- ./readme.html.tmp ./readme.html
+!!
+
