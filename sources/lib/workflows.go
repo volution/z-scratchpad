@@ -116,6 +116,30 @@ func WorkflowDocumentEdit (_identifierUnsafe string, _index *Index, _editor *Edi
 
 
 
+func WorkflowDocumentBrowse (_identifierUnsafe string, _index *Index, _browser *Browser, _synchronous bool) (*Error) {
+	
+	_document, _library, _error := WorkflowDocumentAndLibraryResolve (_identifierUnsafe, _index)
+	if _error != nil {
+		return _error
+	}
+	
+	return BrowserDocumentOpen (_browser, _library, _document, _synchronous)
+}
+
+
+func WorkflowLibraryBrowse (_identifierUnsafe string, _index *Index, _browser *Browser, _synchronous bool) (*Error) {
+	
+	_library, _error := WorkflowLibraryResolve (_identifierUnsafe, _index)
+	if _error != nil {
+		return _error
+	}
+	
+	return BrowserLibraryOpen (_browser, _library, _synchronous)
+}
+
+
+
+
 func WorkflowLibraryResolve (_identifierUnsafe string, _index *Index) (*Library, *Error) {
 	if _identifierUnsafe == "" {
 		return nil, errorw (0xbef72625, nil)

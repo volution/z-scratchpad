@@ -40,6 +40,7 @@ type editSession struct {
 	file *os.File
 	command *exec.Cmd
 	synchronous bool
+	terminal bool
 	error *Error
 }
 
@@ -94,13 +95,10 @@ func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document
 			synchronous : _synchronous,
 		}
 	
-	if !_session.synchronous {
-		go editSessionRun (_session)
-		return nil
-	}
-	
-	return editSessionRun (_session)
+	return editSessionStart (_session)
 }
+
+
 
 
 func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName string, _synchronous bool) (*Error) {
@@ -138,30 +136,19 @@ func EditorDocumentCreate (_editor *Editor, _library *Library, _documentName str
 			synchronous : _synchronous,
 		}
 	
-	if !_session.synchronous {
-		go editSessionRun (_session)
-		return nil
-	}
-	
-	return editSessionRun (_session)
+	return editSessionStart (_session)
 }
 
 
-func editSessionRun (_session *editSession) (*Error) {
+
+
+func editSessionStart (_session *editSession) (*Error) {
 	
 	_globals := _session.globals
 	
-	if ! _globals.TerminalMutexTryLock () {
-		return errorw (0x5fcbecde, nil)
-	}
-	defer _globals.TerminalMutexUnlock ()
-	
-//	logf ('d', 0x0edfabbf, "[editor-session]  launching editor for `%s`...", _session.path)
-	
-	_command, _error := EditorResolveEditCommand (_session.editor)
+	_command, _terminal, _error := EditorResolveEditCommand (_session.editor)
 	if _error != nil {
-		_session.error = _error
-		return editSessionClose (_session)
+		return _error
 	}
 	
 	_argumentPathReplaced := false
@@ -174,16 +161,35 @@ func editSessionRun (_session *editSession) (*Error) {
 		}
 	}
 	if !_argumentPathReplaced {
-		_session.error = errorw (0xf15a16c4, nil)
-		return editSessionClose (_session)
-	}
-	
-	if _error := _command.Start (); _error != nil {
-		_session.error = errorw (0x4b48b0bc, _error)
-		return editSessionClose (_session)
+		return errorw (0xf15a16c4, nil)
 	}
 	
 	_session.command = _command
+	_session.terminal = _terminal
+	
+	if _session.terminal {
+		if ! _globals.TerminalMutexTryLock () {
+			return errorw (0x5fcbecde, nil)
+		}
+	}
+	
+	if !_session.synchronous {
+		go editSessionRun (_session)
+		return nil
+	}
+	
+	return editSessionRun (_session)
+}
+
+
+func editSessionRun (_session *editSession) (*Error) {
+	
+//	logf ('d', 0x0edfabbf, "[editor-session]  launching editor for `%s`...", _session.path)
+	
+	if _error := _session.command.Start (); _error != nil {
+		_session.error = errorw (0x4b48b0bc, _error)
+		return editSessionClose (_session)
+	}
 	
 //	logf ('d', 0xff9ec344, "[editor-session]  waiting editor for `%s`...", _session.path)
 	
@@ -263,6 +269,12 @@ func editSessionFinalize (_session *editSession) (*Error) {
 
 func editSessionClose (_session *editSession) (*Error) {
 	
+	_globals := _session.globals
+	
+	if _session.terminal {
+		defer _globals.TerminalMutexUnlock ()
+	}
+	
 	if _session.error != nil {
 		if !_session.synchronous {
 			logErrorf ('e', 0x35a898d8, _session.error, "[editor-session]  failed for `%s`!", _session.path)
@@ -286,18 +298,22 @@ func EditorSelect (_editor *Editor, _options []string) ([]string, *Error) {
 		return nil, errorw (0xdafc150d, nil)
 	}
 	
-	if ! _globals.TerminalMutexTryLock () {
-		return nil, errorw (0xcba65bc9, nil)
-	}
-	defer _globals.TerminalMutexUnlock ()
-	
 	_command := (*exec.Cmd) (nil)
 	_okExitCodes := []int (nil)
-	if _command_0, _okExitCodes_0, _error := EditorResolveSelectCommand (_editor); _error == nil {
+	_terminal := false
+	if _command_0, _okExitCodes_0, _terminal_0, _error := EditorResolveSelectCommand (_editor); _error == nil {
 		_command = _command_0
 		_okExitCodes = _okExitCodes_0
+		_terminal = _terminal_0
 	} else {
 		return nil, _error
+	}
+	
+	if _terminal {
+		if ! _globals.TerminalMutexTryLock () {
+			return nil, errorw (0xcba65bc9, nil)
+		}
+		defer _globals.TerminalMutexUnlock ()
 	}
 	
 	_stdin, _error := _command.StdinPipe ()
@@ -398,7 +414,7 @@ func EditorSelect (_editor *Editor, _options []string) ([]string, *Error) {
 
 
 
-func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, *Error) {
+func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, bool, *Error) {
 	
 	_globals := _editor.globals
 	
@@ -411,14 +427,14 @@ func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, *Error) {
 			if len (_editor.TerminalEditCommand) > 0 {
 				_executableName_0 := _editor.TerminalEditCommand[0]
 				if _executableName_0 == "" {
-					return nil, errorw (0xf517eea1, nil)
+					return nil, false, errorw (0xf517eea1, nil)
 				}
 				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
 					_executable = _executable_0
 					_executableName = _executableName_0
 					_argumentsUseCommand = true
 				} else {
-					return nil, errorw (0x174df49e, _error)
+					return nil, false, errorw (0x174df49e, _error)
 				}
 			}
 		}
@@ -428,7 +444,7 @@ func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, *Error) {
 					_executable = _executable_0
 					_executableName = _executableName_0
 				} else {
-					return nil, errorw (0xccba26a3, _error)
+					return nil, false, errorw (0xccba26a3, _error)
 				}
 			}
 		}
@@ -442,11 +458,14 @@ func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, *Error) {
 			}
 		}
 		if _executable == "" {
-			return nil, errorw (0x2eebed4d, nil)
+			return nil, false, errorw (0x2eebed4d, nil)
 		}
 		
 		_arguments := make ([]string, 0, 16)
 		_arguments = append (_arguments, _executable)
+		if _argumentsUseCommand && (len (_editor.TerminalEditCommand) == 1) {
+			_argumentsUseCommand = false
+		}
 		if _argumentsUseCommand {
 			_arguments = append (_arguments, _editor.TerminalEditCommand[1:] ...)
 		} else {
@@ -469,7 +488,7 @@ func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, *Error) {
 				Stderr : _globals.TerminalTty,
 			}
 		
-		return _command, nil
+		return _command, true, nil
 		
 	} else if _globals.XorgEnabled {
 		
@@ -480,14 +499,14 @@ func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, *Error) {
 			if len (_editor.XorgEditCommand) > 0 {
 				_executableName_0 := _editor.XorgEditCommand[0]
 				if _executableName_0 == "" {
-					return nil, errorw (0x4977d8c3, nil)
+					return nil, false, errorw (0x4977d8c3, nil)
 				}
 				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
 					_executable = _executable_0
 					_executableName = _executableName_0
 					_argumentsUseCommand = true
 				} else {
-					return nil, errorw (0xeff7203a, _error)
+					return nil, false, errorw (0xeff7203a, _error)
 				}
 			}
 		}
@@ -501,11 +520,14 @@ func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, *Error) {
 			}
 		}
 		if _executable == "" {
-			return nil, errorw (0x5a7c2f6b, nil)
+			return nil, false, errorw (0x5a7c2f6b, nil)
 		}
 		
 		_arguments := make ([]string, 0, 16)
 		_arguments = append (_arguments, _executable)
+		if _argumentsUseCommand && (len (_editor.XorgEditCommand) == 1) {
+			_argumentsUseCommand = false
+		}
 		if _argumentsUseCommand {
 			_arguments = append (_arguments, _editor.XorgEditCommand[1:] ...)
 		} else {
@@ -530,18 +552,18 @@ func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, *Error) {
 				Stderr : _globals.DevNull,
 			}
 		
-		return _command, nil
+		return _command, false, nil
 		
 	} else {
 		
-		return nil, errorw (0xfe957df1, nil)
+		return nil, false, errorw (0xfe957df1, nil)
 	}
 }
 
 
 
 
-func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
+func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, bool, *Error) {
 	
 	_globals := _editor.globals
 	
@@ -554,14 +576,14 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 			if len (_editor.TerminalSelectCommand) > 0 {
 				_executableName_0 := _editor.TerminalSelectCommand[0]
 				if _executableName_0 == "" {
-					return nil, nil, errorw (0xb15447e5, nil)
+					return nil, nil, false, errorw (0xb15447e5, nil)
 				}
 				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
 					_executable = _executable_0
 					_executableName = _executableName_0
 					_argumentsUseCommand = true
 				} else {
-					return nil, nil, errorw (0x7aa9de14, _error)
+					return nil, nil, false, errorw (0x7aa9de14, _error)
 				}
 			}
 		}
@@ -575,7 +597,7 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 			}
 		}
 		if _executable == "" {
-			return nil, nil, errorw (0x10e4bef3, nil)
+			return nil, nil, false, errorw (0x10e4bef3, nil)
 		}
 		
 		_arguments := make ([]string, 0, 32)
@@ -615,7 +637,7 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 				Stderr : _globals.TerminalTty,
 			}
 		
-		return _command, _okExitCodes, nil
+		return _command, _okExitCodes, true, nil
 		
 	} else if _globals.XorgEnabled {
 		
@@ -626,14 +648,14 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 			if len (_editor.XorgSelectCommand) > 0 {
 				_executableName_0 := _editor.XorgSelectCommand[0]
 				if _executableName_0 == "" {
-					return nil, nil, errorw (0x269b47dc, nil)
+					return nil, nil, false, errorw (0x269b47dc, nil)
 				}
 				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
 					_executable = _executable_0
 					_executableName = _executableName_0
 					_argumentsUseCommand = true
 				} else {
-					return nil, nil, errorw (0x0fa998a3, _error)
+					return nil, nil, false, errorw (0x0fa998a3, _error)
 				}
 			}
 		}
@@ -647,7 +669,7 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 			}
 		}
 		if _executable == "" {
-			return nil, nil, errorw (0xcdb975c1, nil)
+			return nil, nil, false, errorw (0xcdb975c1, nil)
 		}
 		
 		_arguments := make ([]string, 0, 32)
@@ -686,11 +708,11 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, *Error) {
 				Stderr : _globals.DevNull,
 			}
 		
-		return _command, _okExitCodes, nil
+		return _command, _okExitCodes, true, nil
 		
 	} else {
 		
-		return nil, nil, errorw (0xdced1bf6, nil)
+		return nil, nil, false, errorw (0xdced1bf6, nil)
 	}
 }
 

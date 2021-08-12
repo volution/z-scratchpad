@@ -99,6 +99,28 @@ type ServerFlags struct {
 	CreateEnabled *bool `long:"server-create-enabled" toml:"create_enabled"`
 }
 
+type ServerConfiguration struct {
+	UrlBase *string `toml:"url_base"`
+	EndpointIp *string `toml:"endpoint_ip"`
+	EndpointPort *uint16 `toml:"endpoint_port"`
+	EditEnabled *bool `toml:"edit_enabled"`
+	CreateEnabled *bool `toml:"create_enabled"`
+}
+
+
+type BrowseFlags struct {
+	Library *string `long:"library" short:"l" value-name:"{identifier}"`
+	Document *string `long:"document" short:"d" value-name:"{identifier}"`
+	SelectLibrary *bool `long:"select-library" short:"S"`
+	SelectDocument *bool `long:"select" short:"s"`
+}
+
+type BrowserConfiguration struct {
+	UrlBase *string `toml:"url_base"`
+	TerminalOpenCommand *[]string `toml:"terminal_open_command"`
+	XorgOpenCommand *[]string `toml:"xorg_open_command"`
+}
+
 
 type MainFlags struct {
 	
@@ -115,6 +137,8 @@ type MainFlags struct {
 	Dump *DumpFlags `command:"dump"`
 	
 	Server *ServerFlags `command:"server"`
+	Browse *BrowseFlags `command:"browse"`
+	
 	Menu *MenuFlags `command:"menu"`
 }
 
@@ -122,7 +146,8 @@ type MainConfiguration struct {
 	Global *GlobalConfiguration `toml:"globals"`
 	Editor *EditorConfiguration `toml:"editor"`
 	Libraries []*Library `toml:"library"`
-	Server *ServerFlags `toml:"server"`
+	Server *ServerConfiguration `toml:"server"`
+	Browser *BrowserConfiguration `toml:"browser"`
 	Menus []*Menu `toml:"menu"`
 }
 
@@ -166,13 +191,16 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			Dump : & DumpFlags {},
 			
 			Server : & ServerFlags {},
+			Browse : & BrowseFlags {},
+			
 			Menu : & MenuFlags {},
 		}
 	
 	_configuration := & MainConfiguration {
 			Global : & GlobalConfiguration {},
 			Editor : & EditorConfiguration {},
-			Server : & ServerFlags {},
+			Server : & ServerConfiguration {},
+			Browser : & BrowserConfiguration {},
 		}
 	
 	_globals, _error := GlobalsNew (_executable, _environment)
@@ -286,6 +314,26 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	if _flags.Global.WorkingDirectory != nil {
 		_flags.Global.WorkingDirectory = nil
 		_configuration.Global.WorkingDirectory = nil
+	}
+	
+	if _configuration.Server.UrlBase == nil {
+		_endpointIp := flag2StringOrDefault (_flags.Server.EndpointIp, _configuration.Server.EndpointIp, "127.0.0.1")
+		_endpointPort := flag2Uint16OrDefault (_flags.Server.EndpointPort, _configuration.Server.EndpointPort, 49894)
+		if _endpointIp_0 := net.ParseIP (_endpointIp); _endpointIp_0 != nil {
+			_endpointIp = _endpointIp_0.String ()
+		} else {
+			return errorw (0x1be6e804, nil)
+		}
+		_urlBase := ""
+		if _endpointPort == 80 {
+			_urlBase = fmt.Sprintf ("http://%s/", _endpointIp)
+		} else {
+			_urlBase = fmt.Sprintf ("http://%s:%d/", _endpointIp, _endpointPort)
+		}
+		_configuration.Server.UrlBase = &_urlBase
+	}
+	if _configuration.Browser.UrlBase == nil {
+		_configuration.Browser.UrlBase = _configuration.Server.UrlBase
 	}
 	
 	if _parser.Active == nil {
@@ -402,6 +450,10 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 		
 		case "server" :
 			return MainServer (_flags.Server, _configuration.Server, _globals, _index, _editor)
+		
+		case "browse" :
+			return MainBrowse (_flags.Browse, _configuration.Browser, _globals, _index, _editor)
+		
 		
 		case "menu" :
 			return MainMenu (_flags.Menu, _configuration.Menus, _configuration, _globals, _index, _editor)
@@ -1123,10 +1175,15 @@ func mainListOutput (_options [][2]string, _format string, _globals *Globals) (*
 
 
 
-func MainServer (_flags *ServerFlags, _configuration *ServerFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
 	_endpointIp := flag2StringOrDefault (_flags.EndpointIp, _configuration.EndpointIp, "127.0.0.1")
 	_endpointPort := flag2Uint16OrDefault (_flags.EndpointPort, _configuration.EndpointPort, 49894)
+	if _endpointIp_0 := net.ParseIP (_endpointIp); _endpointIp_0 != nil {
+		_endpointIp = _endpointIp_0.String ()
+	} else {
+		return errorw (0xfb27d8b0, nil)
+	}
 	
 	_editEnabled := flag2BoolOrDefault (_flags.EditEnabled, _configuration.EditEnabled, false)
 	_createEnabled := flag2BoolOrDefault (_flags.CreateEnabled, _configuration.CreateEnabled, false)
@@ -1156,6 +1213,65 @@ func MainServer (_flags *ServerFlags, _configuration *ServerFlags, _globals *Glo
 	}
 	
 	return nil
+}
+
+
+
+
+func MainBrowse (_flags *BrowseFlags, _configuration *BrowserConfiguration, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+	
+	if (_flags.SelectLibrary != nil) && (_flags.SelectDocument != nil) {
+		return errorw (0x8dbd7a13, nil)
+	}
+	if (_flags.SelectLibrary != nil) && (_flags.Document != nil) {
+		return errorw (0xdb7b52f6, nil)
+	}
+	
+	_browser, _error := BrowserNew (_globals, _index)
+	if _error != nil {
+		return _error
+	}
+	
+	if _configuration.TerminalOpenCommand != nil {
+		_command := *_configuration.TerminalOpenCommand
+		if len (_command) == 0 {
+			return errorw (0xd23959ac, nil)
+		}
+		_browser.TerminalOpenCommand = _command
+	}
+	if _configuration.XorgOpenCommand != nil {
+		_command := *_configuration.XorgOpenCommand
+		if len (_command) == 0 {
+			return errorw (0x045b13e4, nil)
+		}
+		_browser.XorgOpenCommand = _command
+	}
+	
+	if _configuration.UrlBase != nil {
+		_browser.ServerUrlBase = *_configuration.UrlBase
+	} else {
+		return errorw (0xa88827e6, nil)
+	}
+	
+	_libraryIdentifier := ""
+	_documentIdentifier := ""
+	if (_flags.Document != nil) || (_flags.SelectDocument != nil) {
+		_documentIdentifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.SelectDocument, _index, _editor)
+	} else {
+		_libraryIdentifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.SelectLibrary, _index, _editor)
+	}
+	if _error != nil {
+		return _error
+	}
+	
+	if _documentIdentifier != "" {
+		return WorkflowDocumentBrowse (_documentIdentifier, _index, _browser, true)
+	}
+	if _libraryIdentifier != "" {
+		return WorkflowLibraryBrowse (_libraryIdentifier, _index, _browser, true)
+	}
+	
+	return errorw (0x74a20a04, nil)
 }
 
 
