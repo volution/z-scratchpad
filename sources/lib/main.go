@@ -1115,8 +1115,8 @@ func mainListOptions (_libraryIdentifier string, _type string, _labelSource stri
 
 func mainListSelect (_options [][2]string, _editor *Editor) ([][2]string, *Error) {
 	
-	_labels := make ([]string, 0, len (_options))
 	_values := make (map[string]map[string]bool, len (_options))
+	_valuesDuplicate := false
 	for _, _option := range _options {
 		_label := _option[0]
 		_value := _option[1]
@@ -1124,12 +1124,30 @@ func mainListSelect (_options [][2]string, _editor *Editor) ([][2]string, *Error
 		_values_1 := map[string]bool (nil)
 		if _values_0, _exists := _values[_label]; _exists {
 			_values_1 = _values_0
+			_valuesDuplicate = true
 		} else {
-			_labels = append (_labels, _label)
 			_values_1 = make (map[string]bool, 16)
 			_values[_label] = _values_1
 		}
 		_values_1[_value] = true
+	}
+	
+	_labels := make ([]string, 0, len (_values))
+	_labelsMap := make (map[string]string, len (_values))
+	for _label, _values := range _values {
+		if !_valuesDuplicate {
+			_labels = append (_labels, _label)
+			_labelsMap[_label] = _label
+		} else {
+			_labelWithCount := ""
+			if len (_values) > 1 {
+				_labelWithCount = fmt.Sprintf ("%3d | %s", len (_values), _label)
+			} else {
+				_labelWithCount = fmt.Sprintf ("      %s", _label)
+			}
+			_labels = append (_labels, _labelWithCount)
+			_labelsMap[_labelWithCount] = _label
+		}
 	}
 	
 	sort.Strings (_labels)
@@ -1141,6 +1159,11 @@ func mainListSelect (_options [][2]string, _editor *Editor) ([][2]string, *Error
 	
 	_selection := make ([][2]string, 0, 16)
 	for _, _label := range _selection_0 {
+		if _label_0, _exists := _labelsMap[_label]; _exists {
+			_label = _label_0
+		} else {
+			return nil, errorw (0xa37f357b, nil)
+		}
 		if _values_0, _exists := _values[_label]; _exists {
 			for _value, _ := range _values_0 {
 				_selection = append (_selection, [2]string { _label, _value })
