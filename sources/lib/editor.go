@@ -80,9 +80,40 @@ func EditorDocumentEdit (_editor *Editor, _library *Library, _document *Document
 	
 //	logf ('d', 0x226a3cbd, "[editor-session]  opening file for `%s`...", _path)
 	
+	// FIXME:  This file descriptor is leaked;  it should be closed by the garbage collector...
 	_file, _error := os.OpenFile (_path, os.O_RDWR, 0)
 	if _error != nil {
 		return errorw (0xa51cdc41, _error)
+	}
+	_stat, _error := _file.Stat ()
+	if _error != nil {
+		return errorw (0x2c84a0e3, _error)
+	}
+	
+	if _library.SnapshotEnabled {
+		_timestamp := _stat.ModTime ()
+		_timestampToken := _timestamp.Format ("2006-01-02-15-04-05")
+		_snapshotPath := _path + "--" + _timestampToken
+		_snapshotPathTemp := _snapshotPath + ".tmp"
+		if _library.SnapshotExtension != "" {
+			_snapshotPath += "." + _library.SnapshotExtension
+			_snapshotPathTemp += "." + _library.SnapshotExtension
+		}
+		// FIXME:  This file descriptor is leaked;  it should be closed by the garbage collector...
+		_snapshotFile, _error := os.OpenFile (_snapshotPathTemp, os.O_WRONLY | os.O_CREATE | os.O_EXCL, 0o440)
+		if _error == nil {
+			if _, _error := io.Copy (_snapshotFile, _file); _error != nil {
+				return errorw (0x944f12a5, _error)
+			}
+			if _error := _snapshotFile.Close (); _error != nil {
+				return errorw (0xf34fb9e6, _error)
+			}
+			if _error := os.Rename (_snapshotPathTemp, _snapshotPath); _error != nil {
+				return errorw (0xdff00a0a, _error)
+			}
+		} else if ! os.IsExist (_error) {
+			return errorw (0xe4fffd1c, _error)
+		}
 	}
 	
 	_session := & editSession {
