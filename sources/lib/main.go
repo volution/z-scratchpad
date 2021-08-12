@@ -58,6 +58,7 @@ type SearchFlags struct {
 	How *string `long:"how" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
 	Action *string `long:"action" short:"a" chouce:"output" choice:"edit" choice:"export" choice:"browse"`
+	MultipleAllowed *bool `long:"multiple" short:"m"`
 }
 
 type GrepFlags struct {
@@ -67,6 +68,7 @@ type GrepFlags struct {
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json" choice:"context"`
 	Terms []string `long:"term" short:"t" value-name:"{term}"`
 	Action *string `long:"action" short:"a" chouce:"output" choice:"edit" choice:"export" choice:"browse"`
+	MultipleAllowed *bool `long:"multiple" short:"m"`
 }
 
 
@@ -524,26 +526,35 @@ func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor 
 			return mainListOutput (_selection, _format, _globals)
 		
 		case "edit", "export", "browse" :
-			_identifier := ""
 			switch len (_selection) {
 				case 0 :
 					return nil
 				case 1 :
-					_identifier = _selection[0][1]
-				case 2 :
-					return errorw (0xea0431aa, nil)
-			}
-			switch _action {
-				case "edit" :
-					return WorkflowDocumentEdit (_identifier, _index, _editor, true)
-				case "browse" :
-					return WorkflowDocumentBrowse (_identifier, _index, _browser, true)
-				case "export" :
-					// FIXME:  Add support for other formats!
-					return mainExportOutput (_identifier, "source", _globals, _index)
+					// NOP
 				default :
-					return errorw (0xaf7a3532, nil)
+					if ! flagBoolOrDefault (_flags.MultipleAllowed, false) {
+						return errorw (0xea0431aa, nil)
+					}
 			}
+			for _, _selection := range _selection {
+				_identifier := _selection[1]
+				_error := (*Error) (nil)
+				switch _action {
+					case "edit" :
+						_error = WorkflowDocumentEdit (_identifier, _index, _editor, true)
+					case "browse" :
+						_error = WorkflowDocumentBrowse (_identifier, _index, _browser, true)
+					case "export" :
+						// FIXME:  Add support for other formats!
+						_error = mainExportOutput (_identifier, "source", _globals, _index)
+					default :
+						return errorw (0xaf7a3532, nil)
+				}
+				if _error != nil {
+					return _error
+				}
+			}
+			return nil
 		
 		default :
 			return errorw (0xe611caea, nil)
@@ -614,26 +625,35 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 			return mainListOutput (_selection, _format, _globals)
 		
 		case "edit", "export", "browse" :
-			_identifier := ""
 			switch len (_selection) {
 				case 0 :
 					return nil
 				case 1 :
-					_identifier = _selection[0][1]
+					// NOP
 				case 2 :
-					return errorw (0x1e4d02e6, nil)
+					if ! flagBoolOrDefault (_flags.MultipleAllowed, false) {
+						return errorw (0x1e4d02e6, nil)
+					}
 			}
-			switch _action {
-				case "edit" :
-					return WorkflowDocumentEdit (_identifier, _index, _editor, true)
-				case "browse" :
-					return WorkflowDocumentBrowse (_identifier, _index, _browser, true)
-				case "export" :
-					// FIXME:  Add support for other formats!
-					return mainExportOutput (_identifier, "source", _globals, _index)
-				default :
-					return errorw (0xb5fa0b59, nil)
+			for _, _selection := range _selection {
+				_identifier := _selection[1]
+				_error := (*Error) (nil)
+				switch _action {
+					case "edit" :
+						_error = WorkflowDocumentEdit (_identifier, _index, _editor, true)
+					case "browse" :
+						_error = WorkflowDocumentBrowse (_identifier, _index, _browser, true)
+					case "export" :
+						// FIXME:  Add support for other formats!
+						_error = mainExportOutput (_identifier, "source", _globals, _index)
+					default :
+						return errorw (0xb5fa0b59, nil)
+				}
+				if _error != nil {
+					return _error
+				}
 			}
+			return nil
 		
 		default :
 			return errorw (0x1217cd0b, nil)
