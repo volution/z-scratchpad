@@ -19,6 +19,9 @@
 
 :: examples / menu :: exec -- "${ZRUN[@]}" ':: examples / exec' menu "${@}"
 :: examples / server :: exec -- "${ZRUN[@]}" ':: examples / exec' server "${@}"
+:: examples / browse :: exec -- "${ZRUN[@]}" ':: examples / exec' browse "${@}"
+:: examples / browse / select / library :: exec -- "${ZRUN[@]}" ':: examples / exec' browse -S "${@}"
+:: examples / browse / select / document :: exec -- "${ZRUN[@]}" ':: examples / exec' browse -s "${@}"
 :: examples / list :: exec -- "${ZRUN[@]}" ':: examples / exec' list "${@}"
 :: examples / search :: exec -- "${ZRUN[@]}" ':: examples / exec' search "${@}"
 :: examples / search / body :: exec -- "${ZRUN[@]}" ':: examples / exec' search -W body "${@}"
