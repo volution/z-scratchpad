@@ -219,7 +219,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	if (_configurationPath == nil) && (_flags.Global.ConfigurationPath != nil) {
 		_configurationPath = _flags.Global.ConfigurationPath
 	}
-	if _configurationPath == nil {
+	if (_configurationPath == nil) && (len (_flags.Library.Paths) == 0) {
 		_homeStore, _ := os.UserHomeDir ()
 		_configStore, _ := os.UserConfigDir ()
 		for _, _storeAndFolderAndFile := range [][3]string {
@@ -1239,13 +1239,12 @@ func MainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _global
 				Identifier : "library",
 				Name : "Library",
 				Paths : _flags.Paths,
-				UseFileNameAsIdentifier : false,
+				UsePathInLibraryAsIdentifier : true,
 				UseFileExtensionAsFormat : true,
 				IncludeGlobPatterns : []string { "**/*.{txt,md}" },
 				EditEnabled : true,
 				CreateEnabled : true,
 				CreatePath : _flags.Paths[0],
-				SnapshotEnabled : true,
 			}
 		_libraries = append (_libraries, _library)
 	}
