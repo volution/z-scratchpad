@@ -57,7 +57,7 @@ type SearchFlags struct {
 	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path"`
 	How *string `long:"how" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
-	Action *string `long:"action" short:"a" chouce:"output" choice:"edit" choice:"export"`
+	Action *string `long:"action" short:"a" chouce:"output" choice:"edit" choice:"export" choice:"browse"`
 }
 
 type GrepFlags struct {
@@ -66,7 +66,7 @@ type GrepFlags struct {
 	Where *string `long:"where" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json" choice:"context"`
 	Terms []string `long:"term" short:"t" value-name:"{term}"`
-	Action *string `long:"action" short:"a" chouce:"output" choice:"edit" choice:"export"`
+	Action *string `long:"action" short:"a" chouce:"output" choice:"edit" choice:"export" choice:"browse"`
 }
 
 
@@ -409,18 +409,20 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 		_editor.XorgSelectCommand = _command
 	}
 	
+	_browser, _error := mainBrowserNew (_configuration.Browser, _globals, _index)
+	
 	_error = mainLoadLibraries (_flags.Library, _configuration.Libraries, _globals, _index)
 	if _error != nil {
 		return _error
 	}
 	
-	return MainWithFlagsAndContext (_command, _flags, _configuration, _globals, _index, _editor)
+	return MainWithFlagsAndContext (_command, _flags, _configuration, _globals, _index, _editor, _browser)
 }
 
 
 
 
-func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration *MainConfiguration, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration *MainConfiguration, _globals *Globals, _index *Index, _editor *Editor, _browser *Browser) (*Error) {
 	
 	switch _command {
 		
@@ -429,10 +431,10 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 			return MainList (_flags.List, _globals, _index)
 		
 		case "search" :
-			return MainSearch (_flags.Search, _globals, _index, _editor)
+			return MainSearch (_flags.Search, _globals, _index, _editor, _browser)
 		
 		case "grep" :
-			return MainGrep (_flags.Grep, _globals, _index, _editor)
+			return MainGrep (_flags.Grep, _globals, _index, _editor, _browser)
 		
 		
 		case "create" :
@@ -452,11 +454,11 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 			return MainServer (_flags.Server, _configuration.Server, _globals, _index, _editor)
 		
 		case "browse" :
-			return MainBrowse (_flags.Browse, _configuration.Browser, _globals, _index, _editor)
+			return MainBrowse (_flags.Browse, _globals, _index, _editor, _browser)
 		
 		
 		case "menu" :
-			return MainMenu (_flags.Menu, _configuration.Menus, _configuration, _globals, _index, _editor)
+			return MainMenu (_flags.Menu, _configuration.Menus, _configuration, _globals, _index, _editor, _browser)
 		
 		
 		default :
@@ -485,7 +487,7 @@ func MainList (_flags *ListFlags, _globals *Globals, _index *Index) (*Error) {
 
 
 
-func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor *Editor, _browser *Browser) (*Error) {
 	
 	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
 	_type := flagStringOrDefault (_flags.Type, "document")
@@ -497,7 +499,7 @@ func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor 
 	switch _action {
 		case "output" :
 			// NOP
-		case "edit", "export" :
+		case "edit", "export", "browse" :
 			if _flags.Type != nil {
 				return errorw (0x8133f4ab, nil)
 			}
@@ -521,7 +523,7 @@ func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor 
 		case "output" :
 			return mainListOutput (_selection, _format, _globals)
 		
-		case "edit", "export" :
+		case "edit", "export", "browse" :
 			_identifier := ""
 			switch len (_selection) {
 				case 0 :
@@ -531,13 +533,16 @@ func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor 
 				case 2 :
 					return errorw (0xea0431aa, nil)
 			}
-			if _action == "edit" {
-				return WorkflowDocumentEdit (_identifier, _index, _editor, true)
-			} else if _action == "export" {
-				// FIXME:  Add support for other formats!
-				return mainExportOutput (_identifier, "source", _globals, _index)
-			} else {
-				return errorw (0xaf7a3532, nil)
+			switch _action {
+				case "edit" :
+					return WorkflowDocumentEdit (_identifier, _index, _editor, true)
+				case "browse" :
+					return WorkflowDocumentBrowse (_identifier, _index, _browser, true)
+				case "export" :
+					// FIXME:  Add support for other formats!
+					return mainExportOutput (_identifier, "source", _globals, _index)
+				default :
+					return errorw (0xaf7a3532, nil)
 			}
 		
 		default :
@@ -548,7 +553,7 @@ func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor 
 
 
 
-func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Editor, _browser *Browser) (*Error) {
 	
 	_libraryIdentifier := flagStringOrDefault (_flags.Library, "")
 	_what := flagStringOrDefault (_flags.What, "identifier")
@@ -559,7 +564,7 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 	switch _action {
 		case "output" :
 			// NOP
-		case "edit", "export" :
+		case "edit", "export", "browse" :
 			if _flags.What != nil {
 				return errorw (0x966bbfc4, nil)
 			}
@@ -608,7 +613,7 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 		case "output" :
 			return mainListOutput (_selection, _format, _globals)
 		
-		case "edit", "export" :
+		case "edit", "export", "browse" :
 			_identifier := ""
 			switch len (_selection) {
 				case 0 :
@@ -618,13 +623,16 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 				case 2 :
 					return errorw (0x1e4d02e6, nil)
 			}
-			if _action == "edit" {
-				return WorkflowDocumentEdit (_identifier, _index, _editor, true)
-			} else if _action == "export" {
-				// FIXME:  Add support for other formats!
-				return mainExportOutput (_identifier, "source", _globals, _index)
-			} else {
-				return errorw (0xb5fa0b59, nil)
+			switch _action {
+				case "edit" :
+					return WorkflowDocumentEdit (_identifier, _index, _editor, true)
+				case "browse" :
+					return WorkflowDocumentBrowse (_identifier, _index, _browser, true)
+				case "export" :
+					// FIXME:  Add support for other formats!
+					return mainExportOutput (_identifier, "source", _globals, _index)
+				default :
+					return errorw (0xb5fa0b59, nil)
 			}
 		
 		default :
@@ -1218,7 +1226,7 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 
 
 
-func MainBrowse (_flags *BrowseFlags, _configuration *BrowserConfiguration, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+func MainBrowse (_flags *BrowseFlags, _globals *Globals, _index *Index, _editor *Editor, _browser *Browser) (*Error) {
 	
 	if (_flags.SelectLibrary != nil) && (_flags.SelectDocument != nil) {
 		return errorw (0x8dbd7a13, nil)
@@ -1227,34 +1235,9 @@ func MainBrowse (_flags *BrowseFlags, _configuration *BrowserConfiguration, _glo
 		return errorw (0xdb7b52f6, nil)
 	}
 	
-	_browser, _error := BrowserNew (_globals, _index)
-	if _error != nil {
-		return _error
-	}
-	
-	if _configuration.TerminalOpenCommand != nil {
-		_command := *_configuration.TerminalOpenCommand
-		if len (_command) == 0 {
-			return errorw (0xd23959ac, nil)
-		}
-		_browser.TerminalOpenCommand = _command
-	}
-	if _configuration.XorgOpenCommand != nil {
-		_command := *_configuration.XorgOpenCommand
-		if len (_command) == 0 {
-			return errorw (0x045b13e4, nil)
-		}
-		_browser.XorgOpenCommand = _command
-	}
-	
-	if _configuration.UrlBase != nil {
-		_browser.ServerUrlBase = *_configuration.UrlBase
-	} else {
-		return errorw (0xa88827e6, nil)
-	}
-	
 	_libraryIdentifier := ""
 	_documentIdentifier := ""
+	_error := (*Error) (nil)
 	if (_flags.Document != nil) || (_flags.SelectDocument != nil) {
 		_documentIdentifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.SelectDocument, _index, _editor)
 	} else {
@@ -1275,9 +1258,41 @@ func MainBrowse (_flags *BrowseFlags, _configuration *BrowserConfiguration, _glo
 }
 
 
+func mainBrowserNew (_configuration *BrowserConfiguration, _globals *Globals, _index *Index) (*Browser, *Error) {
+	
+	_browser, _error := BrowserNew (_globals, _index)
+	if _error != nil {
+		return nil, _error
+	}
+	
+	if _configuration.TerminalOpenCommand != nil {
+		_command := *_configuration.TerminalOpenCommand
+		if len (_command) == 0 {
+			return nil, errorw (0xd23959ac, nil)
+		}
+		_browser.TerminalOpenCommand = _command
+	}
+	if _configuration.XorgOpenCommand != nil {
+		_command := *_configuration.XorgOpenCommand
+		if len (_command) == 0 {
+			return nil, errorw (0x045b13e4, nil)
+		}
+		_browser.XorgOpenCommand = _command
+	}
+	
+	if _configuration.UrlBase != nil {
+		_browser.ServerUrlBase = *_configuration.UrlBase
+	} else {
+		return nil, errorw (0xa88827e6, nil)
+	}
+	
+	return _browser, nil
+}
 
 
-func MainMenu (_flags *MenuFlags, _menus []*Menu, _configuration *MainConfiguration, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+
+
+func MainMenu (_flags *MenuFlags, _menus []*Menu, _configuration *MainConfiguration, _globals *Globals, _index *Index, _editor *Editor, _browser *Browser) (*Error) {
 	
 	_menuIdentifier := flagStringOrDefault (_flags.Menu, "")
 	if _menuIdentifier == "" {
@@ -1341,7 +1356,7 @@ func MainMenu (_flags *MenuFlags, _menus []*Menu, _configuration *MainConfigurat
 			return errorw (0x2f57b12e, nil)
 		}
 		
-		if _error := MainCommand (_command.Command, _command.Arguments, _configuration, _globals, _index, _editor); _error != nil {
+		if _error := MainCommand (_command.Command, _command.Arguments, _configuration, _globals, _index, _editor, _browser); _error != nil {
 			return _error
 		}
 		
@@ -1355,7 +1370,7 @@ func MainMenu (_flags *MenuFlags, _menus []*Menu, _configuration *MainConfigurat
 
 
 
-func MainCommand (_command string, _arguments []string, _configuration *MainConfiguration, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+func MainCommand (_command string, _arguments []string, _configuration *MainConfiguration, _globals *Globals, _index *Index, _editor *Editor, _browser *Browser) (*Error) {
 	
 	_flags_0 := interface{} (nil)
 	_execute := (func () (*Error)) (nil)
@@ -1377,13 +1392,19 @@ func MainCommand (_command string, _arguments []string, _configuration *MainConf
 			_flags := & SearchFlags {}
 			_flags_0 = _flags
 			_execute = func () (*Error) {
-					return MainSearch (_flags, _globals, _index, _editor)
+					return MainSearch (_flags, _globals, _index, _editor, _browser)
+				}
+		case "browse" :
+			_flags := & BrowseFlags {}
+			_flags_0 = _flags
+			_execute = func () (*Error) {
+					return MainBrowse (_flags, _globals, _index, _editor, _browser)
 				}
 		case "menu" :
 			_flags := & MenuFlags {}
 			_flags_0 = _flags
 			_execute = func () (*Error) {
-					return MainMenu (_flags, _configuration.Menus, _configuration, _globals, _index, _editor)
+					return MainMenu (_flags, _configuration.Menus, _configuration, _globals, _index, _editor, _browser)
 				}
 		default :
 			return errorw (0xbd997a82, nil)
