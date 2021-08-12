@@ -338,11 +338,18 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		_configuration.Browser.UrlBase = _configuration.Server.UrlBase
 	}
 	
-	if _parser.Active == nil {
-		return _help (true, errorw (0x4cae2ee5, nil))
+	_command := ""
+	if _parser.Active != nil {
+		_command = _parser.Active.Name
+	} else {
+		if len (_configuration.Menus) > 0 {
+			_command = "menu"
+		} else {
+			return _help (true, errorw (0x4cae2ee5, nil))
+		}
 	}
 	
-	return MainWithFlags (_parser.Active.Name, _flags, _configuration, _globals)
+	return MainWithFlags (_command, _flags, _configuration, _globals)
 }
 
 
