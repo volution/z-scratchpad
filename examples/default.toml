@@ -5,7 +5,7 @@ name = "Tests"
 paths = ["./tests"]
 edit_enabled = true
 create_enabled = false
-snapshot_enabled = true
+snapshot_enabled = false
 use_library_as_identifier_prefix = true
 use_file_name_as_identifier = true
 use_file_extension_as_format = true
@@ -61,13 +61,13 @@ commands = [
 	{label = "open / tests", command = "browse", arguments = ["--library", "tests", "--select"]},
 	{label = "open / inbox", command = "browse", arguments = ["--library", "inbox", "--select"]},
 	
-	{label = "search / edit / ...", command = "search", arguments = ["--action", "edit", "--how", "body", "--multiple"]},
-	{label = "search / edit / tests", command = "search", arguments = ["--library", "tests", "--action", "edit", "--how", "body", "--multiple"]},
-	{label = "search / edit / inbox", command = "search", arguments = ["--library", "inbox", "--action", "edit", "--how", "body", "--multiple"]},
+	{label = "search / edit / ...", command = "search", arguments = ["--action", "edit", "--how", "body"]},
+	{label = "search / edit / tests", command = "search", arguments = ["--library", "tests", "--action", "edit", "--how", "body"]},
+	{label = "search / edit / inbox", command = "search", arguments = ["--library", "inbox", "--action", "edit", "--how", "body"]},
 	
-	{label = "search / open / ...", command = "search", arguments = ["--action", "browse", "--how", "body", "--multiple"]},
-	{label = "search / open / tests", command = "search", arguments = ["--library", "tests", "--action", "browse", "--how", "body", "--multiple"]},
-	{label = "search / open / inbox", command = "search", arguments = ["--library", "inbox", "--action", "browse", "--how", "body", "--multiple"]},
+	{label = "search / open / ...", command = "search", arguments = ["--action", "browse", "--how", "body"]},
+	{label = "search / open / tests", command = "search", arguments = ["--library", "tests", "--action", "browse", "--how", "body"]},
+	{label = "search / open / inbox", command = "search", arguments = ["--library", "inbox", "--action", "browse", "--how", "body"]},
 	
 	{label = "create ->", command = "menu", arguments = ["--menu", "create"]},
 ]
