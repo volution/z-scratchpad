@@ -685,14 +685,11 @@ func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor 
 	_error := (*Error) (nil)
 	if _flags.Document != nil {
 		_identifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
-	} else {
+	} else if _flags.Library != nil {
 		_identifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.Select, _index, _editor)
 	}
 	if _error != nil {
 		return _error
-	}
-	if _identifier == "" {
-		return nil
 	}
 	
 	return WorkflowDocumentCreate (_identifier, _index, _editor, true)
