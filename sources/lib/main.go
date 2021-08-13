@@ -263,6 +263,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	}
 	
 	_configurationPath := (*string) (nil)
+	_configurationPathInStore := false
 	if (_configurationPath == nil) && (_flags.Global.ConfigurationPath != nil) {
 		_configurationPath = _flags.Global.ConfigurationPath
 	}
@@ -294,6 +295,9 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 					}
 				}
 				_configurationPath = &_path
+				if _storeAndFolderAndFile[0] == "." {
+					_configurationPathInStore = true
+				}
 				break
 			} else if ! os.IsNotExist (_error) {
 				return errorw (0xbb4d9103, _error)
@@ -310,12 +314,22 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		if _error != nil {
 			return errorw (0xf2be5f5f, _error)
 		}
-		_buffer := bytes.NewBuffer (_data)
-		_decoder := toml.NewDecoder (_buffer)
-		_decoder.Strict (true)
-		_error = _decoder.Decode (_configuration)
-		if _error != nil {
-			return errorw (0x93e9dab8, _error)
+		if len (bytes.TrimSpace (_data)) > 0 {
+			_buffer := bytes.NewBuffer (_data)
+			_decoder := toml.NewDecoder (_buffer)
+			_decoder.Strict (true)
+			_error = _decoder.Decode (_configuration)
+			if _error != nil {
+				return errorw (0x93e9dab8, _error)
+			}
+		} else {
+			if _configurationPathInStore {
+				_library, _error := mainLibraryForPaths ([]string { path.Dir (_path) })
+				if _error != nil {
+					return _error
+				}
+				_configuration.Libraries = []*Library { _library }
+			}
 		}
 	}
 	
@@ -1537,17 +1551,10 @@ func mainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _global
 	_libraries := make ([]*Library, 0, 16)
 	
 	if len (_flags.Paths) > 0 {
-		_library := & Library {
-				Identifier : "library",
-				Name : "Library",
-				Paths : _flags.Paths,
-				UsePathInLibraryAsIdentifier : true,
-				UseFileExtensionAsFormat : true,
-				IncludeGlobPatterns : []string { "**/*.{txt,md}" },
-				EditEnabled : true,
-				CreateEnabled : true,
-				CreatePath : _flags.Paths[0],
-			}
+		_library, _error := mainLibraryForPaths (_flags.Paths)
+		if _error != nil {
+			return _error
+		}
 		_libraries = append (_libraries, _library)
 	}
 	
@@ -1629,6 +1636,22 @@ func mainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _global
 	}
 	
 	return nil
+}
+
+
+func mainLibraryForPaths (_paths []string) (*Library, *Error) {
+	_library := & Library {
+			Identifier : "library",
+			Name : "Library",
+			Paths : _paths,
+			UsePathInLibraryAsIdentifier : true,
+			UseFileExtensionAsFormat : true,
+			IncludeGlobPatterns : []string { "**/*.{txt,md}" },
+			EditEnabled : true,
+			CreateEnabled : true,
+			CreatePath : _paths[0],
+		}
+	return _library, nil
 }
 
 
