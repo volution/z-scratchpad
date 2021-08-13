@@ -124,6 +124,9 @@ type BrowserConfiguration struct {
 }
 
 
+type HelpFlags struct {}
+
+
 type MainFlags struct {
 	
 	Global *GlobalFlags `group:"Global options"`
@@ -142,6 +145,8 @@ type MainFlags struct {
 	Browse *BrowseFlags `command:"browse"`
 	
 	Menu *MenuFlags `command:"menu"`
+	
+	Help *HelpFlags `command:"help"`
 }
 
 type MainConfiguration struct {
@@ -210,18 +215,19 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		return _error
 	}
 	
-	_parser := flags.NewNamedParser ("z-scratchpad", flags.PassDoubleDash)
-	_parser.SubcommandsOptional = true
-	if _, _error := _parser.AddGroup ("", "", _flags); _error != nil {
-		return errorw (0x5b48e356, _error)
+	_parser, _error := mainParserNew (_flags)
+	if _error != nil {
+		return _error
 	}
 	
 	_help := func (_log bool, _error *Error) (*Error) {
 		_buffer := bytes.NewBuffer (nil)
+		_buffer.WriteByte ('\n')
 		_parser.WriteHelp (_buffer)
+		_buffer.WriteByte ('\n')
 		if _log {
 			if _globals.StdioIsTty && _globals.TerminalEnabled {
-				logf ('`', 0xa725b4bc, "\n%s\n", _buffer.String ())
+				logf ('`', 0xa725b4bc, "%s", _buffer.String ())
 			}
 		} else {
 			if _, _error := _buffer.WriteTo (_globals.Stdout); _error != nil {
@@ -345,11 +351,21 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		if len (_configuration.Menus) > 0 {
 			_command = "menu"
 		} else {
-			return _help (true, errorw (0x4cae2ee5, nil))
+			_command = "help-abort"
 		}
 	}
 	
 	return MainWithFlags (_command, _flags, _configuration, _globals)
+}
+
+
+func mainParserNew (_flags *MainFlags) (*flags.Parser, *Error) {
+	_parser := flags.NewNamedParser ("z-scratchpad", flags.PassDoubleDash)
+	_parser.SubcommandsOptional = true
+	if _, _error := _parser.AddGroup ("", "", _flags); _error != nil {
+		return nil, errorw (0x5b48e356, _error)
+	}
+	return _parser, nil
 }
 
 
@@ -468,6 +484,17 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 		
 		case "menu" :
 			return MainMenu (_flags.Menu, _configuration.Menus, _configuration, _globals, _index, _editor, _browser)
+		
+		
+		case "help", "help-abort" :
+			if _error := MainHelp (_flags.Help, _globals, _editor); _error != nil {
+				return _error
+			}
+			if _command == "help-abort" {
+				return errorf (0x7f3fc1a7, "no command was specified, and no default menu was configured!")
+			} else {
+				return nil
+			}
 		
 		
 		default :
@@ -1478,6 +1505,24 @@ func MainCommand (_command string, _arguments []string, _configuration *MainConf
 	}
 	
 	return _execute ()
+}
+
+
+
+
+func MainHelp (_flags *HelpFlags, _globals *Globals, _editor *Editor) (*Error) {
+	_parser, _error := mainParserNew (& MainFlags {})
+	if _error != nil {
+		return _error
+	}
+	_buffer := bytes.NewBuffer (nil)
+	_buffer.WriteByte ('\n')
+	_parser.WriteHelp (_buffer)
+	_buffer.WriteByte ('\n')
+	if _, _error := _buffer.WriteTo (_globals.Stdout); _error != nil {
+		return errorw (0xf4170873, _error)
+	}
+	return nil
 }
 
 
