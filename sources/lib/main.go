@@ -405,11 +405,33 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 		return _error
 	}
 	
+	_error = mainLoadLibraries (_flags.Library, _configuration.Libraries, _globals, _index)
+	if _error != nil {
+		return _error
+	}
+	
 	_editor, _error := EditorNew (_globals, _index)
 	if _error != nil {
 		return _error
 	}
 	
+	if _configuration.Editor.DefaultCreateLibrary == nil {
+		_libraries, _error := IndexLibrariesSelectAll (_index)
+		if _error != nil {
+			return _error
+		}
+		_defaultLibrary := ""
+		_multipleLibraries := 0
+		for _, _library := range _libraries {
+			if _library.CreateEnabled {
+				_defaultLibrary = _library.Identifier
+				_multipleLibraries += 1
+			}
+		}
+		if _multipleLibraries == 1 {
+			_configuration.Editor.DefaultCreateLibrary = &_defaultLibrary
+		}
+	}
 	if _configuration.Editor.DefaultCreateLibrary != nil {
 		_library := *_configuration.Editor.DefaultCreateLibrary
 		if _library == "" {
@@ -449,11 +471,6 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 	}
 	
 	_browser, _error := mainBrowserNew (_configuration.Browser, _globals, _index)
-	
-	_error = mainLoadLibraries (_flags.Library, _configuration.Libraries, _globals, _index)
-	if _error != nil {
-		return _error
-	}
 	
 	return MainWithFlagsAndContext (_command, _flags, _configuration, _globals, _index, _editor, _browser)
 }
@@ -725,9 +742,17 @@ func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor 
 	_identifier := ""
 	_error := (*Error) (nil)
 	if _flags.Document != nil {
-		_identifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
+		// FIXME: _identifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
+		if _flags.Library != nil {
+			_identifier = fmt.Sprintf ("%s:%s", *_flags.Library, *_flags.Document)
+		} else if _editor.DefaultCreateLibrary != "" {
+			_identifier = fmt.Sprintf ("%s:%s", _editor.DefaultCreateLibrary, *_flags.Document)
+		} else {
+			_identifier = *_flags.Document
+		}
 	} else if _flags.Library != nil {
-		_identifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.Select, _index, _editor)
+		// FIXME: _identifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.Select, _index, _editor)
+		_identifier = *_flags.Library
 	}
 	if _error != nil {
 		return _error

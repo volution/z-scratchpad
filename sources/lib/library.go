@@ -118,7 +118,8 @@ func LibraryInitialize (_library *Library) (*Error) {
 		}
 		_library.CreateExtension = strings.TrimLeft (_library.CreateExtension, ".")
 		if (_library.CreateNameTimestampLength == 0) && (_library.CreateNameRandomLength == 0) {
-			_library.CreateNameRandomLength = 16
+			_library.CreateNameTimestampLength = 3
+			_library.CreateNameRandomLength = 8
 		}
 		if _library.CreateNameTimestampLength > 6 {
 			return errorw (0x56c7f2da, nil)
