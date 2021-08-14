@@ -331,13 +331,13 @@ and how it should store one's documents.</p>
 <h3>Concepts</h3>
 <p><code>z-scratchpad</code> uses the following concepts:</p>
 <ul>
-<li><strong>instance</strong> -- mainly identified with a single configuration file;  (one can many instances;)</li>
+<li><strong>instance</strong> -- mainly identified with a single configuration file;  (one can have many instances, each using a different configuration file;)</li>
 <li><strong>document</strong> -- an individual plain text UTF-8 file, composed of lines, that has a header and a body;
 <ul>
 <li><strong>document header</strong> -- the first contiguous block of non-empty lines, having a simple syntax, used to give the document a title and some other meta-data;</li>
 <li><strong>document body</strong> -- all the other lines following the header, separated by at least one empty line;  the syntax of the body depends on the document format;</li>
 <li><strong>document format</strong> -- how should the body be parsed (mainly when exporting to HTML);  currently there are three supported formats:  CommonMark, snippets, and just text;</li>
-<li><strong>document title</strong> -- one or more &quot;titles&quot; that can are used mainly in the UI to select a document;  (multiple documents can have the same title, although it is not advisable;)</li>
+<li><strong>document title</strong> -- one or more &quot;titles&quot; that are used mainly in the UI to select a document;  (multiple documents can have the same title, although it is not advisable;)</li>
 <li><strong>document identifier</strong> -- a token (with strict syntax) that uniquely identifies a document within its library;</li>
 <li><strong>document snapshot</strong> -- an optional backup of a document, created just before editing it;</li>
 </ul>

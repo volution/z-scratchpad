@@ -382,12 +382,12 @@ If one is interested in why I've reached this model, please see the next section
 ### Concepts
 
 `z-scratchpad` uses the following concepts:
-* **instance** -- mainly identified with a single configuration file;  (one can many instances;)
+* **instance** -- mainly identified with a single configuration file;  (one can have many instances, each using a different configuration file;)
 * **document** -- an individual plain text UTF-8 file, composed of lines, that has a header and a body;
   * **document header** -- the first contiguous block of non-empty lines, having a simple syntax, used to give the document a title and some other meta-data;
   * **document body** -- all the other lines following the header, separated by at least one empty line;  the syntax of the body depends on the document format;
   * **document format** -- how should the body be parsed (mainly when exporting to HTML);  currently there are three supported formats:  CommonMark, snippets, and just text;
-  * **document title** -- one or more "titles" that can are used mainly in the UI to select a document;  (multiple documents can have the same title, although it is not advisable;)
+  * **document title** -- one or more "titles" that are used mainly in the UI to select a document;  (multiple documents can have the same title, although it is not advisable;)
   * **document identifier** -- a token (with strict syntax) that uniquely identifies a document within its library;
   * **document snapshot** -- an optional backup of a document, created just before editing it;
 * **library** -- a set of documents;  one can have multiple libraries inside the same instance;
