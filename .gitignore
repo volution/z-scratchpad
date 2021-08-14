@@ -5,6 +5,9 @@
 /examples/inbox/**
 !/examples/inbox/.gitignore
 
+/examples/imports/**
+!/examples/imports/.gitignore
+
 *~
 *#
 *.bak
