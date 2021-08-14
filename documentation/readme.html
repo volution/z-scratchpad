@@ -43,7 +43,7 @@
 <main class="markdown-body">
 <h1><code>z-scratchpad</code> -- lightweight Go-based notes tool</h1>
 <blockquote>
-<h6>Table of contents</h6>
+<h2>Table of contents</h2>
 <ul>
 <li><a href="#about">about</a>; <a href="#status">status</a>; <a href="#documentation">documentation</a>;</li>
 <li><a href="#features">features (and anti-features)</a>;</li>
@@ -87,7 +87,6 @@ that uses one's preferred editor and UI tools.</p>
 <li>a fully-fledged wiki;  it does have a web interface, but that is tailored for browsing and viewing;  (and it should never be exposed to the network;)</li>
 <li>a document management system;</li>
 </ul>
-<h6>Further details</h6>
 <p>For more features, and anti-features, please see the <a href="#features">dedicated section</a>.</p>
 <p>Also see the following useful sections:</p>
 <ul>
@@ -102,7 +101,9 @@ Please see the <a href="#contributions">contributions</a> and <a href="#license"
 <hr />
 <p><a name="status"></a></p>
 <h2>Status</h2>
-<h6><strong>WIP</strong> (work in progress)</h6>
+<blockquote>
+<p><strong>WIP</strong> (work in progress)</p>
+</blockquote>
 <p>At the moment <code>z-scratchpad</code> is still under heavy development.</p>
 <p>That being said, I'm using it for all my note taking,
 from personal notes, to for-work project specific documents.</p>
@@ -113,7 +114,9 @@ thus usable with generic file-management tools.</p>
 <hr />
 <p><a name="documentation"></a></p>
 <h2>Documentation</h2>
-<h6><strong>WIP</strong> (work in progress)</h6>
+<blockquote>
+<p><strong>WIP</strong> (work in progress)</p>
+</blockquote>
 <p>Besides what is available by running <code>z-scratchpad help</code> there is no other documentation at the moment.</p>
 <p>That being said, just run the following and start experimenting with the commands.
 (If there is need for documentation, besides the frugally <code>-h</code> for each command, I have failed in one of the mandatory requirements, that of being &quot;simple to use&quot;.)</p>
@@ -181,7 +184,7 @@ some-identifier.txt
 <hr />
 <p><a name="features"></a></p>
 <h2>Features (and anti-features)</h2>
-<h6>Features</h6>
+<h3>Features and requirements</h3>
 <p>The following are the main requirements, sorted by priority, that I have in mind while implementing or extending <code>z-scratchpad</code>:</p>
 <ul>
 <li>(<strong>mandatory</strong>) stores the documents in plain text files, with minimal requirements on the file-system structure;  (if tomorrow <code>z-scratchpad</code> disappears, no one should lose anything, and should be able to easily migrate to other tools;)</li>
@@ -202,7 +205,7 @@ some-identifier.txt
 The reason is that although during implementation they should be maintained, compromises can be made (for example in terms of performance).
 On the other hand, the higher some are on the list, the fewer compromises should be made.</p>
 <p><a name="anti-features"></a></p>
-<h6>Anti-features</h6>
+<h3>Anti-features</h3>
 <p>Conversely, there are also some negative requirements, or anti-features, that I keep in mind:</p>
 <ul>
 <li>(<strong>mandatory</strong>) does not support any non-text documents;  (it doesn't care what is inside the document, i.e. its syntax, as long as it's a plain text file;)</li>
@@ -220,7 +223,7 @@ On the other hand, the higher some are on the list, the fewer compromises should
 <li>does not prioritize built-in advanced workflows;  (however, by using the CLI interface one can implement in his favorite scripting language any workflow one desires;)</li>
 </ul>
 <p><a name="ui"></a></p>
-<h6>UI considerations</h6>
+<h3>UI considerations</h3>
 <p>The careful reader might see that I've listed &quot;does not implement any TUI / GUI&quot; twice, both in features and anti-features, it was not a mistake.
 <code>z-scratchpad</code> should limit its UI requirements to the following primitive operations that can be provided by external tools.</p>
 <ul>
@@ -233,12 +236,14 @@ On the other hand, the higher some are on the list, the fewer compromises should
 <hr />
 <p><a name="how"></a></p>
 <h2>How, concepts, and inner workings...</h2>
-<h6><strong>WIP</strong> (work in progress)</h6>
+<blockquote>
+<p><strong>WIP</strong> (work in progress)</p>
+</blockquote>
 <p>In this section I mainly describe what use-cases <code>z-scratchpad</code> should cover,
 how it should integrate in one's environment,
 and how it should store one's documents.</p>
 <p>If one is interested in why I've reached this model, please see the next section on <a href="#why">&quot;why&quot;</a>.</p>
-<h6>Concepts</h6>
+<h3>Concepts</h3>
 <p><code>z-scratchpad</code> uses the following concepts:</p>
 <ul>
 <li><strong>instance</strong> -- mainly identified with a single configuration file;  (one can many instances;)</li>
@@ -269,7 +274,7 @@ and how it should store one's documents.</p>
 </ul>
 </li>
 </ul>
-<h6>Use-cases and workflows</h6>
+<h3>Use-cases and workflows</h3>
 <p>Creating a new document:</p>
 <ul>
 <li><code>z-scratchpad create</code> -- if there is configured a default create library, an new document with a random name (prefixed with the current date) is created under that library's create path, and the preferred editor is opened with the corresponding file;</li>
@@ -298,7 +303,7 @@ and how it should store one's documents.</p>
 <li><code>z-scratchpad export -l some-library -d some-document -f source</code> -- export the given document's source code;  (with the document header canonicalized;)</li>
 <li><code>z-scratchpad export -l some-library -d some-document -f html</code> -- export the given document's body rendered as HTML (only the actual body, that could be included in for example <code>&lt;main&gt;...&lt;/main&gt;</code>);</li>
 </ul>
-<h6>TUI vs GUI</h6>
+<h3>TUI vs GUI</h3>
 <p><code>z-scratchpad</code> tries to detect if it is running under a terminal or Xorg:</p>
 <ul>
 <li>it considers running under a terminal if all these conditions are met:
@@ -318,7 +323,9 @@ and how it should store one's documents.</p>
 </ul>
 <p>Depending on whether it considers running under a terminal or Xorg, it tries to use different tools (for editing, selecting, etc.)</p>
 <p>However one can always set the same tools for both terminal or Xorg configuration properties.</p>
-<h6><strong>TBC</strong> (to be continued)</h6>
+<blockquote>
+<p><strong>TBC</strong> (to be continued)</p>
+</blockquote>
 <hr />
 <p><a name="why"></a></p>
 <h2>Why, and history and reasons...</h2>

@@ -2,7 +2,7 @@
 # `z-scratchpad` -- lightweight Go-based notes tool
 
 
-> ###### Table of contents
+> ## Table of contents
 >
 > * [about](#about); [status](#status); [documentation](#documentation);
 > * [features (and anti-features)](#features);
@@ -59,8 +59,6 @@ What `z-scrpatchpad` is not:
 * a fully-fledged wiki;  it does have a web interface, but that is tailored for browsing and viewing;  (and it should never be exposed to the network;)
 * a document management system;
 
-###### Further details
-
 For more features, and anti-features, please see the [dedicated section](#features).
 
 Also see the following useful sections:
@@ -85,7 +83,7 @@ Please see the [contributions](#contributions) and [licensing](#license) section
 
 ## Status
 
-###### **WIP** (work in progress)
+> **WIP** (work in progress)
 
 At the moment `z-scratchpad` is still under heavy development.
 
@@ -109,7 +107,7 @@ thus usable with generic file-management tools.
 
 ## Documentation
 
-###### **WIP** (work in progress)
+> **WIP** (work in progress)
 
 Besides what is available by running `z-scratchpad help` there is no other documentation at the moment.
 
@@ -212,7 +210,7 @@ z-scratchpad browse -d some-identifier
 
 ## Features (and anti-features)
 
-###### Features
+### Features and requirements
 
 The following are the main requirements, sorted by priority, that I have in mind while implementing or extending `z-scratchpad`:
 
@@ -236,7 +234,7 @@ On the other hand, the higher some are on the list, the fewer compromises should
 
 <a name="anti-features"></a>
 
-###### Anti-features
+### Anti-features
 
 Conversely, there are also some negative requirements, or anti-features, that I keep in mind:
 
@@ -256,7 +254,7 @@ Conversely, there are also some negative requirements, or anti-features, that I 
 
 <a name="ui"></a>
 
-###### UI considerations
+### UI considerations
 
 The careful reader might see that I've listed "does not implement any TUI / GUI" twice, both in features and anti-features, it was not a mistake.
 `z-scratchpad` should limit its UI requirements to the following primitive operations that can be provided by external tools.
@@ -280,7 +278,7 @@ Anything that is not on this list should be made to fit a workflow based on thes
 
 ## How, concepts, and inner workings...
 
-###### **WIP** (work in progress)
+> **WIP** (work in progress)
 
 In this section I mainly describe what use-cases `z-scratchpad` should cover,
 how it should integrate in one's environment,
@@ -289,7 +287,7 @@ and how it should store one's documents.
 If one is interested in why I've reached this model, please see the next section on ["why"](#why).
 
 
-###### Concepts
+### Concepts
 
 `z-scratchpad` uses the following concepts:
 * **instance** -- mainly identified with a single configuration file;  (one can many instances;)
@@ -312,7 +310,7 @@ If one is interested in why I've reached this model, please see the next section
   * nested menus -- although it does not support "nested" or "hierarchical" menus, one can call another menu as a command;  (thus one can implement arbitrary menu paths;)
 
 
-###### Use-cases and workflows
+### Use-cases and workflows
 
 Creating a new document:
 * `z-scratchpad create` -- if there is configured a default create library, an new document with a random name (prefixed with the current date) is created under that library's create path, and the preferred editor is opened with the corresponding file;
@@ -339,7 +337,7 @@ Integrating in other scripts:
 * `z-scratchpad export -l some-library -d some-document -f html` -- export the given document's body rendered as HTML (only the actual body, that could be included in for example `<main>...</main>`);
 
 
-###### TUI vs GUI
+### TUI vs GUI
 
 `z-scratchpad` tries to detect if it is running under a terminal or Xorg:
 * it considers running under a terminal if all these conditions are met:
@@ -356,7 +354,7 @@ Depending on whether it considers running under a terminal or Xorg, it tries to 
 However one can always set the same tools for both terminal or Xorg configuration properties.
 
 
-###### **TBC** (to be continued)
+> **TBC** (to be continued)
 
 
 
