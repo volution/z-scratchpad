@@ -51,6 +51,15 @@
 	
 	test "${#}" -eq 0
 	
+	if test -e ./.git ; then
+		_git_hash="$( exec -- git rev-parse HEAD )"
+		if ! git diff --quiet || ! git diff --quiet --cached ; then
+			_git_hash+="-uncommitted"
+		fi
+	else
+		_git_hash='unknown'
+	fi
+	
 	if test -s ./sources/embedded/build/sources.cpio.gz ; then
 		rm -- ./sources/embedded/build/sources.cpio.gz
 		touch -- ./sources/embedded/build/sources.cpio.gz
@@ -100,15 +109,6 @@
 		rm -- ./.outputs/markers/build-sources.list.tmp
 		rm -- ./.outputs/markers/build-sources.md5.tmp
 		rm -- ./.outputs/markers/build-sources.hash.tmp
-	fi
-	
-	if test -e ./.git ; then
-		_git_hash="$( exec -- git rev-parse HEAD )"
-		if ! git diff --quiet || ! git diff --quiet --cached ; then
-			_git_hash+="-uncommitted"
-		fi
-	else
-		_git_hash='unknown'
 	fi
 	
 	printf -- '%s\n' "${_git_hash}" >| ./.outputs/markers/build-git-hash.txt.tmp
