@@ -124,8 +124,8 @@
 	
 	if test -s ./sources/embedded/build/sources.cpio.gz ; then
 		rm -- ./sources/embedded/build/sources.cpio.gz
-		touch -- ./sources/embedded/build/sources.cpio.gz
 	fi
+	touch --reference ./sources/embedded/build/timestamp.txt -- ./sources/embedded/build/sources.cpio.gz
 	
 	execline-cd ./sources \
 	find . \

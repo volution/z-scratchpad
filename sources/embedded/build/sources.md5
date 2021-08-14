@@ -24,14 +24,15 @@ d41d8cd98f00b204e9800998ecf8427e *embedded/templates/library-view.txt
 6ba68a8d492f4b556b28fbfaa4fe6705 *embedded/templates/version.html
 4a03a9ecf069e3ca4825c5914aed1072 *go.mod
 6a98f6a3e0697ad21a85bc577edda7e9 *go.sum
+da95848c11b7c2a8fc121732f46ff9cb *lib/browser.go
 adc6da72ee5469f8ccf099b27445088a *lib/constants.go
 a0bf1b0a0d713f9cce7429a3a5f1b7d1 *lib/crypto.go
 14a744142f8db5aaaf3792b9b2c88e52 *lib/document.go
-ccb4536deb65e3d7b72c64914b34bad1 *lib/editor.go
+591de8a12b467b745e38f7f98667b065 *lib/editor.go
 ad208f51cae08fd86fe0fbaacc1f46f4 *lib/globals.go
 5baedbac808251ccdcaaf5fa4ff5b803 *lib/index.go
-af2deb2441e88db99b1b0e77175d662f *lib/library.go
-3d9db98219c79c2b1dc190c533930854 *lib/main.go
+211f515a6587ca4b6c5ed2de29b23637 *lib/library.go
+ce3de23ba78fb5601226c0e83f3c6dfc *lib/main.go
 1eda90712c28eed65f1c947c5e5dd8f3 *lib/parser-commonmark.go
 06316230933c70c61bac6a71764ebae8 *lib/parser-snippets.go
 c67ffe68ccb6db3cb86af13bcbcb67e3 *lib/premain.go
@@ -42,4 +43,4 @@ d41a36463ad5ae7a0b8d61afe208b4cc *lib/server.go
 138952de04f7616336d8f0fb6a3aed76 *lib/templates.go
 716d90ef359073b920195c4b8d2f905e *lib/transcript.go
 9b082d19b96cd17ce721c95f66620d55 *lib/utils.go
-3a1dcccf4280b78cebdc76a267a2fc2a *lib/workflows.go
+e8011c67c8d7d33ec77c29bea99f1450 *lib/workflows.go
