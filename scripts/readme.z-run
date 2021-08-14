@@ -10,7 +10,7 @@
 
 << readme / html / open
 	test "${#}" -eq 0
-	exec -- x-www guest:cmark-gfm open file:"$( exec -- readlink -e -- ./readme.html )"
+	exec -- x-www guest:cmark-gfm open file:"$( exec -- readlink -e -- ./documentation/readme.html )"
 !!
 
 
@@ -27,10 +27,14 @@
 
 << readme / html / render
 	test "${#}" -eq 0
+	if test ./documentation/readme.md -ot ./documentation/readme.html ; then
+		# printf -- '[ii]  skipping rendering readme...\n' >&2
+		exit -- 0
+	fi
 	printf -- '[ii]  rendering readme...\n' >&2
-	_html="$( exec -- cmark-gfm --validate-utf8 --to html < ./readme.md )"
+	_html="$( exec -- cmark-gfm --to html --validate-utf8 --unsafe < ./documentation/readme.md )"
 	test -n "${_html}"
-	cat >| ./readme.html.tmp << EOS
+	cat >| ./documentation/readme.html.tmp << EOS
 	<!doctype html>
 	<html>
 	<head>
@@ -41,6 +45,7 @@
 				background: hsl(0, 0%, 5%);
 			}
 			.markdown-body {
+				filter: invert(0.9) grayscale(0.5);
 				background: hsl(0, 0%, 100%);
 				border: 1px solid hsl(0, 0%, 5%);
 				box-sizing: border-box;
@@ -51,7 +56,7 @@
 			}
 			@media (max-width: 767px) {
 				.markdown-body {
-				padding: 15px;
+					padding: 15px;
 				}
 			}
 		</style>
@@ -59,6 +64,9 @@
 			(function () {
 				"use strict";
 				function _reload () {
+					if (window.location.search != "?reload") {
+						return;
+					}
 					if (window.history.scrollRestoration !== undefined) {
 						window.history.scrollRestoration = "auto";
 					}
@@ -75,6 +83,6 @@
 	</body>
 	</html>
 	EOS
-	mv -T -- ./readme.html.tmp ./readme.html
+	mv -T -- ./documentation/readme.html.tmp ./documentation/readme.html
 !!
 

@@ -1,15 +1,492 @@
 
-# **z-scratchpad** -- lightweight Go-based notes tool
+# `z-scratchpad` -- lightweight Go-based notes tool
+
+
+> ###### Table of contents
+>
+> * [about](#about); [status](#status); [documentation](#documentation);
+> * [features (and anti-features)](#features);
+> * [how? (concepts, and inner workings)](#how);
+> * [why? (history, and reasons)](#why);
+> * [contributions](#contributions); [licensing](#license);
+
+
+
+
+--------------------------------------------------------------------------------
+
+<a name="about"></a>
 
 
 
 
 ## About
 
-(TO-BE-CONTINUED...)
+`z-scratchpad`, as the title says, is a lightweight and highly customizable tool
+implemented in pure Go (thus portable to most POSIX compliant OS's)
+that allows one to easily take notes,
+from the unorganized post-it pile, reusable copy-paste snippets,
+memos, document drafts,
+up to the highly organized (and carefully tagged and categorized) project specific documents.
+
+Most importantly, `z-scratchpad` does not use a database (neither embedded nor client-server);
+instead it uses plain text files with minimal syntax, on a plain file-system,
+with minimal requirements on file and folder organization.
+Thus, the actual documents can be easily searched and edited with tools like `nano`, `grep`, `sed`, etc.,
+versioned with Git, Mercurial, etc.,
+synchronized with `rsync`, Dropbox, etc.,
+and interacted with like any other plain text file.
+
+It provides a CLI (command line), TUI (terminal interface, a.k.a. "curses" interface), and a GUI.
+However, the TUI / GUI is delegated to one's preferred tools
+(like `nano`, `vim`, `sublime_text`, etc., for editing, and `fzf`, `dmenu`, `rofi`, etc., for menus).
+
+It also provides a simple WUI (web interface via a built-in HTTP server) for browsing and viewing.
+Although the WUI is not intended to be the primary interface, and was not designed to be exposed to the network.
+However, for publishing on the internet it provides a simple HTML static site export.
+
+It is tailored to individual use, although, given it uses only plain text files, one could leverage Git or any other versioning system.
+Also, it does not require running a daemon or server in the background.
+
+One can think of `z-scratchpad` as the merger of
+[Notational Velocity](https://notational.net/)
+(or [nvALT](https://brettterpstra.com/projects/nvalt/))
+with [MoinMoin](https://moinmo.in/) (or other wiki's),
+that uses one's preferred editor and UI tools.
+
+What `z-scrpatchpad` is not:
+* a fancy mind-mapping, org-mode, or the latest buzzword note taking tool;
+* a fully-fledged wiki;  it does have a web interface, but that is tailored for browsing and viewing;  (and it should never be exposed to the network;)
+* a document management system;
+
+###### Further details
+
+For more features, and anti-features, please see the [dedicated section](#features).
+
+Also see the following useful sections:
+* [status](#status) -- the current implementation status;
+* [documentation](#status) -- how to use and configure it;
+* [UI look-and-feel](#ui) -- how the UI works, and what can one expect when interacting with it;
+* [how it works](#how) -- the various use-cases it covers, and how it works internally;
+* [why this tool](#why) -- describes how I've reached to implement this tool, and why it behaves like it does;
+
+Finally, it is open-source, licensed under GPL 3 or later.
+Please see the [contributions](#contributions) and [licensing](#license) sections.
 
 
 
+
+--------------------------------------------------------------------------------
+
+<a name="status"></a>
+
+
+
+
+## Status
+
+###### **WIP** (work in progress)
+
+At the moment `z-scratchpad` is still under heavy development.
+
+That being said, I'm using it for all my note taking,
+from personal notes, to for-work project specific documents.
+
+Moreover, given that it just provides the glue between one's favorite UI tools (editors and such),
+if it breaks nothing is lost.
+All one's files are stored on the file-system, in plain text files,
+thus usable with generic file-management tools.
+
+
+
+
+--------------------------------------------------------------------------------
+
+<a name="documentation"></a>
+
+
+
+
+## Documentation
+
+###### **WIP** (work in progress)
+
+Besides what is available by running `z-scratchpad help` there is no other documentation at the moment.
+
+That being said, just run the following and start experimenting with the commands.
+(If there is need for documentation, besides the frugally `-h` for each command, I have failed in one of the mandatory requirements, that of being "simple to use".)
+
+Get some help:
+~~~~
+z-scratchpad -h
+z-scratchpad create -h
+z-scratchpad edit -h
+z-scratchpad list -h
+~~~~
+
+Initialize the notes store:
+~~~~
+# create an empty folder for the notes store
+mkdir ./some-notes
+
+# mark the folder as the notes store
+touch ./some-notes/.z-scratchpad
+
+# switch to the notes store
+# (alternatively, add `-C ./some-notes` to all commands)
+cd ./some-notes
+~~~~
+
+Create a note (with a random identifier prefixed by the current date):
+~~~~
+z-scratchpad create
+~~~~
+
+Create a note with a custom identifier:
+~~~~
+z-scratchpad create -d some-identifier
+~~~~
+
+The note syntax is very simple:
+* use the first line, prefixed with `##`, as a document title;  (e.g. `## some title`;)
+* leave at least one empty line;  (to separate the note header from the body;)
+* write anything afterwards;
+~~~~
+## some title
+
+some content
+~~~~
+
+Edit a note by selecting it from a menu:
+~~~~
+z-scratchpad edit -s
+~~~~
+
+Edit a note by using its identifier:
+~~~~
+z-scratchpad edit -d some-identifier
+~~~~
+
+List all notes (either identifiers, titles, or paths):
+~~~~
+z-scratchpad list
+z-scratchpad list -w identifier
+z-scratchpad list -w title
+z-scratchpad list -w path
+~~~~
+
+List all the files in the notes store:
+~~~~
+ls -a -1
+~~~~
+~~~~
+2021-08-13--6d2ace99.txt
+some-identifier.txt
+.z-scratchpad
+~~~~
+
+Start the WUI server:
+~~~~
+z-scratchpad server
+~~~~
+
+Open a note in the browser by selecting it from a menu:
+~~~~
+z-scratchpad browse -s
+~~~~
+
+Open a note in the browser by using its identifier:
+~~~~
+z-scratchpad browse -d some-identifier
+~~~~
+
+
+
+
+--------------------------------------------------------------------------------
+
+<a name="features"></a>
+
+
+
+
+## Features (and anti-features)
+
+###### Features
+
+The following are the main requirements, sorted by priority, that I have in mind while implementing or extending `z-scratchpad`:
+
+* (**mandatory**) stores the documents in plain text files, with minimal requirements on the file-system structure;  (if tomorrow `z-scratchpad` disappears, no one should lose anything, and should be able to easily migrate to other tools;)
+* simple to use;  (once configured, although it can be easily used even without a configuration file, based on sensible defaults;)
+* simple to integrate with one's favorite tools;  (from preferred editor to preferred browser;)
+* (**mandatory**) works under the terminal (i.e. TUI);
+* (**mandatory**) works under Xorg / Wayland (i.e. GUI);
+* (**mandatory**) does not implement any TUI / GUI;  (instead delegates everything to other tools like `fzf`, `dmenu` or `rofi`;)
+* (**mandatory**) provides a CLI;  (thus can be integrated in custom workflows, for example `bash` scripts and other scripting tools;)
+* (**mandatory**) does not require running a daemon or server;
+* provides an HTTP interface accessible from a browser  (i.e. WUI);
+* provides an HTML static site export;  (for selected documents, thus one should be able to mix private and public documents;)
+* support for [CommonMark](https://commonmark.org/);  (that is of importance mainly for the WUI and the HTML export;)
+* (**mandatory**) portability to many of the POSIX compliant OS's, especially Linux (my main environment), OSX, OpenBSD and FreeBSD;
+* (**mandatory**) single executable, place it anywhere deployments;  (anything that is required to have it running, including assets for the WUI, should be embedded in the binary;)
+
+Note that some requirements are marked with "mandatory" although are not at the top.
+The reason is that although during implementation they should be maintained, compromises can be made (for example in terms of performance).
+On the other hand, the higher some are on the list, the fewer compromises should be made.
+
+<a name="anti-features"></a>
+
+###### Anti-features
+
+Conversely, there are also some negative requirements, or anti-features, that I keep in mind:
+
+* (**mandatory**) does not support any non-text documents;  (it doesn't care what is inside the document, i.e. its syntax, as long as it's a plain text file;)
+* (**mandatory**) does not support any non-ASCII or non-UTF-8 documents;
+* (**mandatory**) does not implement any TUI / GUI;
+* (**mandatory**) does not implement any form of encryption;  (always use full disk encryption, always use encrypted swap, always use memory backed temporary folders;  always use tools that focus just on cryptography (like [GnuPG](https://gnupg.org/));  never use fancy tools that provide "encryption" features;)
+* (**mandatory**) does not support multiple users;  (although one could use different instances;)
+* does not provide support for attachments;  (one should use other means to store files, and link them;)
+* does not provide extensions to the CommonMark syntax (except perhaps the quasi-standard ones introduced by GitHub, i.e. [GFM](https://github.github.com/gfm/), and supported by many current parsers);
+* does not prioritize support for alternative syntaxes to CommonMark (or the no-syntax plain text alternative currently implemented);
+* does not prioritize exposing the HTTP interface to the network;  (it should always listen on `localhost`;  if one needs to expose it to the network, please use a reverse proxy (like [HAProxy](https://www.haproxy.org/));)
+* does not prioritize editing (and other workflows) via the WUI;
+* does not prioritize support for images (or other media), especially in the WUI and HTML export;
+* does not prioritize Windows support;  (in theory it should work, however the Windows ecosystem lacks many of the tools relied-on by the TUI / GUI;)
+* does not prioritize built-in advanced workflows;  (however, by using the CLI interface one can implement in his favorite scripting language any workflow one desires;)
+
+<a name="ui"></a>
+
+###### UI considerations
+
+The careful reader might see that I've listed "does not implement any TUI / GUI" twice, both in features and anti-features, it was not a mistake.
+`z-scratchpad` should limit its UI requirements to the following primitive operations that can be provided by external tools.
+
+* editing a plain text file;  (using one's preferred editor, from `nano`, `vim`, and `emacs` to `howl`, `sublime_text`, and `vscode`;)
+* viewing a plain text file;  (which can be easily solved by the same editor as above;)
+* selecting an option from a non-hierarchical menu;  (using for example `fzf` under the terminal, or `dmenu` or `rofi` under Xorg;)
+* viewing an HTML file if one uses the WUI;  (the browser should not be used for any other purposes as part of other workflows;)
+
+Anything that is not on this list should be made to fit a workflow based on these primitives.
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+<a name="how"></a>
+
+## How, concepts, and inner workings...
+
+###### **WIP** (work in progress)
+
+In this section I mainly describe what use-cases `z-scratchpad` should cover,
+how it should integrate in one's environment,
+and how it should store one's documents.
+
+If one is interested in why I've reached this model, please see the next section on ["why"](#why).
+
+
+###### Concepts
+
+`z-scratchpad` uses the following concepts:
+* **instance** -- mainly identified with a single configuration file;  (one can many instances;)
+* **document** -- an individual plain text UTF-8 file, composed of lines, that has a header and a body;
+  * **document header** -- the first contiguous block of non-empty lines, having a simple syntax, used to give the document a title and some other meta-data;
+  * **document body** -- all the other lines following the header, separated by at least one empty line;  the syntax of the body depends on the document format;
+  * **document format** -- how should the body be parsed (mainly when exporting to HTML);  currently there are three supported formats:  CommonMark, snippets, and just text;
+  * **document title** -- one or more "titles" that can are used mainly in the UI to select a document;  (multiple documents can have the same title, although it is not advisable;)
+  * **document identifier** -- a token (with strict syntax) that uniquely identifies a document within its library;
+  * **document snapshot** -- an optional backup of a document, created just before editing it;
+* **library** -- a set of documents;  one can have multiple libraries inside the same instance;
+  * **library paths** -- one or more folders that are recursively walked to identify documents;
+  * **library create path** -- exactly one (or none) folder where new documents should be placed in;  (think of this like the `inbox` folder;)
+  * **library identifier** -- a token (with strict syntax) that uniquely identifies a library within an instance;
+  * **library configuration** -- various properties that change certain behaviors when interacting with this library;
+  * **default create library** -- each instance can have exactly one library where new documents are placed by default (if no library is specified);  (think of this like the `inbox` library;)
+* **menus** -- each instance can have configured one or more flat menus;
+  * **menu item** -- each entry in a menu, with a display label, and a command with arguments;
+  * **menu command** -- a sub-set of the available commands that can be called from within the menu;  (mainly creating, editing, searching and opening documents, plus showing other sub-menus;)
+  * nested menus -- although it does not support "nested" or "hierarchical" menus, one can call another menu as a command;  (thus one can implement arbitrary menu paths;)
+
+
+###### Use-cases and workflows
+
+Creating a new document:
+* `z-scratchpad create` -- if there is configured a default create library, an new document with a random name (prefixed with the current date) is created under that library's create path, and the preferred editor is opened with the corresponding file;
+* `z-scratchpad create -l some-library` -- as above the document would be created in the given library's create path;
+* `z-scratchpad create -s` -- the user is prompted to select a library where a document should be created;
+* `z-scratchpad create -l some-library -d some-document` -- a document with the given identifier is created in the given library;
+
+Editing an existing document:
+* `z-scratchpad edit -s` -- the user is prompted to select a document from all available libraries, and then the preferred editor is opened with the corresponding path;
+* `z-scratchpad edit -l some-library -s` -- as above, but the document selection is limited to the given library;
+* `z-scratchpad edit -l some-library -d some-document` -- the document with the given identifier and in the given library is opened for edit;
+
+Opening an existing document in the preferred browser:
+* just replace `edit` with `browse`;
+
+Integrating in other scripts:
+* `z-scratchpad list -t library` -- lists the identifiers of available libraries;
+* `z-scratchpad list -t library -f json` -- the same as above, but output a JSON array;
+* `z-scratchpad list -t library -l some-library -w path` -- list all the store paths for the given library;
+* `z-scratchpad list -t document -l some-library -w path` -- list all the document paths for all the documents in the given library;
+* `z-scratchpad grep -t some-token-a -t some-token-b -W body -w path` -- list all the document paths, whose title contain any of the given tokens;
+* `z-scratchpad grep -t some-token-a -t some-token-b -W body -w path` -- list all the document paths, whose bodies contain any of the given tokens;
+* `z-scratchpad export -l some-library -d some-document -f source` -- export the given document's source code;  (with the document header canonicalized;)
+* `z-scratchpad export -l some-library -d some-document -f html` -- export the given document's body rendered as HTML (only the actual body, that could be included in for example `<main>...</main>`);
+
+
+###### TUI vs GUI
+
+`z-scratchpad` tries to detect if it is running under a terminal or Xorg:
+* it considers running under a terminal if all these conditions are met:
+  * the `TERM` environment variable is set (and not equal with `dumb`);
+  * the `stderr` file descriptor is a TTY;
+  * terminal access is not disabled (for example via configuration, or running as a server;)
+* it considers running under Xorg if all these conditions are met:
+  * it does not consider running under a terminal;  (i.e. TUI has precedence over GUI;)
+  * the `DISPLAY` environment variable is set;
+  * Xorg access is not disable (for example via configuration;)
+
+Depending on whether it considers running under a terminal or Xorg, it tries to use different tools (for editing, selecting, etc.)
+
+However one can always set the same tools for both terminal or Xorg configuration properties.
+
+
+###### **TBC** (to be continued)
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+<a name="why"></a>
+
+## Why, and history and reasons...
+
+I've been a long time user of the [MoinMoin](https://moinmo.in/) wiki,
+my earliest document being from April 2008,
+and I've used it for anything, from writing research papers,
+to `bash` snippets, to-do lists,
+and even as a store for encrypted credentials.
+However, somewhere in 2015 I've started moving away from it to something else.
+
+The main issue I had with MoinMoin was the editing experience.
+Not the syntax, because I liked the MoinMoin [one-of-a-kind syntax](https://moinmo.in/HelpOnMoinWikiSyntax),
+and besides that it also had support for many others
+(a favorite of mine being [reStructuredText](https://en.wikipedia.org/wiki/ReStructuredText)).
+When I say the editing experience I mean actually editing the wiki markup,
+which required me to use the provided `<textarea>`,
+that not only was incredibly small
+(by default it used 20 rows with 80 columns, thus covering perhaps at most 50% of the display of even a small laptop),
+but also gave me the experience of the Windows 95 Notepad...
+
+But I've managed by using a Firefox plugin called [It's All Text!](https://github.com/docwhat/itsalltext),
+that unfortunately somewhere in 2017 with the release of Firefox 57 stopped working.
+This plugin added a small icon to one of the `<textarea>` corners (for any site)
+that when pressed would open my favorite plain text editor,
+and then listened for saves and refreshed the `<textarea>` contents.
+
+However, even with this small improvement, it all just didn't work with my workflow.
+I have (and had) the habit of writing (and saving) anything, from one-time `bash` snippets to personal notes on a phone-call.
+Basically, I've used my wiki as both a "highly structured document editing and publishing platform",
+but also as a "blackboard full of post-its";  it worked for the former, id really didn't for the latter.
+
+So around January 2015 I'we wrote a simple `bash` script, called `x-scratchpad` that would do the following three simple things:
+* call it with `create` (or no arguments),
+  and it would generate a random 8 hex-character identifier,
+  create a text file (in a certain hard-coded "store" folder),
+  then open the preferred editor with that file;
+* call it with `open`,
+  and it would list all the file names in the store,
+  concatenate that with the first line in each file,
+  pipe that through `dmenu` to allow the user to select a file (by title),
+  then open the same preferred editor with that file;
+* call it with `search`,
+  and would do the same thing as `open`, but instead of using only the first line,
+  it would use all (non-empty) lines in each file;
+  (thus a basic "full-text-search";)
+
+Granted, this is not a "new and unique" concept, OSX users had [Notational Velocity](https://notational.net/) and [nvALT](https://brettterpstra.com/projects/nvalt/),
+however Linux users only had [Zim](https://zim-wiki.org/)...
+
+This small `bash` script allowed me to cover the "blackboard full of post-its" use-case.
+However, using it was such a breeze as compared to the MoinMoin workflow (especially creating new documents),
+that very soon I've started using it instead of my wiki.
+(By carefully using titles such as `project / topic / document`, I could have both use-cases in the same folder.)
+At the moment I have around 2K documents (and I guess in the last 5 years perhaps I've cleaned at least as many),
+and I use it for anything.
+
+Since 2015 until now (that is 2021), I've made only minor improvements,
+and although I've been a happy user, it started to show it's pain points:
+* first, it got slow;
+  read the first line in each file, prefix that with the file name,
+  and do this for 2K documents takes around a second or two
+  (even on an hot-cache SSD);
+* secondly, it blocked me from publishing some of my "unorganized" notes and snippets;
+  (something that MoinMoin excelled at;)
+
+I did investigate lots of alternatives, but all had their issues which I would summarize as:
+* focused on publishing full-blown wikis, with the same trade-offs as MoinMoin;
+  (I need not add that perhaps 99% of these were written in NodeJS...)
+* focused on local note taking, with lots of bells-and-whistles,
+  but lacking integration with custom plain text editor;
+  (not to mention that perhaps 99% of these were using Electron, thus written in NodeJS...)
+* focused exclusively on terminal (i.e. CLI) interaction;
+
+I did encounter a few tools that had some of my desired traits,
+but none had everything "just right":
+* [neuron](https://github.com/srid/neuron), and perhaps its rewrite [emanote](https://github.com/srid/emanote),
+  that is the closest to the tool I've written;
+* [nuttyartist/notes](https://github.com/nuttyartist/notes), GUI, similar with nvALT or Notational;
+* [zk](https://github.com/mickael-menu/zk) and [pimterry/notes](https://github.com/pimterry/notes), focused on terminal and CLI;
+
+(If one would look carefully at these projects,
+one would observe that all are written in **compiled languages**,
+that yield actual **native executables**,
+and none of them are written in NodeJS...) :)
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+<a name="contributions"></a>
+
+## Contributions
+
+**Bug reports, feature requests, and patches are always welcomed!**
+
+That being said, take into account that:
+* this is a very **personally tailored** tool, that fits just perfectly in my **personal workflow**; (note the "personal" used twice;) :)
+* it tries to keep implementation complexity to a minimum;
+  any feature that is implemented should either provide performance improvements (perceivable by a human),
+  enable generally useful workflows (that otherwise are hard to implement via scripting),
+  or increase flexibility (especially with regard to integration with one's generic tools);
+* also see the anti-features listed in the [dedicated section](#anti-features);
+
+Therefor, a feature request or patch might not be applied.
+That doesn't mean the proposed idea is bad or worthless;  it just doesn't fit well with this tool.
+
+However, given it is an open-source project, one can always just fork the project and take it in any direction.
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+<a name="license"></a>
 
 ## Notice (copyright and licensing)
 
@@ -21,11 +498,11 @@ The code is licensed under GPL 3 or later.
 
 ### Notice -- long version
 
-For details about the copyright and licensing, please consult the `notice.txt` file in the `documentation/licensing` folder.
+For details about the copyright and licensing, please consult the [`notice.txt`](./documentation/licensing/notice.txt) file in the [`documentation/licensing`](./documentation/licensing) folder.
 
 If someone requires the sources and/or documentation to be released
 under a different license, please send an email to the authors,
-stating the licensing requirements, accompanied with the reasons
+stating the licensing requirements, accompanied by the reasons
 and other details; then, depending on the situation, the authors might
 release the sources and/or documentation under a different license.
 

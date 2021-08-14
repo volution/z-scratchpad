@@ -5,8 +5,6 @@
 /examples/inbox/**
 !/examples/inbox/.gitignore
 
-/readme.html
-
 *~
 *#
 *.bak
