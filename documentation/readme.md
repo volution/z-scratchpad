@@ -4,7 +4,8 @@
 
 > ## Table of contents
 >
-> * [about](#about); [status](#status); [documentation](#documentation);
+> * [about](#about); [status](#status);
+> * [documentation](#documentation);  [install](#install);
 > * [features (and anti-features)](#features);
 > * [how? (concepts, and inner workings)](#how);
 > * [why? (history, and reasons)](#why);
@@ -63,7 +64,8 @@ For more features, and anti-features, please see the [dedicated section](#featur
 
 Also see the following useful sections:
 * [status](#status) -- the current implementation status;
-* [documentation](#status) -- how to use and configure it;
+* [install](#install) -- how to download and install it;
+* [documentation](#documentation) -- how to use and configure it;
 * [UI look-and-feel](#ui) -- how the UI works, and what can one expect when interacting with it;
 * [how it works](#how) -- the various use-cases it covers, and how it works internally;
 * [why this tool](#why) -- describes how I've reached to implement this tool, and why it behaves like it does;
@@ -113,6 +115,8 @@ Besides what is available by running `z-scratchpad help` there is no other docum
 
 That being said, just run the following and start experimenting with the commands.
 (If there is need for documentation, besides the frugally `-h` for each command, I have failed in one of the mandatory requirements, that of being "simple to use".)
+
+For how to download and install it see the [dedicated section](#install).
 
 Get some help:
 ~~~~
@@ -196,6 +200,94 @@ z-scratchpad browse -s
 Open a note in the browser by using its identifier:
 ~~~~
 z-scratchpad browse -d some-identifier
+~~~~
+
+
+
+
+--------------------------------------------------------------------------------
+
+<a name="install"></a>
+
+
+
+
+## Installation
+
+As mentioned many times, `z-scratchpad` is a single self-contained executable,
+thus it can be deployed by downloading the executable and placing it somewhere on the `$PATH`.
+
+Traditionally one should place it inside the `/usr/local/bin` folder (available on many POSIX compliant OS's).
+Alternatively, one can place it in one's `$HOME/bin` folder and add that to `$PATH`.
+
+### Releases
+
+The self-contained executable is available from the `z-scratchpad` GitHub repository [releases](https://github.com/cipriancraciun/z-scratchpad/releases):
+* [v0.0.1](https://github.com/cipriancraciun/z-scratchpad/releases/tag/v0.0.1) -- the first preliminary preview release:
+  * [v0.0.1 for Linux](https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1) -- tested on OpenSUSE, and used by me in my everyday work;
+  * [v0.0.1 for OSX](https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--darwin--v0.0.1) -- untested;
+  * [v0.0.1 for FreeBSD](https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--freebsd--v0.0.1) -- untested;
+  * [v0.0.1 for OpenBSD](https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--openbsd--v0.0.1) -- untested;
+
+Also, each of these files are signed with my PGP key `5A974037A6FD8839`, thus do check the signature.
+
+### Download and verify
+
+The following is an example how one could download, verify, and deploy `z-scratchpad`:
+* import my PGP key:
+~~~~
+curl -s https://github.com/cipriancraciun.gpg | gpg2 --import
+~~~~
+~~~~
+gpg: key 5A974037A6FD8839: public key "Ciprian Dorin Craciun <ciprian@volution.ro>" imported
+gpg: Total number processed: 1
+gpg:               imported: 1
+~~~~
+* download the executable and signature (replace the `linux` token with `darwin` (for OSX), `freebsd` or `openbsd`):
+~~~~
+curl -s -L -S -f -o ./z-scratchpad \
+    https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1
+
+curl -s -L -S -f -o ./z-scratchpad.asc \
+    https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1.asc
+~~~~
+* verify the executable:
+~~~~
+gpg2 --verify ./z-scratchpad.asc ./z-scratchpad
+~~~~
+* **check that the key is `58FC2194FCC2478399CB220C5A974037A6FD8839`**:
+~~~~
+gpg: assuming signed data in './z-scratchpad'
+gpg: Signature made Sat Aug 14 17:12:39 2021 EEST
+gpg:                using DSA key 58FC2194FCC2478399CB220C5A974037A6FD8839
+gpg: Good signature from "Ciprian Dorin Craciun <ciprian@volution.ro>" [unknown]
+gpg:                 aka "Ciprian Dorin Craciun <ciprian.craciun@gmail.com>" [unknown]
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 58FC 2194 FCC2 4783 99CB  220C 5A97 4037 A6FD 8839
+~~~~
+* make it executable:
+~~~~
+chmod 0755 ./z-scratchpad
+~~~~
+* copy it on the `$PATH`:
+~~~~
+sudo cp ./z-scratchpad /usr/local/bin/z-scratchpad
+~~~~
+* check that it works:
+~~~~
+z-scratchpad --version
+~~~~
+~~~~
+* version       : 0.0.1
+* executable    : z-scratchpad
+* build target  : release, linux-amd64, go1.16.7, gc
+* build number  : 2025, 2021-08-13-11-56-08
+* code & issues : https://github.com/cipriancraciun/z-scratchpad
+* sources git   : 1abeee1c76fc4a40e1465e4810be0258992d1815
+* sources hash  : 51382d0da05c3e129fc73eac59754fad
+* uname node    : some-workstation
+* uname system  : Linux, 5.some-version, x86_64
 ~~~~
 
 
