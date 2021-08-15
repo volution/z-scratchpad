@@ -1643,7 +1643,8 @@ func mainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _global
 		}
 	}
 	
-	if true {
+	if false {
+		// FIXME:  Make pre-rendering optional!
 		_documents, _error := IndexDocumentsSelectAll (_index)
 		if _error != nil {
 			return _error
