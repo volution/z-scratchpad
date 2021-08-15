@@ -24,6 +24,13 @@
 			<hr/><hr/>
 			{{ template "document-html-nav" .Document }}
 			{{ template "library-html-nav" .Library }}
+			<!--
+				<ul>
+				{{ range $url, $labels := .Document.HtmlLinks }}
+					<li><a href="{{ $url }}" rel="nofollow noreferrer">{{ $url }}</a></li>
+				{{ end }}
+				</ul>
+			-->
 		</footer>
 		
 	</body>

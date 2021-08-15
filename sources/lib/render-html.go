@@ -43,12 +43,13 @@ func DocumentRenderToHtml (_document *Document) (string, *Error) {
 		return "", _error
 	}
 	
-	_render, _error = DocumentSanitizeHtml (_document, _render)
+	_render, _outcome, _error := DocumentSanitizeHtml (_document, _render)
 	if _error != nil {
 		return "", _error
 	}
 	
 	_document.RenderHtml = _render
+	_document.HtmlLinks = _outcome.UrlsLabel
 	
 	return _document.RenderHtml, nil
 }

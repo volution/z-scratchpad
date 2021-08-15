@@ -38,6 +38,8 @@ type Document struct {
 	RenderHtml string
 	RenderText string
 	
+	HtmlLinks map[string][]string
+	
 	EditEnabled bool
 	Timestamp time.Time
 }
