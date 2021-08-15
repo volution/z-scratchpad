@@ -44,7 +44,10 @@ default_create_library = "inbox"
 terminal_edit_command = ["nano", "--", "{{path}}"]
 xorg_edit_command = ["howl", "--", "{{path}}"]
 terminal_select_command = ["fzf", "--prompt", ": ", "-e", "-x", "-i"]
-xorg_select_command = ["rofi", "-dmenu", "-p", "", "-i", "-no-custom"]
+xorg_select_command = ["rofi", "-dmenu", "-p", "", "-i", "-no-custom",
+		"-location", "0", "-width", "-80", "-l", "16",
+		"-font", "JetBrains Mono NL 24px",
+	]
 
 [server]
 endpoint_ip = "127.9.212.148"
