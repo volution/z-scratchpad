@@ -16,8 +16,11 @@ type Browser struct {
 	
 	ServerUrlBase string
 	
-	TerminalOpenCommand []string
-	XorgOpenCommand []string
+	TerminalOpenInternalCommand []string
+	XorgOpenInternalCommand []string
+	
+	TerminalOpenExternalCommand []string
+	XorgOpenExternalCommand []string
 }
 
 
@@ -43,7 +46,7 @@ func BrowserDocumentOpen (_browser *Browser, _library *Library, _document *Docum
 	_url := "/d/" + _document.Identifier
 	_url = strings.TrimRight (_browser.ServerUrlBase, "/") + _url
 	
-	return BrowserUrlOpen (_browser, _url, _synchronous)
+	return browserUrlOpen (_browser, _url, true, _synchronous)
 }
 
 
@@ -56,11 +59,16 @@ func BrowserLibraryOpen (_browser *Browser, _library *Library, _synchronous bool
 	_url := "/l/" + _library.Identifier
 	_url = strings.TrimRight (_browser.ServerUrlBase, "/") + _url
 	
-	return BrowserUrlOpen (_browser, _url, _synchronous)
+	return browserUrlOpen (_browser, _url, true, _synchronous)
 }
 
 
-func BrowserUrlOpen (_browser *Browser, _url string, _synchronous bool) (*Error) {
+func BrowserUrlExternalOpen (_browser *Browser, _url string, _synchronous bool) (*Error) {
+	return browserUrlOpen (_browser, _url, false, _synchronous)
+}
+
+
+func browserUrlOpen (_browser *Browser, _url string, _internal bool, _synchronous bool) (*Error) {
 	
 	if _url == "" {
 		return errorw (0x61668460, nil)
@@ -68,7 +76,7 @@ func BrowserUrlOpen (_browser *Browser, _url string, _synchronous bool) (*Error)
 	
 	_globals := _browser.globals
 	
-	_command, _terminal, _error := BrowserResolveOpenCommand (_browser)
+	_command, _terminal, _error := BrowserResolveOpenCommand (_browser, _internal)
 	if _error != nil {
 		return _error
 	}
@@ -124,7 +132,7 @@ func BrowserUrlOpen (_browser *Browser, _url string, _synchronous bool) (*Error)
 
 
 
-func BrowserResolveOpenCommand (_browser *Browser) (*exec.Cmd, bool, *Error) {
+func BrowserResolveOpenCommand (_browser *Browser, _internal bool) (*exec.Cmd, bool, *Error) {
 	
 	_globals := _browser.globals
 	
@@ -135,15 +143,26 @@ func BrowserResolveOpenCommand (_browser *Browser) (*exec.Cmd, bool, *Error) {
 	_true := true
 	_false := false
 	
-	if (_executable == "") && _globals.TerminalEnabled && (len (_browser.TerminalOpenCommand) > 0) {
-		_executableName_0 := _browser.TerminalOpenCommand[0]
+	_terminalOpenCommand := []string (nil)
+	_xorgOpenCommand := []string (nil)
+	
+	if _internal {
+		_terminalOpenCommand = _browser.TerminalOpenInternalCommand
+		_xorgOpenCommand = _browser.XorgOpenInternalCommand
+	} else {
+		_terminalOpenCommand = _browser.TerminalOpenExternalCommand
+		_xorgOpenCommand = _browser.XorgOpenExternalCommand
+	}
+	
+	if (_executable == "") && _globals.TerminalEnabled && (len (_terminalOpenCommand) > 0) {
+		_executableName_0 := _terminalOpenCommand[0]
 		if _executableName_0 == "" {
 			return nil, false, errorw (0x4c4f8738, nil)
 		}
 		if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
 			_executable = _executable_0
 			_executableName = _executableName_0
-			_executableArguments = _browser.TerminalOpenCommand[1:]
+			_executableArguments = _terminalOpenCommand[1:]
 			if len (_executableArguments) == 0 {
 				_executableArguments = nil
 			}
@@ -153,15 +172,15 @@ func BrowserResolveOpenCommand (_browser *Browser) (*exec.Cmd, bool, *Error) {
 		}
 	}
 	
-	if (_executable == "") && _globals.XorgEnabled && (len (_browser.XorgOpenCommand) > 0) {
-		_executableName_0 := _browser.XorgOpenCommand[0]
+	if (_executable == "") && _globals.XorgEnabled && (len (_xorgOpenCommand) > 0) {
+		_executableName_0 := _xorgOpenCommand[0]
 		if _executableName_0 == "" {
 			return nil, false, errorw (0x6ff9fcad, nil)
 		}
 		if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
 			_executable = _executable_0
 			_executableName = _executableName_0
-			_executableArguments = _browser.XorgOpenCommand[1:]
+			_executableArguments = _xorgOpenCommand[1:]
 			if len (_executableArguments) == 0 {
 				_executableArguments = nil
 			}

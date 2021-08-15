@@ -95,10 +95,11 @@ type DumpFlags struct {}
 
 
 type ServerFlags struct {
-	EndpointIp *string `long:"server-ip" value-name:"{ip}" toml:"endpoint_ip"`
-	EndpointPort *uint16 `long:"server-port" value-name:"{port}" toml:"endpoint_port"`
-	EditEnabled *bool `long:"server-edit-enabled" toml:"edit_enabled"`
-	CreateEnabled *bool `long:"server-create-enabled" toml:"create_enabled"`
+	EndpointIp *string `long:"server-ip" value-name:"{ip}"`
+	EndpointPort *uint16 `long:"server-port" value-name:"{port}"`
+	EditEnabled *bool `long:"server-edit-enabled"`
+	CreateEnabled *bool `long:"server-create-enabled"`
+	BrowseEnabled *bool `long:"server-browse-enabled"`
 }
 
 type ServerConfiguration struct {
@@ -107,6 +108,7 @@ type ServerConfiguration struct {
 	EndpointPort *uint16 `toml:"endpoint_port"`
 	EditEnabled *bool `toml:"edit_enabled"`
 	CreateEnabled *bool `toml:"create_enabled"`
+	BrowseEnabled *bool `toml:"browse_enabled"`
 }
 
 
@@ -119,8 +121,10 @@ type BrowseFlags struct {
 
 type BrowserConfiguration struct {
 	UrlBase *string `toml:"url_base"`
-	TerminalOpenCommand *[]string `toml:"terminal_open_command"`
-	XorgOpenCommand *[]string `toml:"xorg_open_command"`
+	TerminalOpenInternalCommand *[]string `toml:"terminal_open_internal_command"`
+	XorgOpenInternalCommand *[]string `toml:"xorg_open_internal_command"`
+	TerminalOpenExternalCommand *[]string `toml:"terminal_open_external_command"`
+	XorgOpenExternalCommand *[]string `toml:"xorg_open_external_command"`
 }
 
 
@@ -507,7 +511,7 @@ func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration
 		
 		
 		case "server" :
-			return MainServer (_flags.Server, _configuration.Server, _globals, _index, _editor)
+			return MainServer (_flags.Server, _configuration.Server, _globals, _index, _editor, _browser)
 		
 		case "browse" :
 			return MainBrowse (_flags.Browse, _globals, _index, _editor, _browser)
@@ -1305,7 +1309,7 @@ func mainListOutput (_options [][2]string, _format string, _globals *Globals) (*
 
 
 
-func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
+func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _globals *Globals, _index *Index, _editor *Editor, _browser *Browser) (*Error) {
 	
 	_endpointIp := flag2StringOrDefault (_flags.EndpointIp, _configuration.EndpointIp, "127.0.0.1")
 	_endpointPort := flag2Uint16OrDefault (_flags.EndpointPort, _configuration.EndpointPort, 49894)
@@ -1317,6 +1321,7 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 	
 	_editEnabled := flag2BoolOrDefault (_flags.EditEnabled, _configuration.EditEnabled, false)
 	_createEnabled := flag2BoolOrDefault (_flags.CreateEnabled, _configuration.CreateEnabled, false)
+	_browseEnabled := flag2BoolOrDefault (_flags.BrowseEnabled, _configuration.BrowseEnabled, false)
 	
 	_endpoint := fmt.Sprintf ("%s:%d", _endpointIp, _endpointPort)
 	
@@ -1329,13 +1334,14 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 	
 	_globals.TerminalEnabled = false
 	
-	_server, _error := ServerNew (_globals, _index, _editor, _listener)
+	_server, _error := ServerNew (_globals, _index, _editor, _browser, _listener)
 	if _error != nil {
 		return _error
 	}
 	
-	_server.EditEnabled = _editEnabled
-	_server.CreateEnabled = _createEnabled
+	_server.EditEnabled = _server.EditEnabled && _editEnabled
+	_server.CreateEnabled = _server.CreateEnabled && _createEnabled
+	_server.BrowseEnabled = _server.BrowseEnabled && _browseEnabled
 	
 	_error = ServerRun (_server)
 	if _error != nil {
@@ -1387,19 +1393,34 @@ func mainBrowserNew (_configuration *BrowserConfiguration, _globals *Globals, _i
 		return nil, _error
 	}
 	
-	if _configuration.TerminalOpenCommand != nil {
-		_command := *_configuration.TerminalOpenCommand
+	if _configuration.TerminalOpenInternalCommand != nil {
+		_command := *_configuration.TerminalOpenInternalCommand
 		if len (_command) == 0 {
 			return nil, errorw (0xd23959ac, nil)
 		}
-		_browser.TerminalOpenCommand = _command
+		_browser.TerminalOpenInternalCommand = _command
 	}
-	if _configuration.XorgOpenCommand != nil {
-		_command := *_configuration.XorgOpenCommand
+	if _configuration.XorgOpenInternalCommand != nil {
+		_command := *_configuration.XorgOpenInternalCommand
 		if len (_command) == 0 {
 			return nil, errorw (0x045b13e4, nil)
 		}
-		_browser.XorgOpenCommand = _command
+		_browser.XorgOpenInternalCommand = _command
+	}
+	
+	if _configuration.TerminalOpenExternalCommand != nil {
+		_command := *_configuration.TerminalOpenExternalCommand
+		if len (_command) == 0 {
+			return nil, errorw (0xeaf6799d, nil)
+		}
+		_browser.TerminalOpenExternalCommand = _command
+	}
+	if _configuration.XorgOpenExternalCommand != nil {
+		_command := *_configuration.XorgOpenExternalCommand
+		if len (_command) == 0 {
+			return nil, errorw (0x7bf7b1d7, nil)
+		}
+		_browser.XorgOpenExternalCommand = _command
 	}
 	
 	if _configuration.UrlBase != nil {
