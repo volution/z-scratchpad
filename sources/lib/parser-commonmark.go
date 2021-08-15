@@ -5,6 +5,7 @@ package zscratchpad
 
 import "bytes"
 import "unicode/utf8"
+import "strings"
 
 import goldmark "github.com/yuin/goldmark"
 import goldmark_text "github.com/yuin/goldmark/text"
@@ -39,6 +40,9 @@ func parseAndRenderCommonMarkToHtml (_sourceLines []string) (string, *Error) {
 	}
 	
 	_output := string (_outputBytes)
+	
+	// FIXME:  This is generated for custom HTML!
+	_output = strings.ReplaceAll (_output, "<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>\n", "")
 	
 	return _output, nil
 }
