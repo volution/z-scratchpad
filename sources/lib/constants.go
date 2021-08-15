@@ -20,6 +20,7 @@ var BUILD_TARGET_ARCH string = runtime.GOARCH
 var BUILD_TARGET_OS string = runtime.GOOS
 var BUILD_COMPILER_TYPE string = runtime.Compiler
 var BUILD_COMPILER_VERSION string = runtime.Version ()
+var BUILD_DEVELOPMENT bool = (BUILD_TARGET == "development")
 
 var BUILD_VERSION string = strings.Trim (embedded.BuildVersion, "\n")
 var BUILD_NUMBER string = strings.Trim (embedded.BuildNumber, "\n")

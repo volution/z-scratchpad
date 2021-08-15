@@ -4,6 +4,8 @@ package zscratchpad
 
 
 import "bytes"
+import "encoding/xml"
+import "io"
 import "net"
 import "net/http"
 import "strings"
@@ -190,7 +192,7 @@ func ServerHandleHome (_server *Server, _response http.ResponseWriter) (*Error) 
 		} {
 			_server,
 		}
-	return respondWithHtmlTemplate (_response, _server.templates.homeHtml, _context)
+	return respondWithHtmlTemplate (_response, _server.templates.homeHtml, _context, true)
 }
 
 
@@ -206,7 +208,7 @@ func ServerHandleLibrariesIndex (_server *Server, _response http.ResponseWriter)
 			_server,
 			_libraries,
 		}
-	return respondWithHtmlTemplate (_response, _server.templates.librariesIndexHtml, _context)
+	return respondWithHtmlTemplate (_response, _server.templates.librariesIndexHtml, _context, true)
 }
 
 
@@ -222,7 +224,7 @@ func ServerHandleDocumentsIndex (_server *Server, _response http.ResponseWriter)
 			_server,
 			_documents,
 		}
-	return respondWithHtmlTemplate (_response, _server.templates.documentsIndexHtml, _context)
+	return respondWithHtmlTemplate (_response, _server.templates.documentsIndexHtml, _context, true)
 }
 
 
@@ -246,7 +248,7 @@ func ServerHandleLibraryView (_server *Server, _identifierUnsafe string, _respon
 			_library,
 			_documents,
 		}
-	return respondWithHtmlTemplate (_response, _server.templates.libraryViewHtml, _context)
+	return respondWithHtmlTemplate (_response, _server.templates.libraryViewHtml, _context, true)
 }
 
 
@@ -272,7 +274,7 @@ func ServerHandleDocumentView (_server *Server, _identifierUnsafe string, _respo
 			_document,
 			html_template.HTML (_documentHtml),
 		}
-	return respondWithHtmlTemplate (_response, _server.templates.documentViewHtml, _context)
+	return respondWithHtmlTemplate (_response, _server.templates.documentViewHtml, _context, true)
 }
 
 
@@ -294,7 +296,7 @@ func ServerHandleDocumentExportHtml (_server *Server, _identifierUnsafe string, 
 			_document,
 			html_template.HTML (_documentHtml),
 		}
-	return respondWithHtmlTemplate (_response, _server.templates.documentExportHtml, _context)
+	return respondWithHtmlTemplate (_response, _server.templates.documentExportHtml, _context, true)
 }
 
 
@@ -424,7 +426,7 @@ func ServerHandleVersion (_server *Server, _response http.ResponseWriter) (*Erro
 			UNAME_MACHINE,
 			
 		}
-	return respondWithHtmlTemplate (_response, _server.templates.versionHtml, _context)
+	return respondWithHtmlTemplate (_response, _server.templates.versionHtml, _context, true)
 }
 
 
@@ -465,11 +467,73 @@ func serverDocumentAndLibraryResolve (_server *Server, _identifierUnsafe string)
 
 
 
-func respondWithHtmlTemplate (_response http.ResponseWriter, _template *html_template.Template, _context interface{}) (*Error) {
+func respondWithHtmlTemplate (_response http.ResponseWriter, _template *html_template.Template, _context interface{}, _perhapsStrict bool) (*Error) {
+	
 	_buffer := bytes.NewBuffer (nil)
 	if _error := _template.Execute (_buffer, _context); _error != nil {
 		return errorw (0xfa7016b8, _error)
 	}
+	
+	if _perhapsStrict && BUILD_DEVELOPMENT {
+		_buffer := bytes.NewReader (_buffer.Bytes ())
+		_decoder := xml.NewDecoder (_buffer)
+		_decoder.Entity = xml.HTMLEntity
+		if _token, _error := _decoder.Token (); _error == nil {
+			if _directive, _ok := _token.(xml.Directive); _ok {
+				if ! bytes.Equal (_directive, []byte ("doctype html")) {
+					return errorw (0x4ca7b74e, nil)
+				}
+			} else {
+				return errorw (0x4b180ca6, nil)
+			}
+		} else {
+			return errorw (0x4fcdd2d3, _error)
+		}
+		_loopStart : for {
+			_token, _error := _decoder.Token ()
+			if _error != nil {
+				return errorw (0x8adce50b, _error)
+			}
+			switch _token := _token.(type) {
+				case xml.StartElement :
+					if _token.Name.Local != "html" {
+						return errorw (0x8adce50b, nil)
+					}
+					break _loopStart
+				case xml.CharData :
+					if len (bytes.TrimSpace (_token)) != 0 {
+						return errorw (0x5be3689a, nil)
+					}
+				case xml.Comment :
+					// NOP
+				default :
+					return errorw (0x603bc00b, nil)
+			}
+		}
+		if _error := _decoder.Skip (); _error != nil {
+			return errorw (0xaf8cf302, _error)
+		}
+		_loopEnd : for {
+			_token, _error := _decoder.Token ()
+			if _error == io.EOF {
+				break _loopEnd
+			}
+			if _error != nil {
+				return errorw (0x096981bf, _error)
+			}
+			switch _token := _token.(type) {
+				case xml.CharData :
+					if len (bytes.TrimSpace (_token)) != 0 {
+						return errorw (0x45153a1a, nil)
+					}
+				case xml.Comment :
+					// NOP
+				default :
+					return errorw (0x0375afba, nil)
+			}
+		}
+	}
+	
 	return respondWithHtmlBuffer (_response, _buffer)
 }
 
