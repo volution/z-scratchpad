@@ -2,15 +2,16 @@
 <html>
 	
 	<head>
-		<title>{home}</title>
+		<title>{scratchpad}</title>
 		{{ template "global-html-head-css" }}
 	</head>
 	
 	<body>
 		
 		<header>
-			<h1>{home}</h1>
-			{{ template "global-navigation" }}
+			<h1>{scratchpad}</h1>
+			{{ template "global-html-nav" }}
+			<hr/><hr/>
 		</header>
 		
 		<main>
@@ -19,6 +20,11 @@
 				<li><a href="/d/"><code>/d/</code> -- documents</a></li>
 			</ul>
 		</main>
+		
+		<footer>
+			<hr/><hr/>
+			{{ template "global-html-nav" }}
+		</footer>
 		
 	</body>
 	

@@ -10,18 +10,20 @@
 		
 		<header>
 			{{ template "document-html-header-title" .Document }}
-			{{ template "global-navigation" }}
+			{{ template "document-html-header-details" .Document }}
+			{{ template "document-html-nav" .Document }}
+			{{ template "library-html-nav" .Library }}
+			<hr/><hr/>
 		</header>
 		
-		<main>
+		<main class="document document-format-{{ .Document.Format }}">
 {{ .DocumentHtml }}
 		</main>
 		
 		<footer>
+			<hr/><hr/>
 			{{ template "document-html-nav" .Document }}
-			{{ if .Library }}
-				{{ template "library-html-nav" .Library }}
-			{{ end }}
+			{{ template "library-html-nav" .Library }}
 		</footer>
 		
 	</body>

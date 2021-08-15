@@ -53,9 +53,6 @@ var DocumentExportText string
 var DocumentExportSource string
 
 
-//go:embed templates/global-navigation.html
-var GlobalNavigationHtml string
-
 //go:embed templates/global-partials.html
 var GlobalPartialsHtml string
 

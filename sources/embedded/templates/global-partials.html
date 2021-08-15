@@ -2,12 +2,11 @@
 
 {{ define "library-html-head-title" -}}
 	{{- if .Name -}}
-	<title>{{ .Name }}</title>
+		<title>{{ .Name }}</title>
 	{{- else -}}
-	<title>[{{ .Identifier }}]</title>
+		<title>[{{ .Identifier }}]</title>
 	{{- end -}}
 {{- end }}
-
 
 {{ define "library-html-header-title" -}}
 	{{- if .Name -}}
@@ -15,6 +14,25 @@
 	{{- else -}}
 		<h1>[{{ .Identifier }}]</h1>
 	{{- end -}}
+{{- end }}
+
+
+{{ define "library-html-header-details" -}}
+{{- end }}
+
+
+{{ define "library-html-nav" -}}
+	<nav>
+		<p>Library navigation</p>
+		<ul>
+			{{ if . }}
+				<li><a href="/dc/{{ .Identifier }}">{create}</a></li>
+			{{ end }}
+			<li><a href="/l/">{libraries}</a></li>
+			<li><a href="/d/">{documents}</a></li>
+			<li><a href="/">{scratchpad}</a></li>
+		</ul>
+	</nav>
 {{- end }}
 
 
@@ -26,35 +44,65 @@
 	{{- end -}}
 {{- end }}
 
-{{ define "library-html-nav" -}}
-	<nav>
-		<ul>
-			<li><a href="/dc/{{ .Identifier }}">{create}</a>
-		</ul>
-	</nav>
-{{- end }}
-
 
 
 
 {{ define "document-html-head-title" -}}
 	{{- if .Title -}}
-	<title>{{ .Title }}</title>
+		<title>{{ .Title }}</title>
 	{{- else -}}
-	<title>[{{ .Identifier }}]</title>
+		<title>[{{ .Identifier }}]</title>
 	{{- end -}}
 {{- end }}
 
-
 {{ define "document-html-header-title" -}}
-	{{- if .Title -}}
-		<h1>{{ .Title }}</h1>
-	{{- else -}}
-		<h1>[{{ .Identifier }}]</h1>
-	{{- end -}}
-	{{- if .Timestamp.IsZero | not -}}
-		<h2>({{ .Timestamp.Format "2006-01-02 15:04:05" }})</h2>
-	{{- end -}}
+	<h1>
+		{{- if .Title -}}
+			{{ .Title }}
+		{{- else -}}
+			[{{ .Identifier }}]
+		{{- end -}}
+	</h1>
+{{- end }}
+
+
+{{ define "document-html-header-details" -}}
+	<nav>
+		<p>Document details</p>
+		<dl>
+			<div>
+				<dt>identifier</dt>
+				<dd><code>{{ .Identifier  }}</code></dd>
+			</div>
+			<div>
+				<dt>library</dt>
+				<dd><code>{{ .Library  }}</code></dd>
+			</div>
+			{{- if .Timestamp.IsZero | not -}}
+			<div>
+				<dt>timestamp</dt>
+				<dd><time datetime="{{ .Timestamp.Format "2006-01-02" }}">{{ .Timestamp.Format "2006-01-02 15:04:05" }}</time></dd>
+			</div>
+			<div>
+				<dt>format</dt>
+				<dd><code>{{ .Format  }}</code></dd>
+			</div>
+			{{- end -}}
+		</dl>
+	</nav>
+{{- end }}
+
+
+{{ define "document-html-nav" -}}
+	<nav>
+		<p>Document navigation</p>
+		<ul>
+			<li><a href="/de/{{ .Identifier }}">{edit}</a></li>
+			<li><a href="/dx/source/{{ .Identifier }}">{source}</a></li>
+			<li><a href="/dx/html/{{ .Identifier }}">{export HTML}</a></li>
+			<li><a href="/dx/text/{{ .Identifier }}">{export txt}</a></li>
+		</ul>
+	</nav>
 {{- end }}
 
 
@@ -67,13 +115,15 @@
 {{- end }}
 
 
-{{ define "document-html-nav" -}}
+
+
+{{ define "global-html-nav" -}}
 	<nav>
+		<p>Global navigation</p>
 		<ul>
-			<li><a href="/de/{{ .Identifier }}">{edit}</a>
-			<li><a href="/dx/source/{{ .Identifier }}">{source}</a>
-			<li><a href="/dx/html/{{ .Identifier }}">{export HTML}</a>
-			<li><a href="/dx/text/{{ .Identifier }}">{export txt}</a>
+			<li><a href="/l/">{libraries}</a></li>
+			<li><a href="/d/">{documents}</a></li>
+			<li><a href="/">{scratchpad}</a></li>
 		</ul>
 	</nav>
 {{- end }}
@@ -82,7 +132,9 @@
 
 
 {{ define "global-html-head-css" }}
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=0.5, maximum-scale=1.0, user-scalable=yes" />
 	<link href="/assets/css/reset.css" rel="stylesheet" />
 	<link href="/assets/css/core.css" rel="stylesheet" />
+	<link href="/assets/css/layout.css" rel="stylesheet" />
 {{ end }}
 

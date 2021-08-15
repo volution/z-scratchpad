@@ -10,7 +10,8 @@
 		
 		<header>
 			<h1>{documents}</h1>
-			{{ template "global-navigation" }}
+			{{ template "global-html-nav" }}
+			<hr/><hr/>
 		</header>
 		
 		<main>
@@ -24,6 +25,11 @@
 				<p>No documents!</p>
 			{{ end }}
 		</main>
+		
+		<footer>
+			<hr/><hr/>
+			{{ template "global-html-nav" }}
+		</footer>
 		
 	</body>
 	

@@ -10,7 +10,9 @@
 		
 		<header>
 			{{ template "library-html-header-title" .Library }}
-			{{ template "global-navigation" }}
+			{{ template "library-html-header-details" .Library }}
+			{{ template "library-html-nav" .Library }}
+			<hr/><hr/>
 		</header>
 		
 		<main>
@@ -26,6 +28,7 @@
 		</main>
 		
 		<footer>
+			<hr/><hr/>
 			{{ template "library-html-nav" .Library }}
 		</footer>
 		
