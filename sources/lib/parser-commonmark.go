@@ -26,10 +26,7 @@ func parseAndRenderCommonMarkToHtml (_sourceLines []string) (string, *Error) {
 	_parser := goldmark.DefaultParser ()
 	
 	_renderer := goldmark.DefaultRenderer ()
-	_renderer.AddOptions (
-			goldmark_html.WithXHTML (),
-			goldmark_html.WithUnsafe (),
-		)
+	_renderer.AddOptions (goldmark_html.WithXHTML ())
 	
 	_reader := goldmark_text.NewReader (_sourceBytes)
 	_writer := bytes.NewBuffer (nil)
