@@ -108,21 +108,30 @@ thus usable with generic file-management tools.
 ## Screenshots
 
 
+### WUI in Firefox
+
 The WUI showing this readme rendered in Firefox browser (under Xorg):
 
 ![wui-firefox-document](./documentation/screenshots/wui-firefox-document.png)
+
+
+### WUI under terminal
 
 The WUI showing this readme rendered in [links](http://links.twibright.com/) (under URxvt terminal) (scrolled 1 page to skip the document header):
 
 ![wui-links-document](./documentation/screenshots/wui-links-document.png)
 
 
+### Menus under Xorg
+
 Selecting a document to edit with [`rofi`](https://github.com/davatorium/rofi) (under Xorg):
 
 ![select-rofi-document](./documentation/screenshots/select-rofi-document.png)
 
 
-Selecting a document to edit with [`fzf`](https://github.com/junegunn/fzf) (under URxvt terminal):
+### Menus under terminal
+
+Selecting a document to edit with [`fzf`](https://github.com/junegunn/fzf) (under URxvt terminal with [`tmux`](https://github.com/tmux/tmux) support):
 
 ![select-fzf-document](./documentation/screenshots/select-fzf-document.png)
 
