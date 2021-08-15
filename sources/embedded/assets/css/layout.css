@@ -1,0 +1,343 @@
+
+
+html:root > body > main,
+html:root > body > header,
+html:root > body > footer {
+	display : block;
+	margin-left : auto;
+	margin-right : auto;
+	width : 120.0ch;
+	min-width : 20.0ch;
+	max-width : 100vw;
+}
+
+html:root > body > header,
+html:root > body > footer {
+	padding-left : 2ch;
+	padding-right : 2ch;
+}
+
+html:root > body > main {
+	font-size : 1.00rem;
+	line-height : 1.50rem;
+	margin-top : 4.50rem;
+	margin-bottom : 4.50rem;
+}
+
+html:root > body > header {
+	font-size : 1.00rem;
+	line-height : 1.50rem;
+	margin-top : 0px;
+	margin-bottom : 4.50rem;
+	padding-top : 0.75rem;
+	padding-bottom : 0.75rem;
+	background : hsl(210, 100%, 15%);
+}
+
+html:root > body > footer {
+	font-size : 1.00rem;
+	line-height : 1.50rem;
+	margin-top : 4.50rem;
+	margin-bottom : 0px;
+	padding-top : 0.75rem;
+	padding-bottom : 0.75rem;
+	background : hsl(210, 100%, 15%);
+}
+
+
+
+
+html:root > body > header *,
+html:root > body > footer * {
+	font-size : inherit;
+	line-height : inherit;
+	margin : 0px;
+	padding : 0px;
+	border : none;
+}
+
+html:root > body > header > h1 {
+	font-size : 1.75rem;
+	line-height : 3.00rem;
+}
+
+html:root > body > header > nav *,
+html:root > body > footer > nav * {
+	display : inline;
+}
+
+html:root > body > header > nav > p::before,
+html:root > body > footer > nav > p::before {
+	content : '>> ';
+}
+html:root > body > header > nav > p::after,
+html:root > body > footer > nav > p::after {
+	content : ' >> ';
+}
+
+html:root > body > header > nav > dl > div > dt::after {
+	content : ': ';
+}
+
+html:root > body > header > nav > dl > div > dd::after,
+html:root > body > header > nav > ul > li::after,
+html:root > body > footer > nav > ul > li::after {
+	content : '; ';
+}
+
+html:root > body > header > nav,
+html:root > body > footer > nav {
+	font-size : 0.75rem;
+	line-height : 1.0rem;
+	opacity : 0.5;
+}
+html:root > body > header:hover > nav,
+html:root > body > footer:hover > nav {
+	opacity : 1.0;
+}
+
+html:root > body > header > hr,
+html:root > body > footer > hr {
+	display : none;
+}
+
+
+
+
+main.document > * {
+	display : block;
+}
+
+main.document > *:first-child {
+	margin-top : 0px;
+}
+
+main.document > *:last-child {
+	margin-bottom : 0px;
+}
+
+main.document h1,
+main.document h2 {
+	margin-top : 4.50rem;
+	margin-bottom : 1.50rem;
+	border-color : hsl(0, 0%, 25%);
+	border-bottom-style : solid;
+	border-bottom-width : 0.25rem;
+}
+
+main.document h3,
+main.document h4 {
+	margin-top : 3.00rem;
+	margin-bottom : 1.50rem;
+	border-color : hsl(0, 0%, 25%);
+	border-bottom-style : solid;
+	border-bottom-width : 0.15rem;
+}
+
+main.document h5,
+main.document h6 {
+	margin-top : 3.00rem;
+	margin-bottom : 1.50rem;
+}
+
+main.document h1,
+main.document h2,
+main.document h3,
+main.document h4,
+main.document h5,
+main.document h6 {
+	font-weight : bolder;
+}
+
+main.document h1 {
+	font-size : 1.75rem;
+	line-height : 3.00rem;
+}
+main.document h2 {
+	font-size : 1.50rem;
+	line-height : 3.00rem;
+}
+main.document h3 {
+	font-size : 1.20rem;
+}
+main.document h4 {
+	font-size : 1.10rem;
+}
+main.document h5 {
+	font-size : 1.05rem;
+}
+main.document h6 {
+	font-size : 1.00rem;
+}
+
+
+
+
+main.document hr {
+	margin-top : 3.00rem;
+	margin-bottom : 3.00rem;
+	border-color : hsl(0, 0%, 25%);
+	border-bottom-style : dotted;
+	border-bottom-width : 0.50rem;
+}
+
+
+
+
+main.document p {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+}
+
+main.document blockquote {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+	padding-top : 1ch;
+	padding-bottom : 1ch;
+	padding-left : 2ch;
+	padding-right : 2ch;
+	border-color : hsl(0, 0%, 25%);
+	border-left-style : solid;
+	border-left-width : 0.25rem;
+	background-color : hsla(0, 0%, 50%, 10%);
+}
+
+
+
+
+main.document ul,
+main.document ol,
+main.document dl {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+}
+
+main.document p + ul,
+main.document p + ol,
+main.document p + dl {
+	margin-top : -1.25rem;
+}
+
+main.document ul > li::marker,
+main.document ol > li::marker {
+	content : "\25aa\00a0";
+	font-size : 1em;
+}
+
+main.document ul > li:not(:first-child),
+main.document ol > li:not(:first-child),
+main.document dl > dt:not(:first-child),
+main.document dl > dd:not(:first-child) {
+	margin-top : 0.25rem;
+}
+
+main.document ul > li:not(:last-child),
+main.document ol > li:not(:last-child),
+main.document dl > dt:not(:last-child),
+main.document dl > dd:not(:last-child) {
+	margin-bottom : 0.25rem;
+}
+
+main.document li > ul,
+main.document li > ol,
+main.document li > dl {
+	display : block;
+	margin-top : 0.50rem;
+	margin-bottom : 0.50rem;
+}
+
+main.document li > ul > li,
+main.document li > ol > li,
+main.document li > dl > dd,
+main.document li > dl > dt {
+	margin-left : 2ch;
+}
+
+
+
+
+main.document blockquote > * {
+	display : block;
+	margin-left : 0px;
+}
+
+main.document blockquote > h1,
+main.document blockquote > h2,
+main.document blockquote > h3,
+main.document blockquote > h4,
+main.document blockquote > h5,
+main.document blockquote > h6 {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+}
+main.document blockquote > *:first-child {
+	margin-top : 0px;
+}
+main.document blockquote > *:last-child {
+	margin-bottom : 0px;
+}
+
+
+
+
+main.document pre {
+	white-space : pre;
+	overflow : auto;
+}
+
+main.document-format-commonmark pre,
+main.document-format-snippets pre {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+	padding-top : 1ch;
+	padding-bottom : 1ch;
+	padding-left : 2ch;
+	padding-right : 2ch;
+}
+
+main.document blockquote > pre,
+main.document li > pre {
+	display : block;
+	padding-left : 0.5ch;
+	padding-right : 0.5ch;
+}
+
+main.document-format-commonmark pre,
+main.document-format-snippets pre {
+	background : hsl(0, 0%, 12%);
+}
+main.document-format-commonmark code,
+main.document-format-snippets code {
+	background : hsl(0, 0%, 18%);
+}
+
+main.document-format-commonmark pre:hover,
+main.document-format-snippets pre:hover,
+main.document-format-commonmark code:hover,
+main.document-format-snippets code:hover {
+	background : hsl(30, 50%, 15%);
+}
+
+main.document pre > code,
+main.document pre:hover > code:hover {
+	padding : 0px;
+	background : transparent;
+}
+
+
+
+
+main.document h1 *,
+main.document h2 *,
+main.document h3 *,
+main.document h4 *,
+main.document h5 *,
+main.document h6 *,
+main.document pre *,
+main.document code *,
+main.document a * {
+	padding : inherit;
+	color : inherit;
+	background : transparent;
+}
+

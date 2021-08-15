@@ -1,9 +1,11 @@
 
 
+
+
 html:root {
 	font-family : "JetBrains Mono NL", "JetBrains Mono", "Fira Mono", "Courier New", monospace;
-	font-size : 22px;
-	line-height : 32px;
+	font-size : 16px;
+	line-height : 24px;
 }
 
 
@@ -24,8 +26,6 @@ hr {
 }
 
 
-
-
 ul > li, ol > li {
 	display : list-item;
 	display : list-item block flow-root;
@@ -40,8 +40,27 @@ ol > li {
 }
 
 
+
+
 pre {
 	white-space : pre;
+}
+
+em, i, u {
+	font-style : italic;
+}
+
+strong, mark, b {
+	font-weight : bolder;
+}
+
+del, s {
+	text-decoration-line : line-through;
+	text-decoration-style : solid;
+}
+
+q::before, q::after {
+	content : '"';
 }
 
 
@@ -51,22 +70,34 @@ a,
 button, select,
 input[type="submit"], input[type="reset"], input[type="button"],
 details > summary {
-	color : hsl(270, 50%, 75%) !important;
-	cursor : pointer !important;
+	color : hsl(270, 50%, 75%);
+	cursor : pointer;
 }
+
 a *,
 button *, select *,
 input[type="submit"] *, input[type="reset"] *, input[type="button"] *,
 details > summary * {
-	color : inherit !important;
-	cursor : inherit !important;
+	color : inherit;
+	cursor : inherit;
 }
+
+
 a:hover,
+details > summary:hover {
+	color : hsl(360, 50%, 75%);
+	text-decoration-line : underline;
+	text-decoration-style : solid;
+	text-decoration-thickness : 1px;
+	text-decoration-color : hsl(360, 50%, 75%);
+}
+
 button:hover, select:hover,
 input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover,
-details > summary:hover {
-	color : hsl(360, 50%, 75%) !important;
-	outline : dotted 1px hsl(360, 50%, 15%) !important;
-	outline-offset : -1px !important;
+	color : hsl(360, 50%, 75%);
+	outline-style : solid;
+	outline-width : 1px;
+	outline-color : hsl(360, 50%, 75%);
+	outline-offset : -1px;
 }
 
