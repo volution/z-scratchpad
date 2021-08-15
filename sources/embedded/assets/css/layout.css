@@ -341,3 +341,44 @@ main.document a * {
 	background : transparent;
 }
 
+
+
+
+main.document img,
+main.document video {
+	display : block;
+	max-width : -moz-available;
+	max-width : -webkit-fill-available;
+	max-height : 90vh;
+	margin-left : auto;
+	margin-right : auto;
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+	overflow : auto;
+}
+main.document video {
+	object-fit : contain;
+}
+
+
+
+
+main.document a[data-zs-url-type="error"],
+main.document img[data-zs-url-type="error"],
+main.document video[data-zs-url-type="error"] {
+	color : hsl(60, 50%, 75%);
+	background-color : hsl(0, 50%, 15%);
+	cursor : not-allowed;
+}
+
+main.document img[data-zs-url-type="error"],
+main.document video[data-zs-url-type="error"] {
+	padding-top : 1ch;
+	padding-bottom : 1ch;
+	padding-left : 2ch;
+	padding-right : 2ch;
+	border-color : hsl(0, 0%, 25%);
+	border-left-style : solid;
+	border-left-width : 0.25rem;
+}
+
