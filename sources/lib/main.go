@@ -109,6 +109,7 @@ type ServerConfiguration struct {
 	EditEnabled *bool `toml:"edit_enabled"`
 	CreateEnabled *bool `toml:"create_enabled"`
 	BrowseEnabled *bool `toml:"browse_enabled"`
+	ConfirmOpenExternal *bool `toml:"confirm_open_external"`
 }
 
 
@@ -1322,6 +1323,7 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 	_editEnabled := flag2BoolOrDefault (_flags.EditEnabled, _configuration.EditEnabled, false)
 	_createEnabled := flag2BoolOrDefault (_flags.CreateEnabled, _configuration.CreateEnabled, false)
 	_browseEnabled := flag2BoolOrDefault (_flags.BrowseEnabled, _configuration.BrowseEnabled, false)
+	_confirmOpenExternal := flagBoolOrDefault (_configuration.ConfirmOpenExternal, true)
 	
 	_endpoint := fmt.Sprintf ("%s:%d", _endpointIp, _endpointPort)
 	
@@ -1342,6 +1344,7 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 	_server.EditEnabled = _server.EditEnabled && _editEnabled
 	_server.CreateEnabled = _server.CreateEnabled && _createEnabled
 	_server.BrowseEnabled = _server.BrowseEnabled && _browseEnabled
+	_server.ConfirmOpenExternal = _server.ConfirmOpenExternal || _confirmOpenExternal
 	
 	_error = ServerRun (_server)
 	if _error != nil {

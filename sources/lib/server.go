@@ -30,6 +30,7 @@ type Server struct {
 	EditEnabled bool
 	CreateEnabled bool
 	BrowseEnabled bool
+	ConfirmOpenExternal bool
 	
 }
 
@@ -419,8 +420,12 @@ func ServerHandleUrlLaunch (_server *Server, _urlEncoded string, _response http.
 	return nil
 }
 
+
 func ServerHandleUrlOpen (_server *Server, _urlEncoded string, _response http.ResponseWriter) (*Error) {
 	// FIXME:  We should add some type of signature so that we aren't injected malicious URL's!
+	if !_server.ConfirmOpenExternal {
+		return ServerHandleUrlLaunch (_server, _urlEncoded, _response)
+	}
 	_urlOpen_0, _error := base64.RawURLEncoding.DecodeString (_urlEncoded)
 	if _error != nil {
 		return errorw (0x34d08c61, _error)
@@ -437,6 +442,7 @@ func ServerHandleUrlOpen (_server *Server, _urlEncoded string, _response http.Re
 		}
 	return respondWithHtmlTemplate (_response, _server.templates.urlOpenHtml, _context, true)
 }
+
 
 func ServerHandleUrlError (_server *Server, _urlEncoded string, _response http.ResponseWriter) (*Error) {
 	_urlUnsafe_0, _error := base64.RawURLEncoding.DecodeString (_urlEncoded)
