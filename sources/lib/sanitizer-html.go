@@ -56,6 +56,10 @@ func DocumentSanitizeHtml (_document *Document, _unsafe string) (string, *Docume
 		return "", nil, _error
 	}
 	
+	if _error := verifyAnchors (_node); _error != nil {
+		return "", nil, _error
+	}
+	
 	_outcome := & DocumentSanitizeHtmlOutcome {
 			Urls : _extractLinksContext.urlsParsed,
 			UrlsLabel : _extractLinksContext.urlsLabel,
@@ -267,5 +271,144 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 type extractLinksContext struct {
 	urlsParsed map[string]*url.URL
 	urlsLabel map[string][]string
+}
+
+
+
+
+func verifyAnchors (_node *html.Node) (*Error) {
+	
+	_anchors := make (map[string]bool, 1024)
+	
+	if _error := collectAnchors (_node, _anchors); _error != nil {
+		return _error
+	}
+	if _error := validateAnchors (_node, _anchors); _error != nil {
+		return _error
+	}
+	
+	return nil
+}
+
+
+func collectAnchors (_node *html.Node, _anchors map[string]bool) (*Error) {
+	
+	_collectAttribute := func (_node *html.Node, _anchorAttribute string) (*Error) {
+		
+		_anchor := ""
+		
+		// FIXME:  Handle duplicate attributes!
+		for _, _attribute := range _node.Attr {
+			if _attribute.Key == _anchorAttribute {
+				_anchor = _attribute.Val
+			}
+		}
+		
+		_anchor = strings.TrimSpace (_anchor)
+		if _anchor == "" {
+			return nil
+		}
+		
+		if ! strings.HasPrefix (_anchor, "#") {
+			return nil
+		}
+		
+		_anchor = _anchor[1:]
+		if _anchor == "" {
+			return nil
+		}
+		
+		if _, _exists := _anchors[_anchor]; _exists {
+			logf ('e', 0x93a6fd7a, "`%s`", _anchor)
+			return nil
+		}
+		
+		_anchors[_anchor] = true
+		
+		return nil
+	}
+	
+	if _node.Type == html.ElementNode {
+		if _error := _collectAttribute (_node, "id"); _error != nil {
+			return _error
+		}
+		switch _node.DataAtom {
+			case atom.A :
+				if _error := _collectAttribute (_node, "name"); _error != nil {
+					return _error
+				}
+		}
+	}
+	
+	for _child := _node.FirstChild; _child != nil; _child = _child.NextSibling {
+		if _error := collectAnchors (_child, _anchors); _error != nil {
+			return _error
+		}
+	}
+	
+	return nil
+}
+
+
+func validateAnchors (_node *html.Node, _anchors map[string]bool) (*Error) {
+	
+	_validateAttribute := func (_node *html.Node, _anchorAttribute string) (*Error) {
+		
+		_anchor := ""
+		
+		// FIXME:  Handle duplicate attributes!
+		for _, _attribute := range _node.Attr {
+			if _attribute.Key == _anchorAttribute {
+				_anchor = _attribute.Val
+			}
+		}
+		
+		_anchor = strings.TrimSpace (_anchor)
+		if _anchor == "" {
+			return nil
+		}
+		
+		if ! strings.HasPrefix (_anchor, "#") {
+			return nil
+		}
+		
+		_anchor = _anchor[1:]
+		if _anchor == "" {
+			return nil
+		}
+		
+		if _, _exists := _anchors[_anchor]; _exists {
+			return nil
+		}
+		
+		logf ('e', 0xf5b51a6e, "`%s`", _anchor)
+		
+		for _index, _attribute := range _node.Attr {
+			if _attribute.Key == "data-zs-url-type" {
+				_node.Attr[_index].Val = "error"
+				return nil
+			}
+		}
+		
+		_node.Attr = append (_node.Attr, html.Attribute { "", "data-zs-url-type", "error" })
+		return nil
+	}
+	
+	if _node.Type == html.ElementNode {
+		switch _node.DataAtom {
+			case atom.A :
+				if _error := _validateAttribute (_node, "href"); _error != nil {
+					return _error
+				}
+		}
+	}
+	
+	for _child := _node.FirstChild; _child != nil; _child = _child.NextSibling {
+		if _error := validateAnchors (_child, _anchors); _error != nil {
+			return _error
+		}
+	}
+	
+	return nil
 }
 
