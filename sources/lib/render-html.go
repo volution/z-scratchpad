@@ -6,8 +6,6 @@ package zscratchpad
 import "bytes"
 import "html"
 
-import "github.com/microcosm-cc/bluemonday"
-
 
 
 
@@ -45,20 +43,9 @@ func DocumentRenderToHtml (_document *Document) (string, *Error) {
 		return "", _error
 	}
 	
-	if true {
-		
-		_parser := bluemonday.UGCPolicy()
-		
-		_parser.RequireParseableURLs (true)
-		_parser.RequireNoFollowOnLinks (true)
-		_parser.RequireNoReferrerOnLinks (true)
-		_parser.RequireCrossOriginAnonymous (true)
-		
-		_sanitized := _parser.Sanitize (_render)
-		if _sanitized != _render {
-			logf ('d', 0xe4eb5c90, "rendered document was sanitized!")
-			_render = _sanitized
-		}
+	_render, _error = DocumentSanitizeHtml (_document, _render)
+	if _error != nil {
+		return "", _error
 	}
 	
 	_document.RenderHtml = _render
