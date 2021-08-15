@@ -8,7 +8,7 @@
 			background: hsl(0, 0%, 5%);
 		}
 		.markdown-body {
-			filter: invert(0.9) grayscale(0.5);
+			filter: invert(1);
 			background: hsl(0, 0%, 100%);
 			border: 1px solid hsl(0, 0%, 5%);
 			box-sizing: border-box;
@@ -16,6 +16,9 @@
 			max-width: 980px;
 			margin: 0 auto;
 			padding: 45px;
+		}
+		.markdown-body img {
+			filter: invert(1);
 		}
 		@media (max-width: 767px) {
 			.markdown-body {
@@ -45,7 +48,7 @@
 <blockquote>
 <h2>Table of contents</h2>
 <ul>
-<li><a href="#about">about</a>; <a href="#status">status</a>;</li>
+<li><a href="#about">about</a>; <a href="#status">status</a>; <a href="#screenshots">screenshots</a>;</li>
 <li><a href="#documentation">documentation</a>;  <a href="#install">install</a>;</li>
 <li><a href="#features">features (and anti-features)</a>;</li>
 <li><a href="#how">how? (concepts, and inner workings)</a>;</li>
@@ -113,6 +116,17 @@ from personal notes, to for-work project specific documents.</p>
 if it breaks nothing is lost.
 All one's files are stored on the file-system, in plain text files,
 thus usable with generic file-management tools.</p>
+<hr />
+<p><a name="screenshots"></a></p>
+<h2>Screenshots</h2>
+<p>The WUI showing this readme rendered in Firefox browser (under Xorg):</p>
+<p><img src="./screenshots/wui-firefox-document.png" alt="wui-firefox-document" /></p>
+<p>The WUI showing this readme rendered in <a href="http://links.twibright.com/">links</a> (under URxvt terminal) (scrolled 1 page to skip the document header):</p>
+<p><img src="./screenshots/wui-links-document.png" alt="wui-links-document" /></p>
+<p>Selecting a document to edit with <a href="https://github.com/davatorium/rofi"><code>rofi</code></a> (under Xorg):</p>
+<p><img src="./screenshots/select-rofi-document.png" alt="select-rofi-document" /></p>
+<p>Selecting a document to edit with <a href="https://github.com/junegunn/fzf"><code>fzf</code></a> (under URxvt terminal):</p>
+<p><img src="./screenshots/select-fzf-document.png" alt="select-fzf-document" /></p>
 <hr />
 <p><a name="documentation"></a></p>
 <h2>Documentation</h2>
@@ -408,6 +422,15 @@ and how it should store one's documents.</p>
 </ul>
 <p>Depending on whether it considers running under a terminal or Xorg, it tries to use different tools (for editing, selecting, etc.)</p>
 <p>However one can always set the same tools for both terminal or Xorg configuration properties.</p>
+<h3>WUI HTML usability</h3>
+<p>The WUI HTML was designed as simple as possible for two reasons:</p>
+<ul>
+<li>to keep the amount of clutter (links, details, etc.) as low as possible;</li>
+<li>to have it usable even without CSS, <strong>especially in a terminal browser</strong>;  (it works best with <code>links</code>, <code>w3m</code> and <code>lynx</code>;)</li>
+<li>(hopefully, screen readers and other assistive technologies are able to work with it without a problem;)</li>
+</ul>
+<p>As stated multiple times throughout this document, <code>z-scratchpad</code> does not intend to be a &quot;publishing wiki&quot;,
+thus the interface doesn't need to do much except render the documents for easier viewing.</p>
 <blockquote>
 <p><strong>TBC</strong> (to be continued)</p>
 </blockquote>

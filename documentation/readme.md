@@ -4,7 +4,7 @@
 
 > ## Table of contents
 >
-> * [about](#about); [status](#status);
+> * [about](#about); [status](#status); [screenshots](#screenshots);
 > * [documentation](#documentation);  [install](#install);
 > * [features (and anti-features)](#features);
 > * [how? (concepts, and inner workings)](#how);
@@ -96,6 +96,35 @@ Moreover, given that it just provides the glue between one's favorite UI tools (
 if it breaks nothing is lost.
 All one's files are stored on the file-system, in plain text files,
 thus usable with generic file-management tools.
+
+
+
+
+--------------------------------------------------------------------------------
+
+<a name="screenshots"></a>
+
+
+## Screenshots
+
+
+The WUI showing this readme rendered in Firefox browser (under Xorg):
+
+![wui-firefox-document](./documentation/screenshots/wui-firefox-document.png)
+
+The WUI showing this readme rendered in [links](http://links.twibright.com/) (under URxvt terminal) (scrolled 1 page to skip the document header):
+
+![wui-links-document](./documentation/screenshots/wui-links-document.png)
+
+
+Selecting a document to edit with [`rofi`](https://github.com/davatorium/rofi) (under Xorg):
+
+![select-rofi-document](./documentation/screenshots/select-rofi-document.png)
+
+
+Selecting a document to edit with [`fzf`](https://github.com/junegunn/fzf) (under URxvt terminal):
+
+![select-fzf-document](./documentation/screenshots/select-fzf-document.png)
 
 
 
@@ -444,6 +473,17 @@ Integrating in other scripts:
 Depending on whether it considers running under a terminal or Xorg, it tries to use different tools (for editing, selecting, etc.)
 
 However one can always set the same tools for both terminal or Xorg configuration properties.
+
+
+### WUI HTML usability
+
+The WUI HTML was designed as simple as possible for two reasons:
+* to keep the amount of clutter (links, details, etc.) as low as possible;
+* to have it usable even without CSS, **especially in a terminal browser**;  (it works best with `links`, `w3m` and `lynx`;)
+* (hopefully, screen readers and other assistive technologies are able to work with it without a problem;)
+
+As stated multiple times throughout this document, `z-scratchpad` does not intend to be a "publishing wiki",
+thus the interface doesn't need to do much except render the documents for easier viewing.
 
 
 > **TBC** (to be continued)
