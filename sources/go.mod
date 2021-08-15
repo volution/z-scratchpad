@@ -11,5 +11,5 @@ require (
 	github.com/subchen/go-trylock/v2 v2.0.0
 	github.com/yuin/goldmark v1.4.0
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d
-	golang.org/x/sys v0.0.0-20210806184541-e5e7981a1069
+	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e
 )
