@@ -53,6 +53,13 @@ var DocumentExportText string
 var DocumentExportSource string
 
 
+//go:embed templates/url-open.html
+var UrlOpenHtml string
+
+//go:embed templates/url-error.html
+var UrlErrorHtml string
+
+
 //go:embed templates/global-partials.html
 var GlobalPartialsHtml string
 

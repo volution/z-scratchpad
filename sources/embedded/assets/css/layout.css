@@ -104,17 +104,34 @@ html:root > body > footer > hr {
 
 
 
-main.document > * {
+main.document > *,
+main.dialogue > * {
 	display : block;
 }
 
-main.document > *:first-child {
+main.document > *:first-child,
+main.dialogue > *:first-child {
 	margin-top : 0px;
 }
 
-main.document > *:last-child {
+main.document > *:last-child,
+main.dialogue > *:last-child {
 	margin-bottom : 0px;
 }
+
+
+
+
+main.dialogue {
+	padding-top : 0.75rem;
+	padding-bottom : 0.75rem;
+	padding-left : 2ch;
+	padding-right : 2ch;
+	background-color : hsl(45, 100%, 15%);
+}
+
+
+
 
 main.document h1,
 main.document h2 {

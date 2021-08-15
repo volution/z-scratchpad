@@ -4,6 +4,7 @@ package zscratchpad
 
 
 import "bytes"
+import "encoding/base64"
 import "encoding/xml"
 import "io"
 import "net"
@@ -20,6 +21,7 @@ type Server struct {
 	
 	index *Index
 	editor *Editor
+	browser *Browser
 	templates *Templates
 	listener net.Listener
 	http *http.Server
@@ -27,6 +29,7 @@ type Server struct {
 	
 	EditEnabled bool
 	CreateEnabled bool
+	BrowseEnabled bool
 	
 }
 
@@ -38,7 +41,7 @@ type serverHandler struct {
 
 
 
-func ServerNew (_globals *Globals, _index *Index, _editor *Editor, _listener net.Listener) (*Server, *Error) {
+func ServerNew (_globals *Globals, _index *Index, _editor *Editor, _browser *Browser, _listener net.Listener) (*Server, *Error) {
 	
 	_templates := (*Templates) (nil)
 	if _templates_0, _error := TemplatesNew (); _error == nil {
@@ -51,9 +54,14 @@ func ServerNew (_globals *Globals, _index *Index, _editor *Editor, _listener net
 			globals : _globals,
 			index : _index,
 			editor : _editor,
+			browser : _browser,
 			templates : _templates,
 			listener : _listener,
 		}
+	
+	_server.EditEnabled = true
+	_server.CreateEnabled = true
+	_server.BrowseEnabled = true
 	
 	_handler := & serverHandler {
 			server : _server,
@@ -156,6 +164,19 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 	if strings.HasPrefix (_path, "/dc/") {
 		_identifier := _path[4:]
 		return ServerHandleDocumentCreate (_server, _identifier, _response)
+	}
+	
+	if strings.HasPrefix (_path, "/ul/") {
+		_url := _path[4:]
+		return ServerHandleUrlLaunch (_server, _url, _response)
+	}
+	if strings.HasPrefix (_path, "/uo/") {
+		_url := _path[4:]
+		return ServerHandleUrlOpen (_server, _url, _response)
+	}
+	if strings.HasPrefix (_path, "/ue/") {
+		_url := _path[4:]
+		return ServerHandleUrlError (_server, _url, _response)
 	}
 	
 	if _path == "/__/version" {
@@ -347,11 +368,11 @@ func ServerHandleDocumentExportSource (_server *Server, _identifierUnsafe string
 
 
 func ServerHandleDocumentCreate (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
-	if _server.editor == nil {
-		return errorw (0x14317f29, nil)
-	}
 	if !_server.CreateEnabled {
 		return errorw (0x744d1a48, nil)
+	}
+	if _server.editor == nil {
+		return errorw (0x14317f29, nil)
 	}
 	if _error := WorkflowDocumentCreate (_identifierUnsafe, _server.index, _server.editor, false); _error != nil {
 		return _error
@@ -362,17 +383,77 @@ func ServerHandleDocumentCreate (_server *Server, _identifierUnsafe string, _res
 
 
 func ServerHandleDocumentEdit (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
-	if _server.editor == nil {
-		return errorw (0xee28afb6, nil)
-	}
 	if !_server.EditEnabled {
 		return errorw (0x664c252f, nil)
+	}
+	if _server.editor == nil {
+		return errorw (0xee28afb6, nil)
 	}
 	if _error := WorkflowDocumentEdit (_identifierUnsafe, _server.index, _server.editor, false); _error != nil {
 		return _error
 	}
 	http.Error (_response, "", http.StatusNoContent)
 	return nil
+}
+
+
+
+
+func ServerHandleUrlLaunch (_server *Server, _urlEncoded string, _response http.ResponseWriter) (*Error) {
+	// FIXME:  We should add some type of signature so that we aren't injected malicious URL's!
+	_urlLaunch_0, _error := base64.RawURLEncoding.DecodeString (_urlEncoded)
+	if _error != nil {
+		return errorw (0x06ca25ef, _error)
+	}
+	_urlLaunch := string (_urlLaunch_0)
+	if !_server.BrowseEnabled {
+		return errorw (0xcbe5ac01, nil)
+	}
+	if _server.browser == nil {
+		return errorw (0x13f43f95, nil)
+	}
+	if _error := BrowserUrlExternalOpen (_server.browser, _urlLaunch, false); _error != nil {
+		return _error
+	}
+	http.Error (_response, "", http.StatusNoContent)
+	return nil
+}
+
+func ServerHandleUrlOpen (_server *Server, _urlEncoded string, _response http.ResponseWriter) (*Error) {
+	// FIXME:  We should add some type of signature so that we aren't injected malicious URL's!
+	_urlOpen_0, _error := base64.RawURLEncoding.DecodeString (_urlEncoded)
+	if _error != nil {
+		return errorw (0x34d08c61, _error)
+	}
+	_urlOpen := string (_urlOpen_0)
+	_context := struct {
+			Server *Server
+			UrlEncoded string
+			UrlOpen string
+		} {
+			_server,
+			_urlEncoded,
+			_urlOpen,
+		}
+	return respondWithHtmlTemplate (_response, _server.templates.urlOpenHtml, _context, true)
+}
+
+func ServerHandleUrlError (_server *Server, _urlEncoded string, _response http.ResponseWriter) (*Error) {
+	_urlUnsafe_0, _error := base64.RawURLEncoding.DecodeString (_urlEncoded)
+	if _error != nil {
+		return errorw (0x33ccce60, _error)
+	}
+	_urlUnsafe := string (_urlUnsafe_0)
+	_context := struct {
+			Server *Server
+			UrlEncoded string
+			UrlUnsafe string
+		} {
+			_server,
+			_urlEncoded,
+			_urlUnsafe,
+		}
+	return respondWithHtmlTemplate (_response, _server.templates.urlErrorHtml, _context, true)
 }
 
 

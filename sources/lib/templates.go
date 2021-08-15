@@ -36,6 +36,9 @@ type Templates struct {
 	documentExportText *text_template.Template
 	documentExportSource *text_template.Template
 	
+	urlOpenHtml *html_template.Template
+	urlErrorHtml *html_template.Template
+	
 	versionHtml *html_template.Template
 	
 	assets fs.FS
@@ -135,6 +138,19 @@ func TemplatesNew () (*Templates, *Error) {
 	}
 	
 	
+	if _template, _error := html_template.New ("") .Parse (embedded.UrlOpenHtml); _error == nil {
+		_templates.urlOpenHtml = _template
+	} else {
+		return nil, errorw (0x5f69a2f1, _error)
+	}
+	
+	if _template, _error := html_template.New ("") .Parse (embedded.UrlErrorHtml); _error == nil {
+		_templates.urlErrorHtml = _template
+	} else {
+		return nil, errorw (0xe1f336a8, _error)
+	}
+	
+	
 	if _template, _error := html_template.New ("") .Parse (embedded.VersionHtml); _error == nil {
 		_templates.versionHtml = _template
 	} else {
@@ -149,6 +165,8 @@ func TemplatesNew () (*Templates, *Error) {
 			_templates.libraryViewHtml,
 			_templates.documentViewHtml,
 			_templates.documentExportHtml,
+			_templates.urlOpenHtml,
+			_templates.urlErrorHtml,
 			_templates.versionHtml,
 	} {
 		if _, _error := _topTemplate.New ("global-partials") .Parse (embedded.GlobalPartialsHtml); _error != nil {

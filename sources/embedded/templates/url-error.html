@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+	
+	<head>
+		<title>{url-error}</title>
+		{{ template "global-html-head-css" }}
+	</head>
+	
+	<body>
+		
+		<header>
+			<h1>{url-error}</h1>
+			{{ template "global-html-nav" }}
+			<hr/><hr/>
+		</header>
+		
+		<main class="document dialogue">
+			<p>
+				The following URL is broken!
+				<br/>
+				<code>{{ .UrlUnsafe }}</code>
+			</p>
+		</main>
+		
+		<footer>
+			<hr/><hr/>
+			{{ template "global-html-nav" }}
+		</footer>
+		
+	</body>
+	
+</html>

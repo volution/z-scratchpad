@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+	
+	<head>
+		<title>{url-open}</title>
+		{{ template "global-html-head-css" }}
+	</head>
+	
+	<body>
+		
+		<header>
+			<h1>{url-open}</h1>
+			{{ template "global-html-nav" }}
+			<hr/><hr/>
+		</header>
+		
+		<main class="document dialogue">
+			<p>
+				Delegate the following <strong>external</strong> URL to the browser launcher?
+				<br/>
+				<a href="/ul/{{ .UrlEncoded }}">{{ .UrlOpen }}</a>
+			</p>
+			<p>
+				Open the following <strong>external</strong> URL in this browser tab?
+				<br/>
+				<a href="{{ .UrlOpen }}" rel="nofollow noreferrer">{{ .UrlOpen }}</a>
+			</p>
+		</main>
+		
+		<footer>
+			<hr/><hr/>
+			{{ template "global-html-nav" }}
+		</footer>
+		
+	</body>
+	
+</html>
