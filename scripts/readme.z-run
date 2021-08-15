@@ -20,7 +20,7 @@
 			--watch=./documentation \
 			--no-shell \
 			-- \
-			"${ZRUN[@]}" ':: readme / html / render' \
+			"${ZRUN[@]}" ':: readme / html / render' "${@}" \
 	#
 !!
 
@@ -32,6 +32,11 @@
 		exit -- 0
 	fi
 	printf -- '[ii]  rendering readme...\n' >&2
+	exec -- "${ZRUN[@]}" ':: readme / html / render / forced' "${@}"
+!!
+
+--<< readme / html / render / forced
+	test "${#}" -eq 0
 	_html="$( exec -- cmark-gfm --to html --validate-utf8 --unsafe < ./documentation/readme.md )"
 	test -n "${_html}"
 	cat >| ./documentation/readme.html.tmp << EOS
@@ -45,7 +50,7 @@
 				background: hsl(0, 0%, 5%);
 			}
 			.markdown-body {
-				filter: invert(0.9) grayscale(0.5);
+				filter: invert(1);
 				background: hsl(0, 0%, 100%);
 				border: 1px solid hsl(0, 0%, 5%);
 				box-sizing: border-box;
@@ -53,6 +58,9 @@
 				max-width: 980px;
 				margin: 0 auto;
 				padding: 45px;
+			}
+			.markdown-body img {
+				filter: invert(1);
 			}
 			@media (max-width: 767px) {
 				.markdown-body {
