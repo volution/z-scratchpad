@@ -9,6 +9,7 @@ import "strings"
 
 import goldmark "github.com/yuin/goldmark"
 import goldmark_text "github.com/yuin/goldmark/text"
+import goldmark_html "github.com/yuin/goldmark/renderer/html"
 
 
 
@@ -23,13 +24,17 @@ func parseAndRenderCommonMarkToHtml (_sourceLines []string) (string, *Error) {
 	_sourceBytes := _sourceBuffer.Bytes ()
 	
 	_parser := goldmark.DefaultParser ()
+	
 	_renderer := goldmark.DefaultRenderer ()
+	_renderer.AddOptions (
+			goldmark_html.WithXHTML (),
+			goldmark_html.WithUnsafe (),
+		)
 	
 	_reader := goldmark_text.NewReader (_sourceBytes)
 	_writer := bytes.NewBuffer (nil)
 	
 	_ast := _parser.Parse (_reader)
-	
 	if _error := _renderer.Render (_writer, _sourceBytes, _ast); _error != nil {
 		return "", errorw (0xfc82f523, _error)
 	}
