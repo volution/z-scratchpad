@@ -272,6 +272,7 @@ Also, each of these files are signed with my PGP key `5A974037A6FD8839`, thus do
 ### Download and verify
 
 The following is an example how one could download, verify, and deploy `z-scratchpad`:
+
 * import my PGP key:
 ~~~~
 curl -s https://github.com/cipriancraciun.gpg | gpg2 --import
@@ -281,6 +282,7 @@ gpg: key 5A974037A6FD8839: public key "Ciprian Dorin Craciun <ciprian@volution.r
 gpg: Total number processed: 1
 gpg:               imported: 1
 ~~~~
+
 * download the executable and signature (replace the `linux` token with `darwin` (for OSX), `freebsd` or `openbsd`):
 ~~~~
 curl -s -L -S -f -o ./z-scratchpad \
@@ -289,10 +291,12 @@ curl -s -L -S -f -o ./z-scratchpad \
 curl -s -L -S -f -o ./z-scratchpad.asc \
     https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1.asc
 ~~~~
+
 * verify the executable:
 ~~~~
 gpg2 --verify ./z-scratchpad.asc ./z-scratchpad
 ~~~~
+
 * **check that the key is `58FC2194FCC2478399CB220C5A974037A6FD8839`**:
 ~~~~
 gpg: assuming signed data in './z-scratchpad'
@@ -304,14 +308,57 @@ gpg: WARNING: This key is not certified with a trusted signature!
 gpg:          There is no indication that the signature belongs to the owner.
 Primary key fingerprint: 58FC 2194 FCC2 4783 99CB  220C 5A97 4037 A6FD 8839
 ~~~~
-* make it executable:
+
+* change the executable permissions:
 ~~~~
 chmod 0755 ./z-scratchpad
 ~~~~
-* copy it on the `$PATH`:
+
+* copy the executable on the `$PATH`:
 ~~~~
 sudo cp ./z-scratchpad /usr/local/bin/z-scratchpad
 ~~~~
+
+* check that it works:
+~~~~
+z-scratchpad --version
+~~~~
+~~~~
+* version       : 0.0.1
+* executable    : z-scratchpad
+* build target  : release, linux-amd64, go1.16.7, gc
+* build number  : 2025, 2021-08-13-11-56-08
+* code & issues : https://github.com/cipriancraciun/z-scratchpad
+* sources git   : 1abeee1c76fc4a40e1465e4810be0258992d1815
+* sources hash  : 51382d0da05c3e129fc73eac59754fad
+* uname node    : some-workstation
+* uname system  : Linux, 5.some-version, x86_64
+~~~~
+
+### Build from source
+
+Alternatively, one can just build the executable themselves (for example to get the latest unreleased changes).
+
+* clone the repository:
+~~~~
+git clone https://github.com/cipriancraciun/z-scratchpad ./z-scratchpad
+~~~~
+
+* switch to the sources folder:
+~~~~
+cd ./z-scratchpad/sources
+~~~~
+
+* build the executable:
+~~~~
+go build -o ./z-scratchpad ./cmd/main.go
+~~~~
+
+* copy the executable on the `$PATH`:
+~~~~
+sudo cp ./z-scratchpad /usr/local/bin/z-scratchpad
+~~~~
+
 * check that it works:
 ~~~~
 z-scratchpad --version
