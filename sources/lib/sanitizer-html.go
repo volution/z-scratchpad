@@ -145,23 +145,33 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 		
 		_urlUnsafe := ""
 		_label := ""
+		_labelFromTitle := ""
 		
 		for _, _attribute := range _node.Attr {
 			switch _attribute.Key {
 				case _urlAttribute :
 					_urlUnsafe = _attribute.Val
 				case _labelAttribute :
-					_label = _attribute.Val
+					if _labelAttribute != "" {
+						_label = _attribute.Val
+					}
+				case "title" :
+					_labelFromTitle = _attribute.Val
 			}
 		}
 		
 		_urlUnsafe = strings.TrimSpace (_urlUnsafe)
 		_label = strings.TrimSpace (_label)
+		_labelFromTitle = strings.TrimSpace (_labelFromTitle)
+		
 		
 		if _urlUnsafe == "" {
 			_urlUnsafe = "/ue/"
 		}
 		
+		if _label == "" {
+			_label = _labelFromTitle
+		}
 		if _label == "" {
 			if (_node.DataAtom == atom.A) && (_node.FirstChild != nil) && (_node.FirstChild.Type == html.TextNode) {
 				_label = strings.TrimSpace (_node.FirstChild.Data)
@@ -246,15 +256,19 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 	}
 	
 	if _node.Type == html.ElementNode {
+		_error := (*Error) (nil)
 		switch _node.DataAtom {
 			case atom.A :
-				if _error := _mangleAttribute (_node, "href", "title", true); _error != nil {
-					return _error
-				}
+				_error = _mangleAttribute (_node, "href", "", true)
+			case atom.Area :
+				_error = _mangleAttribute (_node, "href", "alt", true)
+			case atom.Blockquote, atom.Q, atom.Ins, atom.Del :
+				_error = _mangleAttribute (_node, "cite", "", true)
 			case atom.Img :
-				if _error := _mangleAttribute (_node, "src", "title", false); _error != nil {
-					return _error
-				}
+				_error = _mangleAttribute (_node, "src", "alt", false)
+		}
+		if _error != nil {
+			return _error
 		}
 	}
 	
@@ -332,12 +346,6 @@ func collectAnchors (_node *html.Node, _anchors map[string]bool) (*Error) {
 		if _error := _collectAttribute (_node, "id"); _error != nil {
 			return _error
 		}
-		switch _node.DataAtom {
-			case atom.A :
-				if _error := _collectAttribute (_node, "name"); _error != nil {
-					return _error
-				}
-		}
 	}
 	
 	for _child := _node.FirstChild; _child != nil; _child = _child.NextSibling {
@@ -395,11 +403,13 @@ func validateAnchors (_node *html.Node, _anchors map[string]bool) (*Error) {
 	}
 	
 	if _node.Type == html.ElementNode {
+		_error := (*Error) (nil)
 		switch _node.DataAtom {
 			case atom.A :
-				if _error := _validateAttribute (_node, "href"); _error != nil {
-					return _error
-				}
+				_error = _validateAttribute (_node, "href")
+		}
+		if _error != nil {
+			return _error
 		}
 	}
 	
