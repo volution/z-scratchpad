@@ -1,6 +1,6 @@
 module github.com/cipriancraciun/z-scratchpad
 
-go 1.16
+go 1.17
 
 require (
 	github.com/gobwas/glob v0.2.3
@@ -12,4 +12,9 @@ require (
 	github.com/yuin/goldmark v1.4.0
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d
 	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e
+)
+
+require (
+	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/gorilla/css v1.0.0 // indirect
 )
