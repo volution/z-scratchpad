@@ -16,12 +16,10 @@
 
 --------------------------------------------------------------------------------
 
-<a name="about"></a>
 
 
 
-
-## About
+## <span id="about">About</span>
 
 `z-scratchpad`, as the title says, is a lightweight and highly customizable tool
 implemented in pure Go (thus portable to most POSIX compliant OS's)
@@ -78,12 +76,10 @@ Please see the [contributions](#contributions) and [licensing](#license) section
 
 --------------------------------------------------------------------------------
 
-<a name="status"></a>
 
 
 
-
-## Status
+## <span id="status">Status</span>
 
 > **WIP** (work in progress)
 
@@ -102,10 +98,10 @@ thus usable with generic file-management tools.
 
 --------------------------------------------------------------------------------
 
-<a name="screenshots"></a>
 
 
-## Screenshots
+
+## <span id="screenshots">Screenshots</span>
 
 
 ### WUI in Firefox
@@ -140,12 +136,10 @@ Selecting a document to edit with [`fzf`](https://github.com/junegunn/fzf) (unde
 
 --------------------------------------------------------------------------------
 
-<a name="documentation"></a>
 
 
 
-
-## Documentation
+## <span id="documentation">Documentation</span>
 
 > **WIP** (work in progress)
 
@@ -245,12 +239,10 @@ z-scratchpad browse -d some-identifier
 
 --------------------------------------------------------------------------------
 
-<a name="install"></a>
 
 
 
-
-## Installation
+## <span id="install">Installation</span>
 
 As mentioned many times, `z-scratchpad` is a single self-contained executable,
 thus it can be deployed by downloading the executable and placing it somewhere on the `$PATH`.
@@ -380,12 +372,10 @@ z-scratchpad --version
 
 --------------------------------------------------------------------------------
 
-<a name="features"></a>
 
 
 
-
-## Features (and anti-features)
+## <span id="features">Features (and anti-features)</span>
 
 ### Features and requirements
 
@@ -409,9 +399,8 @@ Note that some requirements are marked with "mandatory" although are not at the 
 The reason is that although during implementation they should be maintained, compromises can be made (for example in terms of performance).
 On the other hand, the higher some are on the list, the fewer compromises should be made.
 
-<a name="anti-features"></a>
 
-### Anti-features
+### <span id="anti-features">Anti-features</span>
 
 Conversely, there are also some negative requirements, or anti-features, that I keep in mind:
 
@@ -429,9 +418,8 @@ Conversely, there are also some negative requirements, or anti-features, that I 
 * does not prioritize Windows support;  (in theory it should work, however the Windows ecosystem lacks many of the tools relied-on by the TUI / GUI;)
 * does not prioritize built-in advanced workflows;  (however, by using the CLI interface one can implement in his favorite scripting language any workflow one desires;)
 
-<a name="ui"></a>
 
-### UI considerations
+### <span id="ui">UI considerations</span>
 
 The careful reader might see that I've listed "does not implement any TUI / GUI" twice, both in features and anti-features, it was not a mistake.
 `z-scratchpad` should limit its UI requirements to the following primitive operations that can be provided by external tools.
@@ -451,9 +439,7 @@ Anything that is not on this list should be made to fit a workflow based on thes
 
 
 
-<a name="how"></a>
-
-## How, concepts, and inner workings...
+## <span id="how">How, concepts, and inner workings...</span>
 
 > **WIP** (work in progress)
 
@@ -551,9 +537,7 @@ thus the interface doesn't need to do much except render the documents for easie
 
 
 
-<a name="why"></a>
-
-## Why, and history and reasons...
+## <span id="why">Why, and history and reasons...</span>
 
 I've been a long time user of the [MoinMoin](https://moinmo.in/) wiki,
 my earliest document being from April 2008,
@@ -645,9 +629,7 @@ and none of them are written in NodeJS...) :)
 
 
 
-<a name="contributions"></a>
-
-## Contributions
+## <span id="contributions">Contributions</span>
 
 **Bug reports, feature requests, and patches are always welcomed!**
 
@@ -672,9 +654,7 @@ However, given it is an open-source project, one can always just fork the projec
 
 
 
-<a name="license"></a>
-
-## Notice (copyright and licensing)
+## <span id="license">Notice (copyright and licensing)</span>
 
 
 ### Notice -- short version
