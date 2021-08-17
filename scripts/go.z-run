@@ -105,6 +105,7 @@
 	"${ZRUN[@]}" ':: go / tool' \
 			build \
 			-o "${_outputs}/main--release${_suffix}.new" \
+			-a \
 			-tags "${_tags}" \
 			-gcflags "${_gcflags}" \
 			-ldflags "${_ldflags}" \
