@@ -8,8 +8,10 @@ import "unicode/utf8"
 import "strings"
 
 import goldmark "github.com/yuin/goldmark"
-import goldmark_text "github.com/yuin/goldmark/text"
+import goldmark_extensions "github.com/yuin/goldmark/extension"
+import goldmark_parser "github.com/yuin/goldmark/parser"
 import goldmark_html "github.com/yuin/goldmark/renderer/html"
+import goldmark_text "github.com/yuin/goldmark/text"
 
 
 
@@ -24,9 +26,28 @@ func parseAndRenderCommonMarkToHtml (_sourceLines []string) (string, *Error) {
 	_sourceBytes := _sourceBuffer.Bytes ()
 	
 	_parser := goldmark.DefaultParser ()
+	_parser.AddOptions (goldmark_parser.WithAutoHeadingID ())
 	
 	_renderer := goldmark.DefaultRenderer ()
 	_renderer.AddOptions (goldmark_html.WithXHTML ())
+	_renderer.AddOptions (goldmark_html.WithUnsafe ())
+	
+	goldmark.New (
+			goldmark.WithParser (_parser),
+			goldmark.WithRenderer (_renderer),
+			goldmark.WithExtensions (
+					// NOTE:  Part of the GFM (GitHub Flavoured Markdown).
+					goldmark_extensions.Linkify,
+					goldmark_extensions.Strikethrough,
+					goldmark_extensions.TaskList,
+					goldmark_extensions.Table,
+				),
+			goldmark.WithExtensions (
+					// NOTE:  Other useful extensions.
+					goldmark_extensions.DefinitionList,
+					goldmark_extensions.Footnote,
+				),
+		)
 	
 	_reader := goldmark_text.NewReader (_sourceBytes)
 	_writer := bytes.NewBuffer (nil)
