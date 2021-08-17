@@ -144,6 +144,7 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 	_mangleAttribute := func (_node *html.Node, _urlAttribute string, _labelAttribute string, _action bool) (*Error) {
 		
 		_urlUnsafe := ""
+		_urlFound := false
 		_label := ""
 		_labelFromTitle := ""
 		
@@ -151,6 +152,7 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 			switch _attribute.Key {
 				case _urlAttribute :
 					_urlUnsafe = _attribute.Val
+					_urlFound = true
 				case _labelAttribute :
 					if _labelAttribute != "" {
 						_label = _attribute.Val
@@ -158,6 +160,10 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 				case "title" :
 					_labelFromTitle = _attribute.Val
 			}
+		}
+		
+		if !_urlFound {
+			return nil
 		}
 		
 		_urlUnsafe = strings.TrimSpace (_urlUnsafe)
@@ -323,11 +329,6 @@ func collectAnchors (_node *html.Node, _anchors map[string]bool) (*Error) {
 			return nil
 		}
 		
-		if ! strings.HasPrefix (_anchor, "#") {
-			return nil
-		}
-		
-		_anchor = _anchor[1:]
 		if _anchor == "" {
 			return nil
 		}
