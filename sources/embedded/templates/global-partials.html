@@ -21,16 +21,36 @@
 {{- end }}
 
 
-{{ define "library-html-nav" -}}
+{{ define "library-html-header-nav" -}}
+	<nav>
+		<p>Library navigation</p>
+		<ul>
+			{{ if . }}
+				<li class="search-candidate"><a href="/dc/{{ .Identifier }}">{create}</a></li>
+			{{ else }}
+				<li class="search-candidate"><a href="/dc/">{create}</a></li>
+			{{ end }}
+			<li class="search-candidate"><a href="/l/">{libraries}</a></li>
+			<li class="search-candidate"><a href="/d/">{documents}</a></li>
+			<li class="search-candidate"><a href="/i/">{index}</a></li>
+			<li class="search-candidate"><a href="/">{home}</a></li>
+		</ul>
+	</nav>
+{{- end }}
+
+{{ define "library-html-footer-nav" -}}
 	<nav>
 		<p>Library navigation</p>
 		<ul>
 			{{ if . }}
 				<li><a href="/dc/{{ .Identifier }}">{create}</a></li>
+			{{ else }}
+				<li><a href="/dc/">{create}</a></li>
 			{{ end }}
 			<li><a href="/l/">{libraries}</a></li>
 			<li><a href="/d/">{documents}</a></li>
-			<li><a href="/">{scratchpad}</a></li>
+			<li><a href="/i/">{index}</a></li>
+			<li><a href="/">{home}</a></li>
 		</ul>
 	</nav>
 {{- end }}
@@ -93,7 +113,20 @@
 {{- end }}
 
 
-{{ define "document-html-nav" -}}
+{{ define "document-html-header-nav" -}}
+	<nav>
+		<p>Document navigation</p>
+		<ul>
+			<li class="search-candidate"><a href="/de/{{ .Identifier }}">{edit}</a></li>
+			<li class="search-candidate"><a href="/dx/source/{{ .Identifier }}">{source}</a></li>
+			<li class="search-candidate"><a href="/dx/html/{{ .Identifier }}">{export HTML}</a></li>
+			<li class="search-candidate"><a href="/dx/text/{{ .Identifier }}">{export txt}</a></li>
+			<li class="search-candidate"><a href="/d/{{ .Identifier }}">{reload}</a></li>
+		</ul>
+	</nav>
+{{- end }}
+
+{{ define "document-html-footer-nav" -}}
 	<nav>
 		<p>Document navigation</p>
 		<ul>
@@ -101,6 +134,7 @@
 			<li><a href="/dx/source/{{ .Identifier }}">{source}</a></li>
 			<li><a href="/dx/html/{{ .Identifier }}">{export HTML}</a></li>
 			<li><a href="/dx/text/{{ .Identifier }}">{export txt}</a></li>
+			<li><a href="/d/{{ .Identifier }}">{reload}</a></li>
 		</ul>
 	</nav>
 {{- end }}
@@ -117,15 +151,40 @@
 
 
 
-{{ define "global-html-nav" -}}
+{{ define "global-html-header-nav" -}}
 	<nav>
 		<p>Global navigation</p>
 		<ul>
-			<li><a href="/l/">{libraries}</a></li>
-			<li><a href="/d/">{documents}</a></li>
-			<li><a href="/">{scratchpad}</a></li>
+			<li class="search-candidate"><a href="/dc/">{create}</a></li>
+			<li class="search-candidate"><a href="/l/">{libraries}</a></li>
+			<li class="search-candidate"><a href="/d/">{documents}</a></li>
+			<li class="search-candidate"><a href="/i/">{index}</a></li>
+			<li class="search-candidate"><a href="/">{home}</a></li>
 		</ul>
 	</nav>
+{{- end }}
+
+{{ define "global-html-footer-nav" -}}
+	<nav>
+		<p>Global navigation</p>
+		<ul>
+			<li><a href="/dc/">{create}</a></li>
+			<li><a href="/l/">{libraries}</a></li>
+			<li><a href="/d/">{documents}</a></li>
+			<li><a href="/i/">{index}</a></li>
+			<li><a href="/">{home}</a></li>
+		</ul>
+	</nav>
+{{- end }}
+
+
+
+
+{{ define "search-nav" -}}
+	<div class="search-container">
+		<p class="search-prompt"><label for="search-query" class="search-prompt-label">??&nbsp;</label><input id="search-query" class="search-prompt-input" placeholder="query" size="80"></input></p>
+		<ul id="search-results" class="search-results"></ul>
+	</div>
 {{- end }}
 
 
@@ -136,5 +195,9 @@
 	<link href="/assets/css/reset.css" rel="stylesheet" />
 	<link href="/assets/css/core.css" rel="stylesheet" />
 	<link href="/assets/css/layout.css" rel="stylesheet" />
+{{ end }}
+
+{{ define "global-html-head-js" }}
+	<script src="/assets/js/search.js" defer="true"></script>
 {{ end }}
 

@@ -4,6 +4,7 @@
 	<head>
 		{{ template "library-html-head-title" .Library }}
 		{{ template "global-html-head-css" }}
+		{{ template "global-html-head-js" }}
 	</head>
 	
 	<body>
@@ -11,7 +12,8 @@
 		<header>
 			{{ template "library-html-header-title" .Library }}
 			{{ template "library-html-header-details" .Library }}
-			{{ template "library-html-nav" .Library }}
+			{{ template "library-html-header-nav" .Library }}
+			{{ template "search-nav" }}
 			<hr/><hr/>
 		</header>
 		
@@ -19,7 +21,7 @@
 			{{ if .Documents }}
 				<ul>
 					{{ range $_, $document := .Documents }}
-						<li>{{ template "document-html-a-link" $document }}</li>
+						<li class="search-candidate">{{ template "document-html-a-link" $document }}</li>
 					{{ end }}
 				</ul>
 			{{ else }}
@@ -29,7 +31,7 @@
 		
 		<footer>
 			<hr/><hr/>
-			{{ template "library-html-nav" .Library }}
+			{{ template "library-html-footer-nav" .Library }}
 		</footer>
 		
 	</body>

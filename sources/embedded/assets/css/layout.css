@@ -399,3 +399,26 @@ main.document video[data-zs-url-type="error"] {
 	border-left-width : 0.25rem;
 }
 
+
+
+
+.search-container {
+	font-size : 0.75rem !important;
+	line-height : 1.0rem !important;
+}
+
+.search-results {
+	max-height : 10rem;
+	overflow-y : auto;
+}
+
+.search-result {
+	display : block;
+	white-space : nowrap;
+	overflow : hidden;
+}
+
+.search-result-highlight {
+	background-color : hsl(30, 100%, 15%);
+}
+

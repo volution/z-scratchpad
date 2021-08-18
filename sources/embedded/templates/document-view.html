@@ -4,6 +4,7 @@
 	<head>
 		{{ template "document-html-head-title" .Document }}
 		{{ template "global-html-head-css" }}
+		{{ template "global-html-head-js" }}
 	</head>
 	
 	<body>
@@ -11,8 +12,9 @@
 		<header>
 			{{ template "document-html-header-title" .Document }}
 			{{ template "document-html-header-details" .Document }}
-			{{ template "document-html-nav" .Document }}
-			{{ template "library-html-nav" .Library }}
+			{{ template "document-html-header-nav" .Document }}
+			{{ template "library-html-header-nav" .Library }}
+			{{ template "search-nav" }}
 			<hr/><hr/>
 		</header>
 		
@@ -22,8 +24,8 @@
 		
 		<footer>
 			<hr/><hr/>
-			{{ template "document-html-nav" .Document }}
-			{{ template "library-html-nav" .Library }}
+			{{ template "document-html-footer-nav" .Document }}
+			{{ template "library-html-footer-nav" .Library }}
 			<!--
 				<ul>
 				{{ range $url, $labels := .Document.HtmlLinks }}

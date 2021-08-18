@@ -4,13 +4,15 @@
 	<head>
 		<title>{libraries}</title>
 		{{ template "global-html-head-css" }}
+		{{ template "global-html-head-js" }}
 	</head>
 	
 	<body>
 		
 		<header>
 			<h1>{libraries}</h1>
-			{{ template "global-html-nav" }}
+			{{ template "global-html-header-nav" }}
+			{{ template "search-nav" }}
 			<hr/><hr/>
 		</header>
 		
@@ -18,7 +20,7 @@
 			{{ if .Libraries }}
 				<ul>
 					{{ range $_, $library := .Libraries }}
-						<li>{{ template "library-html-a-link" $library }}</li>
+						<li class="search-candidate">{{ template "library-html-a-link" $library }}</li>
 					{{ end }}
 				</ul>
 			{{ else }}
@@ -28,7 +30,7 @@
 		
 		<footer>
 			<hr/><hr/>
-			{{ template "global-html-nav" }}
+			{{ template "global-html-footer-nav" }}
 		</footer>
 		
 	</body>

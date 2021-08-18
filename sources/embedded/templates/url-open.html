@@ -4,13 +4,15 @@
 	<head>
 		<title>{url-open}</title>
 		{{ template "global-html-head-css" }}
+		{{ template "global-html-head-js" }}
 	</head>
 	
 	<body>
 		
 		<header>
 			<h1>{url-open}</h1>
-			{{ template "global-html-nav" }}
+			{{ template "global-html-header-nav" }}
+			{{ template "search-nav" }}
 			<hr/><hr/>
 		</header>
 		
@@ -29,7 +31,7 @@
 		
 		<footer>
 			<hr/><hr/>
-			{{ template "global-html-nav" }}
+			{{ template "global-html-footer-nav" }}
 		</footer>
 		
 	</body>

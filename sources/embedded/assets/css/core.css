@@ -93,11 +93,20 @@ details > summary:hover {
 }
 
 button:hover, select:hover,
-input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover,
+input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover {
 	color : hsl(360, 50%, 75%);
 	outline-style : solid;
 	outline-width : 1px;
 	outline-color : hsl(360, 50%, 75%);
 	outline-offset : -1px;
+}
+
+
+
+
+button, input, select, summary {
+	border-style : solid;
+	border-width : 1px;
+	border-color : hsl(0, 0%, 50%);
 }
 

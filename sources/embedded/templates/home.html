@@ -4,27 +4,29 @@
 	<head>
 		<title>{scratchpad}</title>
 		{{ template "global-html-head-css" }}
+		{{ template "global-html-head-js" }}
 	</head>
 	
 	<body>
 		
 		<header>
 			<h1>{scratchpad}</h1>
-			{{ template "global-html-nav" }}
+			{{ template "global-html-header-nav" }}
+			{{ template "search-nav" }}
 			<hr/><hr/>
 		</header>
 		
 		<main>
 			<ul>
-				<li><a href="/i/"><code>/i/</code> -- index</a></li>
-				<li><a href="/l/"><code>/l/</code> -- libraries</a></li>
-				<li><a href="/d/"><code>/d/</code> -- documents</a></li>
+				<li class="search-candidate"><a href="/i/"><code>/i/</code> -- index</a></li>
+				<li class="search-candidate"><a href="/l/"><code>/l/</code> -- libraries</a></li>
+				<li class="search-candidate"><a href="/d/"><code>/d/</code> -- documents</a></li>
 			</ul>
 		</main>
 		
 		<footer>
 			<hr/><hr/>
-			{{ template "global-html-nav" }}
+			{{ template "global-html-footer-nav" }}
 		</footer>
 		
 	</body>
