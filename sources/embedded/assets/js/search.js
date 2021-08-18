@@ -16,6 +16,7 @@
 	let _resultsList;
 	let _resultsCurrentIndex;
 	let _resultsIdCounter;
+	let _candidatesCache;
 	
 	
 	
@@ -26,6 +27,7 @@
 		_resultsList = document.getElementById ("search-results");
 		_resultsCurrentIndex = null;
 		_resultsIdCounter = 0;
+		_candidatesCache = null;
 		
 		_queryInput.oninput = (_event) => {
 				let _query = _queryInput.value;
@@ -49,8 +51,7 @@
 						}
 						_highlightResult ();
 						if (_resultsCurrentIndex == null) {
-							document.activeElement.blur ();
-							document.body.focus ();
+							_unfocus ();
 						} else {
 							_event.preventDefault ();
 						}
@@ -64,10 +65,15 @@
 						}
 						_highlightResult ();
 						if (_resultsCurrentIndex == null) {
-							document.activeElement.blur ();
-							document.body.focus ();
+							_unfocus ();
 						} else {
 							_event.preventDefault ();
+						}
+						break;
+					
+					case "End" :
+						if (_queryInput.value == "") {
+							_unfocus ();
 						}
 						break;
 					
@@ -78,8 +84,7 @@
 					
 					case "PageDown" :
 					case "PageUp" :
-						document.activeElement.blur ();
-						document.body.focus ();
+						_unfocus ();
 						break;
 					
 					default :
@@ -91,28 +96,36 @@
 		document.body.addEventListener ("keypress", (_event) => {
 				if (_event.key == "/") {
 					if (document.activeElement != _queryInput) {
-						document.body.scrollTo (0, 0);
-						_queryInput.focus ();
-						_queryInput.select ();
 						_event.preventDefault ();
+						_focus ();
 					}
 				}
 			});
 		
 		document.body.addEventListener ("scroll", (_event) => {
-				if (document.body.scrollTop != 0) {
-					if (document.activeElement == _queryInput) {
-						document.activeElement.blur ();
-						document.body.focus ();
-					}
-				} else {
-					_queryInput.focus ();
-					_queryInput.select ();
+				if (document.body.scrollTop == 0) {
+					_focus ();
+				} else if (document.activeElement == _queryInput) {
+					_unfocus ();
 				}
 			});
 		
-		_queryInput.value = "";
+		
+		_focus ();
+	}
+	
+	
+	
+	
+	function _focus () {
+		document.body.scrollTo (0, 0);
 		_queryInput.focus ();
+		_queryInput.select ();
+	}
+	
+	function _unfocus () {
+		document.activeElement.blur ();
+		document.body.focus ();
 	}
 	
 	
@@ -182,6 +195,10 @@
 	
 	
 	function _resolveCandidates () {
+		
+		if (_candidatesCache !== null) {
+			return (_candidatesCache);
+		}
 		
 		function _simplify (_node) {
 			let _childFirst = null;
@@ -270,6 +287,8 @@
 				}
 			}
 		}
+		
+		_candidatesCache = _candidates;
 		
 		return (_candidates);
 	}
