@@ -1371,7 +1371,7 @@ func MainBrowse (_flags *BrowseFlags, _globals *Globals, _index *Index, _editor 
 	_error := (*Error) (nil)
 	if (_flags.Document != nil) || (_flags.SelectDocument != nil) {
 		_documentIdentifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.SelectDocument, _index, _editor)
-	} else {
+	} else if (_flags.Library != nil) || (_flags.SelectLibrary != nil) {
 		_libraryIdentifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.SelectLibrary, _index, _editor)
 	}
 	if _error != nil {
@@ -1384,8 +1384,7 @@ func MainBrowse (_flags *BrowseFlags, _globals *Globals, _index *Index, _editor 
 	if _libraryIdentifier != "" {
 		return WorkflowLibraryBrowse (_libraryIdentifier, _index, _browser, true)
 	}
-	
-	return errorw (0x74a20a04, nil)
+	return WorkflowIndexBrowse (_index, _browser, true)
 }
 
 

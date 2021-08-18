@@ -20,6 +20,9 @@ type Templates struct {
 	homeHtml *html_template.Template
 	homeText *text_template.Template
 	
+	indexHtml *html_template.Template
+	indexText *text_template.Template
+	
 	librariesIndexHtml *html_template.Template
 	librariesIndexText *text_template.Template
 	
@@ -64,6 +67,19 @@ func TemplatesNew () (*Templates, *Error) {
 		_templates.homeText = _template
 	} else {
 		return nil, errorw (0xc165205e, _error)
+	}
+	
+	
+	if _template, _error := html_template.New ("") .Parse (embedded.IndexHtml); _error == nil {
+		_templates.indexHtml = _template
+	} else {
+		return nil, errorw (0x0956c86c, _error)
+	}
+	
+	if _template, _error := text_template.New ("") .Parse (embedded.IndexText); _error == nil {
+		_templates.indexText = _template
+	} else {
+		return nil, errorw (0x53d38d91, _error)
 	}
 	
 	
@@ -160,6 +176,7 @@ func TemplatesNew () (*Templates, *Error) {
 	
 	for _, _topTemplate := range []*html_template.Template {
 			_templates.homeHtml,
+			_templates.indexHtml,
 			_templates.librariesIndexHtml,
 			_templates.documentsIndexHtml,
 			_templates.libraryViewHtml,

@@ -138,6 +138,12 @@ func WorkflowLibraryBrowse (_identifierUnsafe string, _index *Index, _browser *B
 }
 
 
+func WorkflowIndexBrowse (_index *Index, _browser *Browser, _synchronous bool) (*Error) {
+	
+	return BrowserIndexOpen (_browser, _synchronous)
+}
+
+
 
 
 func WorkflowLibraryResolve (_identifierUnsafe string, _index *Index) (*Library, *Error) {

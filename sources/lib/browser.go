@@ -63,6 +63,19 @@ func BrowserLibraryOpen (_browser *Browser, _library *Library, _synchronous bool
 }
 
 
+func BrowserIndexOpen (_browser *Browser, _synchronous bool) (*Error) {
+	
+	if _browser.ServerUrlBase == "" {
+		return errorw (0x82107e2f, nil)
+	}
+	
+	_url := "/i/"
+	_url = strings.TrimRight (_browser.ServerUrlBase, "/") + _url
+	
+	return browserUrlOpen (_browser, _url, true, _synchronous)
+}
+
+
 func BrowserUrlExternalOpen (_browser *Browser, _url string, _synchronous bool) (*Error) {
 	return browserUrlOpen (_browser, _url, false, _synchronous)
 }

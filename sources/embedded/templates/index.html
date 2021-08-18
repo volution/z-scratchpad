@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+	
+	<head>
+		<title>{index}</title>
+		{{ template "global-html-head-css" }}
+	</head>
+	
+	<body>
+		
+		<header>
+			<h1>{index}</h1>
+			{{ template "global-html-nav" }}
+			<hr/><hr/>
+		</header>
+		
+		<main>
+			<section>
+				<h2>Libraries</h2>
+				{{ if .Libraries }}
+					<ul>
+						{{ range $_, $library := .Libraries }}
+							<li>{{ template "library-html-a-link" $library }}</li>
+						{{ end }}
+					</ul>
+				{{ else }}
+					<p>No libraries!</p>
+				{{ end }}
+			</section>
+			<section>
+				<h2>Documents</h2>
+				{{ if .Documents }}
+					<ul>
+						{{ range $_, $document := .Documents }}
+							<li>{{ template "document-html-a-link" $document }}</li>
+						{{ end }}
+					</ul>
+				{{ else }}
+					<p>No documents!</p>
+				{{ end }}
+			</section>
+		</main>
+		
+		<footer>
+			<hr/><hr/>
+			{{ template "global-html-nav" }}
+		</footer>
+		
+	</body>
+	
+</html>

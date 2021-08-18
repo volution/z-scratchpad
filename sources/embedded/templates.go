@@ -15,6 +15,15 @@ var HomeHtml string
 var HomeText string
 
 
+//go:embed templates/index.html
+var IndexHtml string
+
+//go:embed templates/index.txt
+var IndexText string
+
+
+
+
 //go:embed templates/libraries-index.html
 var LibrariesIndexHtml string
 

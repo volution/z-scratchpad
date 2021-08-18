@@ -124,6 +124,9 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 	if _path == "/" {
 		return ServerHandleHome (_server, _response)
 	}
+	if (_path == "/i") || (_path == "/i/") {
+		return ServerHandleIndex (_server, _response)
+	}
 	
 	if (_path == "/d") || (_path == "/d/") || (_path == "/documents") || (_path == "/documents/") {
 		return ServerHandleDocumentsIndex (_server, _response)
@@ -216,6 +219,32 @@ func ServerHandleHome (_server *Server, _response http.ResponseWriter) (*Error) 
 		}
 	return respondWithHtmlTemplate (_response, _server.templates.homeHtml, _context, true)
 }
+
+
+
+
+func ServerHandleIndex (_server *Server, _response http.ResponseWriter) (*Error) {
+	_libraries, _error := IndexLibrariesSelectAll (_server.index)
+	if _error != nil {
+		return _error
+	}
+	_documents, _error := IndexDocumentsSelectAll (_server.index)
+	if _error != nil {
+		return _error
+	}
+	_context := struct {
+			Server *Server
+			Libraries []*Library
+			Documents []*Document
+		} {
+			_server,
+			_libraries,
+			_documents,
+		}
+	return respondWithHtmlTemplate (_response, _server.templates.indexHtml, _context, true)
+}
+
+
 
 
 func ServerHandleLibrariesIndex (_server *Server, _response http.ResponseWriter) (*Error) {
