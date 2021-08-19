@@ -135,7 +135,7 @@
 :: use / profile / all :: export -- __RUN_PROFILE=all
 :: use / profile / cpu :: export -- __RUN_PROFILE=cpu
 :: use / profile / memory :: export -- __RUN_PROFILE=memory
-:: use / hyperfine :: export -- __RUN_PROFILE=hyperfine
+:: use / profile / hyperfine :: export -- __RUN_PROFILE=hyperfine
 
 
 
