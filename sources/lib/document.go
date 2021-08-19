@@ -225,6 +225,7 @@ func DocumentLoadFromPath (_path string) (*Document, *Error) {
 	} else {
 		return nil, errorw (0xc1e080d9, _error)
 	}
+	defer _file.Close ()
 	
 	var _stat os.FileInfo
 	if _stat_0, _error := _file.Stat (); _error == nil {

@@ -302,6 +302,18 @@ func editSessionClose (_session *editSession) (*Error) {
 	
 	_globals := _session.globals
 	
+	if _session.file != nil {
+		if _error := _session.file.Close (); _error != nil {
+			_error := errorw (0xdbdcc43c, _error)
+			if _session.error == nil {
+				_session.error = _error
+			} else {
+				logError (0x258897e2, _error)
+			}
+		}
+		_session.file = nil
+	}
+	
 	if _session.terminal {
 		defer _globals.TerminalMutexUnlock ()
 	}
