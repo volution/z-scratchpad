@@ -25,6 +25,12 @@
 		
 		_queryInput = document.getElementById ("search-query");
 		_resultsList = document.getElementById ("search-results");
+		
+		if ((_queryInput == null) || (_resultsList == null)) {
+			console.debug ("[dd][dd18a5aa]");
+			return null;
+		}
+		
 		_resultsCurrentIndex = null;
 		_resultsIdCounter = 0;
 		_candidatesCache = null;
@@ -40,6 +46,7 @@
 					case "Escape" :
 						_queryInput.value = "";
 						_search (null);
+						_event.stopPropagation ();
 						_event.preventDefault ();
 						break;
 					
@@ -50,11 +57,8 @@
 							_resultsCurrentIndex -= 1;
 						}
 						_highlightResult ();
-						if (_resultsCurrentIndex == null) {
-							_unfocus ();
-						} else {
-							_event.preventDefault ();
-						}
+						_event.stopPropagation ();
+						_event.preventDefault ();
 						break;
 					
 					case "ArrowDown" :
@@ -67,6 +71,7 @@
 						if (_resultsCurrentIndex == null) {
 							_unfocus ();
 						} else {
+							_event.stopPropagation ();
 							_event.preventDefault ();
 						}
 						break;
@@ -79,6 +84,7 @@
 					
 					case "Enter" :
 						_activateResult ();
+						_event.stopPropagation ();
 						_event.preventDefault ();
 						break;
 					
@@ -93,9 +99,12 @@
 				}
 			};
 		
+//		window.addEventListener ("keydown", (_event) => console.log (_event));
+		
 		document.body.addEventListener ("keypress", (_event) => {
 				if (_event.key == "/") {
 					if (document.activeElement != _queryInput) {
+						_event.stopPropagation ();
 						_event.preventDefault ();
 						_focus ();
 					}
@@ -110,8 +119,7 @@
 				}
 			});
 		
-		
-		_focus ();
+		_queryInput.focus ();
 	}
 	
 	
@@ -125,7 +133,6 @@
 	
 	function _unfocus () {
 		document.activeElement.blur ();
-		document.body.focus ();
 	}
 	
 	

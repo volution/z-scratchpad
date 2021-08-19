@@ -4,6 +4,7 @@
 	<head>
 		<title>{version}</title>
 		{{ template "global-html-head-css" }}
+		{{ template "global-html-head-js" }}
 	</head>
 	
 	<body>
@@ -17,7 +18,7 @@
 * version       : {{ .BuildVersion }}
 * build target  : {{ .BuildTarget }}, {{ .BuildTargetOs }}-{{ .BuildTargetArch }}, {{ .BuildCompilerVersion }}, {{ .BuildCompilerType }}
 * build number  : {{ .BuildNumber }}, {{ .BuildTimestamp }}
-* code & issues : <a href="{{ .ProjectUrl }}">{{ .ProjectUrl }}</a>
+* code &amp; issues : <a href="{{ .ProjectUrl }}">{{ .ProjectUrl }}</a>
 * sources git   : {{ .BuildGitHash }}
 * sources hash  : {{ .BuildSourcesHash }}
 * uname system  : {{ .UnameSystem }}, {{ .UnameRelease }}, {{ .UnameMachine }}
