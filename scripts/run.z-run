@@ -137,3 +137,18 @@
 :: use / profile / memory :: export -- __RUN_PROFILE=memory
 :: use / hyperfine :: export -- __RUN_PROFILE=hyperfine
 
+
+
+
+<< go / pprof / cpu / server
+	test "${#}" -eq 0
+	test -f ./.outputs/profile--cpu.pprof
+	exec -- go tool pprof -http 127.70.72.170:8080 -no_browser -functions -- ./.outputs/profile--cpu.pprof
+!!
+
+<< go / pprof / memory / server
+	test "${#}" -eq 0
+	test -f ./.outputs/profile--memory.pprof
+	exec -- go tool pprof -http 127.146.243.63:8080 -no_browser -functions -sample_index=alloc_space -- ./.outputs/profile--memory.pprof
+!!
+
