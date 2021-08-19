@@ -4,6 +4,7 @@
 
 
 ::// run / ...
+::// use / ...
 ::// watch / run / ...
 
 
@@ -40,5 +41,99 @@
 :: run / export / select :: exec -- "${ZRUN[@]}" ':: run / exec' export -s "${@}"
 :: run / dump :: exec -- "${ZRUN[@]}" ':: run / exec' dump "${@}"
 
-:: run / exec :: exec -- "${ZRUN[@]}" ':: go / execute / main / debug' "${@}"
+
+
+
+<< run / exec
+	
+	_target="${__RUN_TARGET:-debug-build}"
+	_profile="${__RUN_PROFILE:-none}"
+	
+	_wrapper=()
+	_extra_arguments=()
+	
+	case "${_profile}" in
+		( none )
+		;;
+		( all | cpu )
+			_extra_arguments+=(
+					--profile-cpu-path ./.outputs/profile--cpu.pprof
+				)
+		;;&
+		( all | memory )
+			_extra_arguments+=(
+					--profile-memory-path ./.outputs/profile--memory.pprof
+				)
+		;;&
+		( all | cpu | memory )
+		;;
+		( hyperfine )
+		;;
+		( * )
+			printf -- '[ee]  invalid run profile `%s`;  aborting!\n' "${_profile}" >&2
+			exit -- 1
+		;;
+	esac
+	
+	case "${_target}" in
+		( debug-build )
+			"${ZRUN[@]}" ':: go / build / main / debug'
+		;;&
+		( release-build )
+			"${ZRUN[@]}" ':: go / build / main / release'
+		;;&
+		( debug | debug-build )
+			_command=( ./.outputs/main--debug "${_extra_arguments[@]}" "${@}" )
+		;;
+		( release | release-build )
+			_command=( ./.outputs/main--release "${_extra_arguments[@]}" "${@}" )
+		;;
+		( installed )
+			_command=( "$( type -P -- z-scratchpad )" "${_extra_arguments[@]}" "${@}" )
+		;;
+		( * )
+			printf -- '[ee]  invalid target `%s`;  aborting!\n' "${_target}" >&2
+			exit -- 1
+		;;
+	esac
+	
+	if test -e ./.outputs/profile--cpu.pprof ; then
+		rm -- ./.outputs/profile--cpu.pprof
+	fi
+	if test -e ./.outputs/profile--memory.pprof ; then
+		rm -- ./.outputs/profile--memory.pprof
+	fi
+	
+	case "${_profile}" in
+		( hyperfine )
+			_wrapper=(
+					hyperfine
+						--warmup 5
+						--min-runs 10
+						--max-runs 100
+						--shell ''
+						--command-name z-scratchpad
+				)
+			exec -- "${_wrapper[@]}" -- "${_command[*]@Q}"
+		;;
+		( * )
+			exec -- "${_wrapper[@]}" "${_command[@]}"
+		;;
+	esac
+!!
+
+
+:: use / reset :: export -- __RUN_TARGET= __RUN_PROFILE=
+
+:: use / target / debug + build :: export -- __RUN_TARGET=debug-build
+:: use / target / release + build :: export -- __RUN_TARGET=release-build
+:: use / target / debug :: export -- __RUN_TARGET=debug
+:: use / target / release :: export -- __RUN_TARGET=release
+:: use / target / installed :: export -- __RUN_TARGET=installed
+
+:: use / profile / none :: export -- __RUN_PROFILE=none
+:: use / profile / all :: export -- __RUN_PROFILE=all
+:: use / profile / cpu :: export -- __RUN_PROFILE=cpu
+:: use / profile / memory :: export -- __RUN_PROFILE=memory
+:: use / hyperfine :: export -- __RUN_PROFILE=hyperfine
 
