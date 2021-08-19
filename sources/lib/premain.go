@@ -7,12 +7,19 @@ import "bytes"
 import "fmt"
 import "os"
 import "log"
+import "runtime"
+import "runtime/debug"
 import "strings"
 
 
 
 
 func PreMain () () {
+	
+	
+	runtime.GOMAXPROCS (2)
+	debug.SetMaxThreads (128)
+	debug.SetGCPercent (200)
 	
 	
 	log.SetFlags (0)
