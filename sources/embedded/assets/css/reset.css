@@ -12,7 +12,7 @@
 	all : unset;
 }
 
-* {
+:not(svg|*) {
 	
 	/* NOTE:  https://bugs.chromium.org/p/chromium/issues/detail?id=420781 */
 	-webkit-text-fill-color : currentcolor;
@@ -29,13 +29,13 @@
 
 
 
-*,
-*::before,
-*::after,
-*::marker,
-*::placeholder,
-*::selection,
-*::text-target {
+:not(svg|*),
+:not(svg|*)::before,
+:not(svg|*)::after,
+:not(svg|*)::marker,
+:not(svg|*)::placeholder,
+:not(svg|*)::selection,
+:not(svg|*)::text-target {
 	display : inline-block;
 	display : inline flow-root;
 	position : static;
@@ -81,13 +81,13 @@ html:root > body script {
 
 
 
-*,
-*::before,
-*::after,
-*::marker,
-*::placeholder,
-*::selection,
-*::text-target {
+:not(svg|*),
+:not(svg|*)::before,
+:not(svg|*)::after,
+:not(svg|*)::marker,
+:not(svg|*)::placeholder,
+:not(svg|*)::selection,
+:not(svg|*)::text-target {
 	
 	font-family : inherit;
 	font-size : inherit;
@@ -142,19 +142,19 @@ html:root {
 
 
 
-* {
+:not(svg|*) {
 	box-sizing : border-box;
 	list-style : none;
 }
 
-* {
+:not(svg|*) {
 	border : none;
 	border-width : 0px;
 	border-style : none;
 	border-color : magenta;
 }
 
-* {
+:not(svg|*) {
 	outline : none;
 	outline-width : 0px;
 	outline-style : none;
