@@ -9,6 +9,8 @@ import "fmt"
 import "net"
 import "os"
 import "path"
+import "runtime"
+import "runtime/pprof"
 import "sort"
 import "strings"
 
@@ -33,6 +35,11 @@ type GlobalConfiguration struct {
 
 type LibraryFlags struct {
 	Paths []string `long:"library-path" value-name:"{library-path}"`
+}
+
+type DebuggingFlags struct {
+	ProfileCpuPath *string `long:"profile-cpu-path" value-name:"{path}"`
+	ProfileMemoryPath *string `long:"profile-memory-path" value-name:"{path}"`
 }
 
 type EditorConfiguration struct {
@@ -136,6 +143,7 @@ type MainFlags struct {
 	
 	Global *GlobalFlags `group:"Global options"`
 	Library *LibraryFlags `group:"Library options"`
+	Debugging *DebuggingFlags `group:"Debugging options"`
 	
 	List *ListFlags `command:"list"`
 	Search *SearchFlags `command:"search"`
@@ -255,6 +263,29 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	
 	if flagBoolOrDefault (_flags.Global.Help, false) {
 		return _help (false, nil)
+	}
+	
+	if _flags.Debugging.ProfileCpuPath != nil {
+		_close, _error := mainProfileCpu (*_flags.Debugging.ProfileCpuPath)
+		if _error != nil {
+			return _error
+		}
+		defer func () () {
+				if _error := _close (); _error != nil {
+					logError ('w', _error)
+				}
+			} ()
+	}
+	if _flags.Debugging.ProfileMemoryPath != nil {
+		_close, _error := mainProfileMemory (*_flags.Debugging.ProfileMemoryPath)
+		if _error != nil {
+			return _error
+		}
+		defer func () () {
+				if _error := _close (); _error != nil {
+					logError ('w', _error)
+				}
+			} ()
 	}
 	
 	if _flags.Global.WorkingDirectory != nil {
@@ -1701,6 +1732,51 @@ func mainLibraryForPaths (_paths []string) (*Library, *Error) {
 			CreatePath : _paths[0],
 		}
 	return _library, nil
+}
+
+
+
+
+func mainProfileCpu (_path string) (func () (*Error), *Error) {
+	if _path == "" {
+		return nil, errorw (0x6a07cc92, nil)
+	}
+	logf ('i', 0x0b2ca2b0, "profiling CPU, writing output to `%s`...", _path)
+	_output, _error := os.OpenFile (_path, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o640)
+	if _error != nil {
+		return nil, errorw (0xd1f70512, _error)
+	}
+	_error = pprof.StartCPUProfile (_output)
+	if _error != nil {
+		return nil, errorw (0x8cceeb40, _error)
+	}
+	_close := func () (*Error) {
+			defer _output.Close ()
+			pprof.StopCPUProfile ()
+			return nil
+		}
+	return _close, nil
+}
+
+func mainProfileMemory (_path string) (func () (*Error), *Error) {
+	if _path == "" {
+		return nil, errorw (0xfc9c43d8, nil)
+	}
+	logf ('i', 0x16f55857, "profiling memory, writing output to `%s`...", _path)
+	_output, _error := os.OpenFile (_path, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o640)
+	if _error != nil {
+		return nil, errorw (0xd1f70512, _error)
+	}
+	_close := func () (*Error) {
+			defer _output.Close ()
+			runtime.GC ()
+			_error := pprof.WriteHeapProfile (_output)
+			if _error != nil {
+				return errorw (0x3e5724d2, nil)
+			}
+			return nil
+		}
+	return _close, nil
 }
 
 
