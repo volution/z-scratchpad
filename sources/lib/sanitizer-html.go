@@ -65,14 +65,15 @@ func DocumentSanitizeHtml (_document *Document, _unsafe string) (string, *Docume
 			UrlsLabel : _extractLinksContext.urlsLabel,
 		}
 	
-	_mangledBuffer := bytes.NewBuffer (nil)
+	_mangledBuffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_mangledBuffer)
 	for _child := _node.FirstChild; _child != nil; _child = _child.NextSibling {
 		if _error := html.Render (_mangledBuffer, _child); _error != nil {
 			return "", nil, errorw (0xba050bcf, _error)
 		}
 	}
 	
-	_mangled := _mangledBuffer.String ()
+	_mangled := string (_mangledBuffer.Bytes ())
 	
 	return _mangled, _outcome, nil
 }

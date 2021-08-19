@@ -3,7 +3,6 @@
 package zscratchpad
 
 
-import "bytes"
 import "unicode/utf8"
 import "strings"
 
@@ -18,7 +17,8 @@ import goldmark_text "github.com/yuin/goldmark/text"
 
 func parseAndRenderCommonMarkToHtml (_sourceLines []string) (string, *Error) {
 	
-	_sourceBuffer := bytes.NewBuffer (nil)
+	_sourceBuffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_sourceBuffer)
 	for _, _line := range _sourceLines {
 		_sourceBuffer.WriteString (_line)
 		_sourceBuffer.WriteByte ('\n')
@@ -50,14 +50,15 @@ func parseAndRenderCommonMarkToHtml (_sourceLines []string) (string, *Error) {
 		)
 	
 	_reader := goldmark_text.NewReader (_sourceBytes)
-	_writer := bytes.NewBuffer (nil)
+	_outputBuffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_outputBuffer)
 	
 	_ast := _parser.Parse (_reader)
-	if _error := _renderer.Render (_writer, _sourceBytes, _ast); _error != nil {
+	if _error := _renderer.Render (_outputBuffer, _sourceBytes, _ast); _error != nil {
 		return "", errorw (0xfc82f523, _error)
 	}
 	
-	_outputBytes := _writer.Bytes ()
+	_outputBytes := _outputBuffer.Bytes ()
 	if ! utf8.Valid (_outputBytes) {
 		return "", errorw (0xbc65423b, nil)
 	}

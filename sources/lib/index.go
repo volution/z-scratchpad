@@ -21,9 +21,9 @@ type Index struct {
 func IndexNew (_globals *Globals) (*Index, *Error) {
 	_index := & Index {
 			globals : _globals,
-			documents : make (map[string]*Document, 1024),
+			documents : make (map[string]*Document, 16 * 1024),
 			libraries : make (map[string]*Library, 128),
-			libraryDocuments : make (map[string]map[string]*Document, 1024),
+			libraryDocuments : make (map[string]map[string]*Document, 128),
 		}
 	return _index, nil
 }
@@ -39,7 +39,7 @@ func IndexLibraryInclude (_index *Index, _library *Library) (*Error) {
 		return errorw (0xb8990674, nil)
 	}
 	_index.libraries[_library.Identifier] = _library
-	_index.libraryDocuments[_library.Identifier] = make (map[string]*Document, 1024)
+	_index.libraryDocuments[_library.Identifier] = make (map[string]*Document, 16 * 1024)
 	return nil
 }
 

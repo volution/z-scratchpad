@@ -84,7 +84,8 @@ func parseAndRenderSnippetsToHtml (_source []string) (string, *Error) {
 		return "", _error
 	}
 	
-	_buffer := bytes.NewBuffer (nil)
+	_buffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_buffer)
 	
 	for _, _block := range _blocks {
 		if _error := _block.RenderHtmlInto (_buffer); _error != nil {

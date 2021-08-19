@@ -3,7 +3,6 @@
 package zscratchpad
 
 
-import "bytes"
 import "html"
 
 
@@ -70,7 +69,8 @@ func documentRenderSnippetsToHtml (_source []string) (string, *Error) {
 
 func documentRenderTextToHtml (_source []string) (string, *Error) {
 	
-	_buffer := bytes.NewBuffer (nil)
+	_buffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_buffer)
 	
 	_buffer.WriteString ("<pre>\n")
 	for _, _line := range _source {

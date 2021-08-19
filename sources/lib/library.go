@@ -249,7 +249,7 @@ func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([][2]str
 		_snapshotSuffix = "." + _library.SnapshotExtension
 	}
 	
-	_documentPaths := make ([][2]string, 0, 1024)
+	_documentPaths := make ([][2]string, 0, 16 * 1024)
 	_folderPaths := make ([]string, 0, 128)
 	
 	_walkFunc := func (_pathEntry string, _entry os.DirEntry) (*Error) {

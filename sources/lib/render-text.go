@@ -3,9 +3,6 @@
 package zscratchpad
 
 
-import "bytes"
-
-
 
 
 func DocumentRenderToText (_document *Document) (string, *Error) {
@@ -66,11 +63,13 @@ func documentRenderTextToText (_source []string) (string, *Error) {
 }
 
 func documentRenderAnyToText (_source []string) (string, *Error) {
-	_buffer := bytes.NewBuffer (nil)
+	_buffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_buffer)
 	for _, _line := range _source {
 		_buffer.WriteString (_line)
 		_buffer.WriteByte ('\n')
 	}
-	return _buffer.String (), nil
+	_render := string (_buffer.Bytes ())
+	return _render, nil
 }
 

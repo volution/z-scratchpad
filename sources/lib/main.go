@@ -234,7 +234,8 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	}
 	
 	_help := func (_log bool, _error *Error) (*Error) {
-		_buffer := bytes.NewBuffer (nil)
+		_buffer := BytesBufferNewSize (4 * 1024)
+		defer BytesBufferRelease (_buffer)
 		_buffer.WriteByte ('\n')
 		_parser.WriteHelp (_buffer)
 		_buffer.WriteByte ('\n')
@@ -346,13 +347,14 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		if _path == "" {
 			return errorw (0x9a6f64a7, nil)
 		}
-		_data, _error := os.ReadFile (_path)
+		_dataBytes, _error := os.ReadFile (_path)
 		if _error != nil {
 			return errorw (0xf2be5f5f, _error)
 		}
-		if len (bytes.TrimSpace (_data)) > 0 {
-			_buffer := bytes.NewBuffer (_data)
-			_decoder := toml.NewDecoder (_buffer)
+		_dataBuffer := bytes.NewBuffer (_dataBytes)
+		defer BytesBufferRelease (_dataBuffer)
+		if len (bytes.TrimSpace (_dataBytes)) > 0 {
+			_decoder := toml.NewDecoder (_dataBuffer)
 			_decoder.Strict (true)
 			_error = _decoder.Decode (_configuration)
 			if _error != nil {
@@ -884,7 +886,8 @@ func MainDump (_flags *DumpFlags, _globals *Globals, _index *Index) (*Error) {
 		return _error
 	}
 	
-	_buffer := bytes.NewBuffer (nil)
+	_buffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_buffer)
 	for _, _document := range _documents {
 		_buffer.WriteString ("\n")
 		_error = DocumentDump (_buffer, _document, true, false, false)
@@ -1307,7 +1310,8 @@ func mainListOutput (_options [][2]string, _format string, _globals *Globals) (*
 	
 	sort.Strings (_list)
 	
-	_buffer := bytes.NewBuffer (nil)
+	_buffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_buffer)
 	
 	switch _format {
 		
@@ -1608,7 +1612,8 @@ func MainHelp (_flags *HelpFlags, _globals *Globals, _editor *Editor) (*Error) {
 	if _error != nil {
 		return _error
 	}
-	_buffer := bytes.NewBuffer (nil)
+	_buffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_buffer)
 	_buffer.WriteByte ('\n')
 	_parser.WriteHelp (_buffer)
 	_buffer.WriteByte ('\n')

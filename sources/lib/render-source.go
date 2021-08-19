@@ -3,7 +3,6 @@
 package zscratchpad
 
 
-import "bytes"
 import "fmt"
 
 
@@ -11,7 +10,8 @@ import "fmt"
 
 func DocumentRenderToSource (_document *Document) (string, *Error) {
 	
-	_buffer := bytes.NewBuffer (nil)
+	_buffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_buffer)
 	
 	if _document.Title != "" {
 		fmt.Fprintf (_buffer, "## %s\n", _document.Title)

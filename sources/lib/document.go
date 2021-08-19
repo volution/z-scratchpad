@@ -3,7 +3,6 @@
 package zscratchpad
 
 
-import "bytes"
 import "fmt"
 import "io"
 import "os"
@@ -236,13 +235,13 @@ func DocumentLoadFromPath (_path string) (*Document, *Error) {
 	
 	_timestamp := _stat.ModTime ()
 	
-	var _sourceBytes []byte
-	if _bytes, _error := os.ReadFile (_path); _error == nil {
-		_sourceBytes = _bytes
-	} else {
+	_sourceBuffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_sourceBuffer)
+	if _, _error := _sourceBuffer.ReadFrom (_file); _error != nil {
 		return nil, errorw (0x483c6b27, _error)
 	}
 	
+	_sourceBytes := _sourceBuffer.Bytes ()
 	if ! utf8.Valid (_sourceBytes) {
 //		logf ('d', 0x742720c2, "%s", _path)
 		return nil, errorf (0xa24965ce, "invalid UTF-8 source")
@@ -402,7 +401,8 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 
 func DocumentDump (_stream io.Writer, _document *Document, _includeIdentifiers bool, _includeBody bool, _includeRender bool) (*Error) {
 	
-	_buffer := bytes.NewBuffer (nil)
+	_buffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_buffer)
 	
 	if _document.Title != "" {
 		fmt.Fprintf (_buffer, "-- title (primary): `%s`\n", _document.Title)
