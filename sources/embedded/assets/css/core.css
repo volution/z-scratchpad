@@ -9,6 +9,40 @@ html:root {
 }
 
 
+html:root {
+	color : hsl(0, 0%, 75%);
+	background-color : hsl(0, 0%, 15%);
+}
+
+
+* {
+	border-color : hsl(0, 0%, 25%);
+	outline-color : hsl(0, 0%, 25%);
+}
+
+
+::selection {
+	color : hsl(0, 0%, 100%) !important;
+	background-color : hsl(30, 100%, 25%) !important;
+}
+
+
+* {
+	scrollbar-width : thin;
+	scrollbar-color : hsl(0, 0%, 5%) hsl(0, 0%, 25%);
+}
+
+::-webkit-scrollbar {
+	width : 6px;
+	height : 6px;
+	background : hsl(0, 0%, 5%);
+}
+
+::-webkit-scrollbar-thumb {
+	background : hsl(0, 0%, 25%);
+}
+
+
 
 
 body, section, article, aside,

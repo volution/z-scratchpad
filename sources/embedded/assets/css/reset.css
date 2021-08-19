@@ -29,15 +29,16 @@
 
 
 
-
-* {
+*,
+*::before,
+*::after,
+*::marker,
+*::placeholder,
+*::selection,
+*::text-target {
 	display : inline-block;
 	display : inline flow-root;
 	position : static;
-	left : 0px;
-	right : 0px;
-	top : 0px;
-	bottom : 0px;
 	margin : 0px;
 	padding : 0px;
 	width : auto;
@@ -49,32 +50,26 @@ html:root {
 	display : block;
 	display : flow-root;
 	display : block flow-root;
-	position : fixed;
-	left : 0px;
-	right : 0px;
-	top : 0px;
-	bottom : 0px;
+	position : static;
 	margin : 0px;
 	padding : 0px;
-	width : 100vw;
-	height : 100vh;
-	overflow : hidden;
+	width : auto;
+	height : auto;
+	max-width : 100vw;
+	max-height : 100vh;
+	overflow : auto;
 }
 
 html:root > body {
 	display : block;
 	display : flow-root;
 	display : block flow-root;
-	position : fixed;
-	left : 0px;
-	right : 0px;
-	top : 0px;
-	bottom : 0px;
+	position : static;
 	margin : 0px;
 	padding : 0px;
-	width : 100vw;
-	height : 100vh;
-	overflow : auto;
+	width : auto;
+	height : auto;
+	overflow : hidden;
 }
 
 html:root > head,
@@ -86,7 +81,13 @@ html:root > body script {
 
 
 
-* {
+*,
+*::before,
+*::after,
+*::marker,
+*::placeholder,
+*::selection,
+*::text-target {
 	
 	font-family : inherit;
 	font-size : inherit;
@@ -132,8 +133,8 @@ html:root {
 	text-align : left;
 	vertical-align : bottom;
 	
-	color : white;
-	background : black;
+	color : magenta;
+	background : brown;
 	
 	cursor : default;
 }
@@ -142,45 +143,21 @@ html:root {
 
 
 * {
-	border : none;
-	outline : none;
 	box-sizing : border-box;
 	list-style : none;
 }
+
 * {
+	border : none;
 	border-width : 0px;
-	border-style : solid;
-	border-color : hsl(0, 0%, 25%);
+	border-style : none;
+	border-color : magenta;
 }
+
 * {
+	outline : none;
 	outline-width : 0px;
-	outline-style : solid;
-	outline-color : hsl(0, 0%, 25%);
-}
-
-
-
-
-html:root {
-	color : hsl(0, 0%, 75%);
-	background-color : hsl(0, 0%, 15%);
-}
-
-::selection {
-	color : hsl(0, 0%, 100%) !important;
-	background-color : hsl(30, 100%, 25%) !important;
-}
-
-* {
-	scrollbar-width : thin;
-	scrollbar-color : hsl(0, 0%, 5%) hsl(0, 0%, 25%);
-}
-::-webkit-scrollbar {
-	width : 6px;
-	height : 6px;
-	background : hsl(0, 0%, 5%);
-}
-::-webkit-scrollbar-thumb {
-	background : hsl(0, 0%, 25%);
+	outline-style : none;
+	outline-color : magenta;
 }
 

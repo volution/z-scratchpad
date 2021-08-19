@@ -5,7 +5,7 @@
 	
 	
 	
-	document.addEventListener ("DOMContentLoaded", (_event) => {
+	window.addEventListener ("DOMContentLoaded", (_event) => {
 			_initialize ();
 		});
 	
@@ -27,7 +27,7 @@
 		_resultsList = document.getElementById ("search-results");
 		
 		if ((_queryInput == null) || (_resultsList == null)) {
-			console.debug ("[dd][dd18a5aa]");
+//			console.debug ("[dd][dd18a5aa]");
 			return null;
 		}
 		
@@ -99,9 +99,7 @@
 				}
 			};
 		
-//		window.addEventListener ("keydown", (_event) => console.log (_event));
-		
-		document.body.addEventListener ("keypress", (_event) => {
+		window.addEventListener ("keypress", (_event) => {
 				if (_event.key == "/") {
 					if (document.activeElement != _queryInput) {
 						_event.stopPropagation ();
@@ -111,8 +109,8 @@
 				}
 			});
 		
-		document.body.addEventListener ("scroll", (_event) => {
-				if (document.body.scrollTop == 0) {
+		window.addEventListener ("scroll", (_event) => {
+				if (window.scrollY == 0) {
 					_focus ();
 				} else if (document.activeElement == _queryInput) {
 					_unfocus ();
@@ -126,7 +124,7 @@
 	
 	
 	function _focus () {
-		document.body.scrollTo (0, 0);
+		window.scrollTo (0, 0);
 		_queryInput.focus ();
 		_queryInput.select ();
 	}
