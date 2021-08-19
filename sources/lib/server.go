@@ -32,6 +32,8 @@ type Server struct {
 	BrowseEnabled bool
 	ConfirmOpenExternal bool
 	
+	reloadToken string
+	
 }
 
 
@@ -58,6 +60,7 @@ func ServerNew (_globals *Globals, _index *Index, _editor *Editor, _browser *Bro
 			browser : _browser,
 			templates : _templates,
 			listener : _listener,
+			reloadToken : generateRandomToken (),
 		}
 	
 	_server.EditEnabled = true
@@ -119,6 +122,9 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 	
 	if _path == "/__/heartbeat" {
 		return respondWithBuffer (_response, "text/plain", bytes.NewBufferString ("OK\n"))
+	}
+	if _path == "/__/reload" {
+		return respondWithBuffer (_response, "text/plain", bytes.NewBufferString (_server.reloadToken))
 	}
 	
 	if _path == "/" {
