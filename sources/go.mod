@@ -3,6 +3,7 @@ module github.com/cipriancraciun/z-scratchpad
 go 1.17
 
 require (
+	github.com/akutz/sortfold v0.2.1
 	github.com/gobwas/glob v0.2.3
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/mattn/go-isatty v0.0.13
