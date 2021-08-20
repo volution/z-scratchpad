@@ -216,6 +216,12 @@ type MenuCommand struct {
 
 func Main (_executable string, _arguments []string, _environment map[string]string) (*Error) {
 	
+	_globals, _error := GlobalsNew (_executable, _environment)
+	if _error != nil {
+		return _error
+	}
+	defer triggerAtExit (_globals)
+	
 	_flags := & MainFlags {
 			
 			Global : & GlobalFlags {},
@@ -244,11 +250,6 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			Server : & ServerConfiguration {},
 			Browser : & BrowserConfiguration {},
 		}
-	
-	_globals, _error := GlobalsNew (_executable, _environment)
-	if _error != nil {
-		return _error
-	}
 	
 	_parser, _error := mainParserNew (_flags)
 	if _error != nil {
@@ -1680,6 +1681,7 @@ func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libr
 	}
 	
 	_databasePath := ""
+	_databaseDirtyPath := ""
 	_databaseEnabled := flagBoolOrDefault (_configuration.DatabaseEnabled, true)
 	if _databaseEnabled {
 		if _configuration.DatabasePath != nil {
@@ -1693,23 +1695,44 @@ func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libr
 			_databasePath = path.Join (_globals.TemporaryDirectory, _databasePath)
 		}
 	}
+	if _databasePath != "" {
+		_databaseDirtyPath = _databasePath + "-dirty"
+	}
 	
 	_databaseShouldLoad := ! flagBoolOrDefault (_flags.LoadDisabled, false)
 	_databaseShouldStore := ! flagBoolOrDefault (_flags.StoreDisabled, false)
 	_databaseShouldWalk := ! flagBoolOrDefault (_flags.WalkDisabled, false)
+	_databaseShouldDirty := true
 	
 	if _databasePath == "" {
 		_databaseShouldLoad = false
 		_databaseShouldStore = false
+		_databaseShouldDirty = false
+	}
+	if _databaseDirtyPath == "" {
+		_databaseShouldDirty = false
 	}
 	
 	if _databaseShouldLoad {
-		if _, _error := os.Stat (_databasePath); _error == nil {
-			// NOP
-		} else if os.IsNotExist (_error) {
-			_databaseShouldLoad = false
-		} else {
+		_dataStat := os.FileInfo (nil)
+		_dirtyStat := os.FileInfo (nil)
+		if _stat, _error := os.Stat (_databasePath); _error == nil {
+			_dataStat = _stat
+		} else if ! os.IsNotExist (_error) {
 			return nil, errorw (0xc35078ab, _error)
+		}
+		if _databaseDirtyPath != "" {
+			if _stat, _error := os.Stat (_databaseDirtyPath); _error == nil {
+				_dirtyStat = _stat
+			} else if ! os.IsNotExist (_error) {
+				return nil, errorw (0xfb9afa94, _error)
+			}
+		}
+		if _dataStat == nil {
+			_databaseShouldLoad = false
+		} else if (_dirtyStat != nil) && _dataStat.ModTime () .Before (_dirtyStat.ModTime ()) {
+			logf ('d', 0xd23ee348, "not loading dirty database...")
+			_databaseShouldLoad = false
 		}
 	}
 	
@@ -1741,6 +1764,32 @@ func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libr
 		if _error := IndexStoreToPath (_index, _databasePath); _error != nil {
 			return nil, _error
 		}
+	}
+	
+	if _databaseShouldDirty {
+		_markDirty := func () (*Error) {
+//				logf ('d', 0xfcc0490e, "marking dirty database...")
+				if _, _error := os.Stat (_databaseDirtyPath); _error == nil {
+					_timestamp := time.Now ()
+					if _error := os.Chtimes (_databaseDirtyPath, _timestamp, _timestamp); _error != nil {
+						return errorw (0x392bb23b, _error)
+					}
+				} else if os.IsNotExist (_error) {
+					if _file, _error := os.OpenFile (_databaseDirtyPath, os.O_WRONLY | os.O_CREATE, 0640); _error == nil {
+						_file.Close ()
+					} else {
+						return errorw (0xb0f0682c, _error)
+					}
+				} else {
+					return errorw (0xe29e9be2, _error)
+				}
+				return nil
+			}
+		_index.dirtyCallback = func () () {
+				if _error := _markDirty (); _error != nil {
+					logError ('e', _error)
+				}
+			}
 	}
 	
 	_elapsed := time.Since (_beginTimestamp)

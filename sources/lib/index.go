@@ -19,7 +19,7 @@ type Index struct {
 	documents map[string]*Document
 	libraries map[string]*Library
 	libraryDocuments map[string]map[string]bool
-	dirty bool
+	dirtyCallback func () ()
 }
 
 
@@ -43,7 +43,6 @@ func IndexNew (_globals *Globals) (*Index, *Error) {
 			documents : make (map[string]*Document, 16 * 1024),
 			libraries : make (map[string]*Library, 128),
 			libraryDocuments : make (map[string]map[string]bool, 128),
-			dirty : false,
 		}
 	return _index, nil
 }
@@ -220,8 +219,6 @@ func IndexLoadData (_index *Index, _gob *IndexGob) (*Error) {
 	_index.documents = _documents
 	_index.libraryDocuments = _libraryDocuments
 	
-	_index.dirty = false
-	
 	return nil
 }
 
@@ -268,7 +265,9 @@ func IndexLibraryInclude (_index *Index, _library *Library) (*Error) {
 	}
 	_index.libraries[_library.Identifier] = _library
 	_index.libraryDocuments[_library.Identifier] = make (map[string]bool, 16 * 1024)
-	_index.dirty = true
+	if _index.dirtyCallback != nil {
+		_index.dirtyCallback ()
+	}
 	return nil
 }
 
@@ -291,7 +290,9 @@ func IndexDocumentInclude (_index *Index, _document *Document) (*Error) {
 	}
 	_index.documents[_document.Identifier] = _document
 	_index.libraryDocuments[_document.Library][_document.Identifier] = true
-	_index.dirty = true
+	if _index.dirtyCallback != nil {
+		_index.dirtyCallback ()
+	}
 	return nil
 }
 
@@ -311,7 +312,9 @@ func IndexDocumentExclude (_index *Index, _document *Document) (*Error) {
 	}
 	delete (_index.documents, _document.Identifier)
 	delete (_index.libraryDocuments[_document.Library], _document.Identifier)
-	_index.dirty = true
+	if _index.dirtyCallback != nil {
+		_index.dirtyCallback ()
+	}
 	return nil
 }
 

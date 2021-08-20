@@ -4,6 +4,7 @@ package zscratchpad
 
 
 import "os"
+import "sync"
 
 
 import "github.com/mattn/go-isatty"
@@ -43,6 +44,9 @@ type Globals struct {
 	TemporaryDirectory string
 	
 	DevNull *os.File
+	
+	atExitSignal chan struct {}
+	atExitWaiting sync.WaitGroup
 }
 
 
@@ -62,6 +66,8 @@ func GlobalsNew (_executable string, _environment map[string]string) (*Globals, 
 			Executable : _executable,
 			Environment : _environment,
 		}
+	
+	_globals.atExitSignal = make (chan struct {})
 	
 	_globals.TemporaryDirectory = os.TempDir ()
 	if _globals.TemporaryDirectory == "" {
@@ -171,5 +177,24 @@ func (_globals *Globals) TerminalMutexTryLock () (bool) {
 func isTerminal (_file *os.File) (bool) {
 	_descriptor := _file.Fd ()
 	return isatty.IsTerminal (_descriptor) || isatty.IsCygwinTerminal (_descriptor)
+}
+
+
+
+
+func deferAtExit (_globals *Globals, _delegate func () (*Error)) () {
+	_globals.atExitWaiting.Add (1)
+	go func () () {
+			defer _globals.atExitWaiting.Done ()
+			_, _ = <- _globals.atExitSignal
+			if _error := _delegate (); _error != nil {
+				logError ('e', _error)
+			}
+		} ()
+}
+
+func triggerAtExit (_globals *Globals) () {
+	close (_globals.atExitSignal)
+	_globals.atExitWaiting.Wait ()
 }
 
