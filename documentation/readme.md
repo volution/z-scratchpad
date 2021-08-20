@@ -6,7 +6,7 @@
 >
 > * [about](#about); [status](#status); [screenshots](#screenshots);
 > * [documentation](#documentation);  [install](#install);
-> * [features (and anti-features)](#features);
+> * [features (and anti-features)](#features); [performance](#performance);
 > * [how? (concepts, and inner workings)](#how);
 > * [why? (history, and reasons)](#why);
 > * [contributions](#contributions); [licensing](#license);
@@ -64,6 +64,7 @@ Also see the following useful sections:
 * [status](#status) -- the current implementation status;
 * [install](#install) -- how to download and install it;
 * [documentation](#documentation) -- how to use and configure it;
+* [performance](#performance) -- what means to be "fast-enough";
 * [UI look-and-feel](#ui) -- how the UI works, and what can one expect when interacting with it;
 * [how it works](#how) -- the various use-cases it covers, and how it works internally;
 * [why this tool](#why) -- describes how I've reached to implement this tool, and why it behaves like it does;
@@ -430,6 +431,53 @@ The careful reader might see that I've listed "does not implement any TUI / GUI"
 * viewing an HTML file if one uses the WUI;  (the browser should not be used for any other purposes as part of other workflows;)
 
 Anything that is not on this list should be made to fit a workflow based on these primitives.
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+## <span id="performance">Performance</span>
+
+Given that `z-scratchpad` should run without a server, and furthermore that the actual notes are stored on the file-system,
+there is quite a lot to be asked in terms of performance...
+
+So I would start to describe some acceptable goals and limitations:
+* it is expected that one doesn't have more than a couple of thousand notes in the same instance;  (for performance profiling I use ~15K documents, all in one folder;)
+* it is expected that one uses SSD's, and that the system isn't under such heavy memory pressure that the buffer cache is starving;
+* it is expected that write operations (like creating or changing a document) happen less frequently than read operations (like listing, browsing, or just viewing documents);
+* it is expected to trade memory (both RAM or disk) in favor of CPU time;  (although it should be within reasonable bounds;)
+* the implemented caching mechanism should be simple, as to keep the overall code simple and bug-free;  (as one once said, "there are two hard things in computer science, cache invalidation and naming things";)
+* cache invalidation requires to walk the file-system;  (we can't use the kernel's file-system notification mechanism, mainly because we don't have a server running in the background;)
+* if one changes (adds, removes, or edits) the notes files without using the tool, one should manually call the tool to invalidate the cache;
+* also let's take [Jakob Nielsen's advice](https://www.nngroup.com/articles/powers-of-10-time-scales-in-ux/) with regard to delays in user experience:
+  * 0.1 seconds (100 milliseconds) -- "users feel like their actions are directly causing something to happen on the screen";
+  * 1 second -- "users feel like the computer is causing the result;  although they notice the short delay, they stay focused on their current train of thought";
+  * 10 seconds -- "it breaks the user's flow";
+* at the moment, the tool requires all libraries, documents and index to be present in Go's memory as objects;  (there is no lazy loading;)
+
+That being said, in my initial performance profiling, with a library composed of ~15K CommonMark documents (generated via [lorem-markdownum](https://github.com/jaspervdj/lorem-markdownum)),
+I've obtained the following times:
+* walking the file-system, parsing the notes meta-data (not the CommonMark syntax), and indexing the entire library takes ~0.7 seconds (i.e. 700 milliseconds);
+  * a good chunk of this time is spent computing document fingerprints (based on cryptographic hashes);
+  * another good chunk is spent actually interacting with the file-system;  (thus can't be optimized away;)
+* loading an already cached index takes ~0.05 seconds (i.e. 50 milliseconds);
+  * the majority of the time is spent in deserializing the index cache file;
+
+In order to obtain these numbers I had to resort to quite a few optimizations:
+* replaced `SHA1` (and before that `SHA256`) with [`blake3`](https://github.com/zeebo/blake3) with AVX2 and SSE4.1 acceleration;
+* disabled the Go garbage collector while we are parsing and indexing the notes;  (not much garbage is actually generated;)
+* used memory-mapped files (for the serialized index cache file);
+* used polled `byte.Buffer` instances, grouped by sizes;
+* quite a few unsafe operations so that temporary `[N]byte` buffers don't escape the stack, and thus don't incur allocations;
+
+Therefore, at the moment, without complicating the code too much, this is the best one can achieve.
+(There is one low-hanging fruit, that of parallelizing the document parsing, however that only reduces the latency, not the overall CPU usage.)
+
+However, even with the current state, I think that the performance objective was achieved.
 
 
 

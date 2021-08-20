@@ -50,15 +50,14 @@
 <ul>
 <li><a href="#about">about</a>; <a href="#status">status</a>; <a href="#screenshots">screenshots</a>;</li>
 <li><a href="#documentation">documentation</a>;  <a href="#install">install</a>;</li>
-<li><a href="#features">features (and anti-features)</a>;</li>
+<li><a href="#features">features (and anti-features)</a>; <a href="#performance">performance</a>;</li>
 <li><a href="#how">how? (concepts, and inner workings)</a>;</li>
 <li><a href="#why">why? (history, and reasons)</a>;</li>
 <li><a href="#contributions">contributions</a>; <a href="#license">licensing</a>;</li>
 </ul>
 </blockquote>
 <hr />
-<p><a name="about"></a></p>
-<h2>About</h2>
+<h2><span id="about">About</span></h2>
 <p><code>z-scratchpad</code>, as the title says, is a lightweight and highly customizable tool
 implemented in pure Go (thus portable to most POSIX compliant OS's)
 that allows one to easily take notes,
@@ -97,6 +96,7 @@ that uses one's preferred editor and UI tools.</p>
 <li><a href="#status">status</a> -- the current implementation status;</li>
 <li><a href="#install">install</a> -- how to download and install it;</li>
 <li><a href="#documentation">documentation</a> -- how to use and configure it;</li>
+<li><a href="#performance">performance</a> -- what means to be &quot;fast-enough&quot;;</li>
 <li><a href="#ui">UI look-and-feel</a> -- how the UI works, and what can one expect when interacting with it;</li>
 <li><a href="#how">how it works</a> -- the various use-cases it covers, and how it works internally;</li>
 <li><a href="#why">why this tool</a> -- describes how I've reached to implement this tool, and why it behaves like it does;</li>
@@ -104,8 +104,7 @@ that uses one's preferred editor and UI tools.</p>
 <p>Finally, it is open-source, licensed under GPL 3 or later.
 Please see the <a href="#contributions">contributions</a> and <a href="#license">licensing</a> sections.</p>
 <hr />
-<p><a name="status"></a></p>
-<h2>Status</h2>
+<h2><span id="status">Status</span></h2>
 <blockquote>
 <p><strong>WIP</strong> (work in progress)</p>
 </blockquote>
@@ -117,19 +116,21 @@ if it breaks nothing is lost.
 All one's files are stored on the file-system, in plain text files,
 thus usable with generic file-management tools.</p>
 <hr />
-<p><a name="screenshots"></a></p>
-<h2>Screenshots</h2>
+<h2><span id="screenshots">Screenshots</span></h2>
+<h3>WUI in Firefox</h3>
 <p>The WUI showing this readme rendered in Firefox browser (under Xorg):</p>
-<p><img src="./screenshots/wui-firefox-document.png" alt="wui-firefox-document" /></p>
+<p><img src="./documentation/screenshots/wui-firefox-document.png" alt="wui-firefox-document" /></p>
+<h3>WUI under terminal</h3>
 <p>The WUI showing this readme rendered in <a href="http://links.twibright.com/">links</a> (under URxvt terminal) (scrolled 1 page to skip the document header):</p>
-<p><img src="./screenshots/wui-links-document.png" alt="wui-links-document" /></p>
+<p><img src="./documentation/screenshots/wui-links-document.png" alt="wui-links-document" /></p>
+<h3>Menus under Xorg</h3>
 <p>Selecting a document to edit with <a href="https://github.com/davatorium/rofi"><code>rofi</code></a> (under Xorg):</p>
-<p><img src="./screenshots/select-rofi-document.png" alt="select-rofi-document" /></p>
-<p>Selecting a document to edit with <a href="https://github.com/junegunn/fzf"><code>fzf</code></a> (under URxvt terminal):</p>
-<p><img src="./screenshots/select-fzf-document.png" alt="select-fzf-document" /></p>
+<p><img src="./documentation/screenshots/select-rofi-document.png" alt="select-rofi-document" /></p>
+<h3>Menus under terminal</h3>
+<p>Selecting a document to edit with <a href="https://github.com/junegunn/fzf"><code>fzf</code></a> (under URxvt terminal with <a href="https://github.com/tmux/tmux"><code>tmux</code></a> support):</p>
+<p><img src="./documentation/screenshots/select-fzf-document.png" alt="select-fzf-document" /></p>
 <hr />
-<p><a name="documentation"></a></p>
-<h2>Documentation</h2>
+<h2><span id="documentation">Documentation</span></h2>
 <blockquote>
 <p><strong>WIP</strong> (work in progress)</p>
 </blockquote>
@@ -199,8 +200,7 @@ some-identifier.txt
 <pre><code>z-scratchpad browse -d some-identifier
 </code></pre>
 <hr />
-<p><a name="install"></a></p>
-<h2>Installation</h2>
+<h2><span id="install">Installation</span></h2>
 <p>As mentioned many times, <code>z-scratchpad</code> is a single self-contained executable,
 thus it can be deployed by downloading the executable and placing it somewhere on the <code>$PATH</code>.</p>
 <p>Traditionally one should place it inside the <code>/usr/local/bin</code> folder (available on many POSIX compliant OS's).
@@ -256,12 +256,49 @@ gpg:          There is no indication that the signature belongs to the owner.
 Primary key fingerprint: 58FC 2194 FCC2 4783 99CB  220C 5A97 4037 A6FD 8839
 </code></pre>
 <ul>
-<li>make it executable:</li>
+<li>change the executable permissions:</li>
 </ul>
 <pre><code>chmod 0755 ./z-scratchpad
 </code></pre>
 <ul>
-<li>copy it on the <code>$PATH</code>:</li>
+<li>copy the executable on the <code>$PATH</code>:</li>
+</ul>
+<pre><code>sudo cp ./z-scratchpad /usr/local/bin/z-scratchpad
+</code></pre>
+<ul>
+<li>check that it works:</li>
+</ul>
+<pre><code>z-scratchpad --version
+</code></pre>
+<pre><code>* version       : 0.0.1
+* executable    : z-scratchpad
+* build target  : release, linux-amd64, go1.16.7, gc
+* build number  : 2025, 2021-08-13-11-56-08
+* code &amp; issues : https://github.com/cipriancraciun/z-scratchpad
+* sources git   : 1abeee1c76fc4a40e1465e4810be0258992d1815
+* sources hash  : 51382d0da05c3e129fc73eac59754fad
+* uname node    : some-workstation
+* uname system  : Linux, 5.some-version, x86_64
+</code></pre>
+<h3>Build from source</h3>
+<p>Alternatively, one can just build the executable themselves (for example to get the latest unreleased changes).</p>
+<ul>
+<li>clone the repository:</li>
+</ul>
+<pre><code>git clone https://github.com/cipriancraciun/z-scratchpad ./z-scratchpad
+</code></pre>
+<ul>
+<li>switch to the sources folder:</li>
+</ul>
+<pre><code>cd ./z-scratchpad/sources
+</code></pre>
+<ul>
+<li>build the executable:</li>
+</ul>
+<pre><code>go build -o ./z-scratchpad ./cmd/main.go
+</code></pre>
+<ul>
+<li>copy the executable on the <code>$PATH</code>:</li>
 </ul>
 <pre><code>sudo cp ./z-scratchpad /usr/local/bin/z-scratchpad
 </code></pre>
@@ -281,8 +318,7 @@ Primary key fingerprint: 58FC 2194 FCC2 4783 99CB  220C 5A97 4037 A6FD 8839
 * uname system  : Linux, 5.some-version, x86_64
 </code></pre>
 <hr />
-<p><a name="features"></a></p>
-<h2>Features (and anti-features)</h2>
+<h2><span id="features">Features (and anti-features)</span></h2>
 <h3>Features and requirements</h3>
 <p>The following are the main requirements, sorted by priority, that I have in mind while implementing or extending <code>z-scratchpad</code>:</p>
 <ul>
@@ -303,8 +339,7 @@ Primary key fingerprint: 58FC 2194 FCC2 4783 99CB  220C 5A97 4037 A6FD 8839
 <p>Note that some requirements are marked with &quot;mandatory&quot; although are not at the top.
 The reason is that although during implementation they should be maintained, compromises can be made (for example in terms of performance).
 On the other hand, the higher some are on the list, the fewer compromises should be made.</p>
-<p><a name="anti-features"></a></p>
-<h3>Anti-features</h3>
+<h3><span id="anti-features">Anti-features</span></h3>
 <p>Conversely, there are also some negative requirements, or anti-features, that I keep in mind:</p>
 <ul>
 <li>(<strong>mandatory</strong>) does not support any non-text documents;  (it doesn't care what is inside the document, i.e. its syntax, as long as it's a plain text file;)</li>
@@ -321,8 +356,7 @@ On the other hand, the higher some are on the list, the fewer compromises should
 <li>does not prioritize Windows support;  (in theory it should work, however the Windows ecosystem lacks many of the tools relied-on by the TUI / GUI;)</li>
 <li>does not prioritize built-in advanced workflows;  (however, by using the CLI interface one can implement in his favorite scripting language any workflow one desires;)</li>
 </ul>
-<p><a name="ui"></a></p>
-<h3>UI considerations</h3>
+<h3><span id="ui">UI considerations</span></h3>
 <p>The careful reader might see that I've listed &quot;does not implement any TUI / GUI&quot; twice, both in features and anti-features, it was not a mistake.
 <code>z-scratchpad</code> should limit its UI requirements to the following primitive operations that can be provided by external tools.</p>
 <ul>
@@ -333,8 +367,55 @@ On the other hand, the higher some are on the list, the fewer compromises should
 </ul>
 <p>Anything that is not on this list should be made to fit a workflow based on these primitives.</p>
 <hr />
-<p><a name="how"></a></p>
-<h2>How, concepts, and inner workings...</h2>
+<h2><span id="performance">Performance</span></h2>
+<p>Given that <code>z-scratchpad</code> should run without a server, and furthermore that the actual notes are stored on the file-system,
+there is quite a lot to be asked in terms of performance...</p>
+<p>So I would start to describe some acceptable goals and limitations:</p>
+<ul>
+<li>it is expected that one doesn't have more than a couple of thousand notes in the same instance;  (for performance profiling I use ~15K documents, all in one folder;)</li>
+<li>it is expected that one uses SSD's, and that the system isn't under such heavy memory pressure that the buffer cache is starving;</li>
+<li>it is expected that write operations (like creating or changing a document) happen less frequently than read operations (like listing, browsing, or just viewing documents);</li>
+<li>it is expected to trade memory (both RAM or disk) in favor of CPU time;  (although it should be within reasonable bounds;)</li>
+<li>the implemented caching mechanism should be simple, as to keep the overall code simple and bug-free;  (as one once said, &quot;there are two hard things in computer science, cache invalidation and naming things&quot;;)</li>
+<li>cache invalidation requires to walk the file-system;  (we can't use the kernel's file-system notification mechanism, mainly because we don't have a server running in the background;)</li>
+<li>if one changes (adds, removes, or edits) the notes files without using the tool, one should manually call the tool to invalidate the cache;</li>
+<li>also let's take <a href="https://www.nngroup.com/articles/powers-of-10-time-scales-in-ux/">Jakob Nielsen's advice</a> with regard to delays in user experience:
+<ul>
+<li>0.1 seconds (100 milliseconds) -- &quot;users feel like their actions are directly causing something to happen on the screen&quot;;</li>
+<li>1 second -- &quot;users feel like the computer is causing the result;  although they notice the short delay, they stay focused on their current train of thought&quot;;</li>
+<li>10 seconds -- &quot;it breaks the user's flow&quot;;</li>
+</ul>
+</li>
+<li>at the moment, the tool requires all libraries, documents and index to be present in Go's memory as objects;  (there is no lazy loading;)</li>
+</ul>
+<p>That being said, in my initial performance profiling, with a library composed of ~15K CommonMark documents (generated via <a href="https://github.com/jaspervdj/lorem-markdownum">lorem-markdownum</a>),
+I've obtained the following times:</p>
+<ul>
+<li>walking the file-system, parsing the notes meta-data (not the CommonMark syntax), and indexing the entire library takes ~0.7 seconds (i.e. 700 milliseconds);
+<ul>
+<li>a good chunk of this time is spent computing document fingerprints (based on cryptographic hashes);</li>
+<li>another good chunk is spent actually interacting with the file-system;  (thus can't be optimized away;)</li>
+</ul>
+</li>
+<li>loading an already cached index takes ~0.05 seconds (i.e. 50 milliseconds);
+<ul>
+<li>the majority of the time is spent in deserializing the index cache file;</li>
+</ul>
+</li>
+</ul>
+<p>In order to obtain these numbers I had to resort to quite a few optimizations:</p>
+<ul>
+<li>replaced <code>SHA1</code> (and before that <code>SHA256</code>) with <a href="https://github.com/zeebo/blake3"><code>blake3</code></a> with AVX2 and SSE4.1 acceleration;</li>
+<li>disabled the Go garbage collector while we are parsing and indexing the notes;  (not much garbage is actually generated;)</li>
+<li>used memory-mapped files (for the serialized index cache file);</li>
+<li>used polled <code>byte.Buffer</code> instances, grouped by sizes;</li>
+<li>quite a few unsafe operations so that temporary <code>[N]byte</code> buffers don't escape the stack, and thus don't incur allocations;</li>
+</ul>
+<p>Therefore, at the moment, without complicating the code too much, this is the best one can achieve.
+(There is one low-hanging fruit, that of parallelizing the document parsing, however that only reduces the latency, not the overall CPU usage.)</p>
+<p>However, even with the current state, I think that the performance objective was achieved.</p>
+<hr />
+<h2><span id="how">How, concepts, and inner workings...</span></h2>
 <blockquote>
 <p><strong>WIP</strong> (work in progress)</p>
 </blockquote>
@@ -435,8 +516,7 @@ thus the interface doesn't need to do much except render the documents for easie
 <p><strong>TBC</strong> (to be continued)</p>
 </blockquote>
 <hr />
-<p><a name="why"></a></p>
-<h2>Why, and history and reasons...</h2>
+<h2><span id="why">Why, and history and reasons...</span></h2>
 <p>I've been a long time user of the <a href="https://moinmo.in/">MoinMoin</a> wiki,
 my earliest document being from April 2008,
 and I've used it for anything, from writing research papers,
@@ -517,8 +597,7 @@ one would observe that all are written in <strong>compiled languages</strong>,
 that yield actual <strong>native executables</strong>,
 and none of them are written in NodeJS...) :)</p>
 <hr />
-<p><a name="contributions"></a></p>
-<h2>Contributions</h2>
+<h2><span id="contributions">Contributions</span></h2>
 <p><strong>Bug reports, feature requests, and patches are always welcomed!</strong></p>
 <p>That being said, take into account that:</p>
 <ul>
@@ -533,8 +612,7 @@ or increase flexibility (especially with regard to integration with one's generi
 That doesn't mean the proposed idea is bad or worthless;  it just doesn't fit well with this tool.</p>
 <p>However, given it is an open-source project, one can always just fork the project and take it in any direction.</p>
 <hr />
-<p><a name="license"></a></p>
-<h2>Notice (copyright and licensing)</h2>
+<h2><span id="license">Notice (copyright and licensing)</span></h2>
 <h3>Notice -- short version</h3>
 <p>The code is licensed under GPL 3 or later.</p>
 <h3>Notice -- long version</h3>
