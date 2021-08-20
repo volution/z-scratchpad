@@ -17,9 +17,9 @@ import "strings"
 func PreMain () () {
 	
 	
-	runtime.GOMAXPROCS (2)
+	runtime.GOMAXPROCS (1)
 	debug.SetMaxThreads (128)
-	debug.SetGCPercent (200)
+	debug.SetGCPercent (-1)
 	
 	
 	log.SetFlags (0)

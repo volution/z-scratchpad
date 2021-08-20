@@ -11,6 +11,7 @@ import "os"
 import "path"
 import "path/filepath"
 import "runtime"
+import "runtime/debug"
 import "runtime/pprof"
 import "sort"
 import "strings"
@@ -559,6 +560,8 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 
 
 func MainWithFlagsAndContext (_command string, _flags *MainFlags, _configuration *MainConfiguration, _globals *Globals, _index *Index, _editor *Editor, _browser *Browser) (*Error) {
+	
+	debug.SetGCPercent (200)
 	
 	switch _command {
 		
