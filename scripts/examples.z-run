@@ -23,6 +23,8 @@
 :: examples / browse / select / library :: exec -- "${ZRUN[@]}" ':: examples / exec' browse -S "${@}"
 :: examples / browse / select / document :: exec -- "${ZRUN[@]}" ':: examples / exec' browse -s "${@}"
 :: examples / list :: exec -- "${ZRUN[@]}" ':: examples / exec' list "${@}"
+:: examples / list / libraries :: exec -- "${ZRUN[@]}" ':: examples / exec' list -t library "${@}"
+:: examples / list / documents :: exec -- "${ZRUN[@]}" ':: examples / exec' list -t document "${@}"
 :: examples / search :: exec -- "${ZRUN[@]}" ':: examples / exec' search "${@}"
 :: examples / search / body :: exec -- "${ZRUN[@]}" ':: examples / exec' search -W body "${@}"
 :: examples / grep :: exec -- "${ZRUN[@]}" ':: examples / exec' grep "${@}"

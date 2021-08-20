@@ -29,6 +29,8 @@
 :: run / browse / select / library :: exec -- "${ZRUN[@]}" ':: run / exec' browse -S "${@}"
 :: run / browse / select / document :: exec -- "${ZRUN[@]}" ':: run / exec' browse -s "${@}"
 :: run / list :: exec -- "${ZRUN[@]}" ':: run / exec' list "${@}"
+:: run / list / libraries :: exec -- "${ZRUN[@]}" ':: run / exec' list -t library "${@}"
+:: run / list / documents :: exec -- "${ZRUN[@]}" ':: run / exec' list -t document "${@}"
 :: run / search :: exec -- "${ZRUN[@]}" ':: run / exec' search "${@}"
 :: run / search / body :: exec -- "${ZRUN[@]}" ':: run / exec' search -W body "${@}"
 :: run / grep :: exec -- "${ZRUN[@]}" ':: run / exec' grep "${@}"
@@ -67,7 +69,7 @@
 		;;&
 		( all | cpu | memory )
 		;;
-		( hyperfine )
+		( hyperfine | time )
 		;;
 		( * )
 			printf -- '[ee]  invalid run profile `%s`;  aborting!\n' "${_profile}" >&2
@@ -113,8 +115,17 @@
 						--max-runs 100
 						--shell ''
 						--command-name z-scratchpad
+						--
 				)
-			exec -- "${_wrapper[@]}" -- "${_command[*]@Q}"
+			exec -- "${_wrapper[@]}" "${_command[*]@Q}"
+		;;
+		( time )
+			_wrapper=(
+					/usr/bin/time
+						-f '(( elapsed: %E (user: %U, kernel: %S), CPU: %P, memory: %M (faults: %F, swapped: %W), I/O: %I / %O (waits: %w) ))'
+						--
+				)
+			exec -- "${_wrapper[@]}" "${_command[@]}"
 		;;
 		( * )
 			exec -- "${_wrapper[@]}" "${_command[@]}"
@@ -135,6 +146,7 @@
 :: use / profile / all :: export -- __RUN_PROFILE=all
 :: use / profile / cpu :: export -- __RUN_PROFILE=cpu
 :: use / profile / memory :: export -- __RUN_PROFILE=memory
+:: use / profile / time :: export -- __RUN_PROFILE=time
 :: use / profile / hyperfine :: export -- __RUN_PROFILE=hyperfine
 
 
