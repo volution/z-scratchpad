@@ -34,6 +34,17 @@ use_library_as_identifier_prefix = false
 use_file_name_as_identifier = true
 use_file_extension_as_format = true
 
+[[library]]
+identifier = "loremipsum"
+name = "Lorem Ipsum"
+paths = ["./loremipsum"]
+edit_enabled = false
+create_enabled = false
+snapshot_enabled = true
+use_library_as_identifier_prefix = true
+use_file_name_as_identifier = true
+use_file_extension_as_format = true
+
 
 [globals]
 working_directory = "{CONF}"

@@ -8,6 +8,9 @@
 /examples/imports/**
 !/examples/imports/.gitignore
 
+/examples/loremipsum/**
+!/examples/loremipsum/.gitignore
+
 *~
 *#
 *.bak
