@@ -55,6 +55,7 @@ type LibraryFlags struct {
 type DebuggingFlags struct {
 	ProfileCpuPath *string `long:"profile-cpu-path" value-name:"{path}"`
 	ProfileMemoryPath *string `long:"profile-memory-path" value-name:"{path}"`
+	ProfileLoops *uint `long:"profile-loops" value-name:"{count}"`
 }
 
 type EditorConfiguration struct {
@@ -442,6 +443,22 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		} else {
 			_command = "help-abort"
 		}
+	}
+	
+	_profilingLoops := uint (0)
+	if _flags.Debugging.ProfileLoops != nil {
+		_profilingLoops = *_flags.Debugging.ProfileLoops
+	}
+	if _profilingLoops > 0 {
+		for _loop := uint (0); _loop < _profilingLoops; _loop += 1 {
+			if _error := MainWithFlags (_command, _flags, _configuration, _globals); _error != nil {
+				return _error
+			}
+			triggerAtExit (_globals)
+			_globals.atExitSignal = make (chan struct {})
+			debug.SetGCPercent (-1)
+		}
+		return nil
 	}
 	
 	return MainWithFlags (_command, _flags, _configuration, _globals)
