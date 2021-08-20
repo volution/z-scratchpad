@@ -26,8 +26,8 @@ type Library struct {
 	
 	CreateEnabled bool `toml:"create_enabled"`
 	CreatePath string `toml:"create_path"`
-	CreateNameTimestampLength uint `toml:"create_name_timestamp_length"`
-	CreateNameRandomLength uint `toml:"create_name_random_length"`
+	CreateNameTimestampLength uint8 `toml:"create_name_timestamp_length"`
+	CreateNameRandomLength uint8 `toml:"create_name_random_length"`
 	CreateExtension string `toml:"create_extension"`
 	
 	SnapshotEnabled bool `toml:"snapshot_enabled"`
@@ -157,6 +157,12 @@ func LibraryInitialize (_library *Library) (*Error) {
 	sort.Strings (_library.ExcludeGlobPatterns)
 	sort.Strings (_library.IncludeRegexPatterns)
 	sort.Strings (_library.ExcludeRegexPatterns)
+	
+	return libraryInitializeMatchers (_library)
+}
+
+
+func libraryInitializeMatchers (_library *Library) (*Error) {
 	
 	_library.includeGlobMatchers = make ([]glob.Glob, 0, len (_library.IncludeGlobPatterns))
 	for _, _pattern := range _library.IncludeGlobPatterns {

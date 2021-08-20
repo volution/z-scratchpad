@@ -33,6 +33,16 @@ type GlobalConfiguration struct {
 	XorgEnabled *bool `toml:"xorg_enabled"`
 }
 
+type IndexFlags struct {
+	LoadDisabled *bool `long:"index-disable-load"`
+	StoreDisabled *bool `long:"index-disable-store"`
+	WalkDisabled *bool `long:"index-disable-walk"`
+}
+
+type IndexConfiguration struct {
+	DatabasePath *string `toml:"database_path"`
+}
+
 type LibraryFlags struct {
 	Paths []string `long:"library-path" value-name:"{library-path}"`
 }
@@ -143,6 +153,7 @@ type MainFlags struct {
 	
 	Global *GlobalFlags `group:"Global options"`
 	Library *LibraryFlags `group:"Library options"`
+	Index *IndexFlags `group:"Index options"`
 	Debugging *DebuggingFlags `group:"Debugging options"`
 	
 	List *ListFlags `command:"list"`
@@ -164,6 +175,7 @@ type MainFlags struct {
 
 type MainConfiguration struct {
 	Global *GlobalConfiguration `toml:"globals"`
+	Index *IndexConfiguration `toml:"index"`
 	Editor *EditorConfiguration `toml:"editor"`
 	Libraries []*Library `toml:"library"`
 	Server *ServerConfiguration `toml:"server"`
@@ -200,6 +212,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			
 			Global : & GlobalFlags {},
 			Library : & LibraryFlags {},
+			Index : & IndexFlags {},
 			
 			List : & ListFlags {},
 			Search : & SearchFlags {},
@@ -218,6 +231,7 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	
 	_configuration := & MainConfiguration {
 			Global : & GlobalConfiguration {},
+			Index : & IndexConfiguration {},
 			Editor : & EditorConfiguration {},
 			Server : & ServerConfiguration {},
 			Browser : & BrowserConfiguration {},
@@ -438,12 +452,12 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 	_globals.TerminalEnabled = _globals.TerminalEnabled && flagBoolOrDefault (_configuration.Global.TerminalEnabled, true)
 	_globals.XorgEnabled = _globals.XorgEnabled && flagBoolOrDefault (_configuration.Global.XorgEnabled, true)
 	
-	_index, _error := IndexNew (_globals)
+	_libraries, _error := mainLibrariesResolve (_flags.Library, _configuration.Libraries)
 	if _error != nil {
 		return _error
 	}
 	
-	_error = mainLoadLibraries (_flags.Library, _configuration.Libraries, _globals, _index)
+	_index, _error := mainIndexNew (_flags.Index, _configuration.Index, _libraries, _globals)
 	if _error != nil {
 		return _error
 	}
@@ -1625,11 +1639,75 @@ func MainHelp (_flags *HelpFlags, _globals *Globals, _editor *Editor) (*Error) {
 
 
 
+func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libraries []*Library, _globals *Globals) (*Index, *Error) {
+	
+	_index, _error := IndexNew (_globals)
+	if _error != nil {
+		return nil, _error
+	}
+	
+	_databasePath := ""
+	if _configuration.DatabasePath != nil {
+		_databasePath = *_configuration.DatabasePath
+	}
+	
+	_databaseShouldLoad := ! flagBoolOrDefault (_flags.LoadDisabled, false)
+	_databaseShouldStore := ! flagBoolOrDefault (_flags.StoreDisabled, false)
+	_databaseShouldWalk := ! flagBoolOrDefault (_flags.WalkDisabled, false)
+	
+	if _databasePath == "" {
+		_databaseShouldLoad = false
+		_databaseShouldStore = false
+	}
+	
+	if _databaseShouldLoad {
+		if _, _error := os.Stat (_databasePath); _error == nil {
+			// NOP
+		} else if os.IsNotExist (_error) {
+			_databaseShouldLoad = false
+		} else {
+			return nil, errorw (0xc35078ab, _error)
+		}
+	}
+	
+	_databaseLoaded := false
+	if _databaseShouldLoad {
+		if _loaded, _error := IndexLoadFromPath (_index, _databasePath); _error != nil {
+			return nil, _error
+		} else if _loaded {
+			_databaseLoaded = true
+			_databaseShouldWalk = false
+			_databaseShouldStore = false
+		} else {
+			logf ('i', 0x1dff7d9a, "database not loaded due to incompatible versions;")
+		}
+	}
+	
+	if _databaseShouldWalk {
+		if _error := mainLibrariesLoad (_index, _libraries); _error != nil {
+			return nil, _error
+		}
+		_databaseLoaded = true
+	}
+	
+	if ! _databaseLoaded {
+		return nil, errorw (0xacfdaefc, nil)
+	}
+	
+	if _databaseShouldStore {
+		if _error := IndexStoreToPath (_index, _databasePath); _error != nil {
+			return nil, _error
+		}
+	}
+	
+	return _index, nil
+}
 
-func mainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _globals *Globals, _index *Index) (*Error) {
+
+func mainLibrariesResolve (_flags *LibraryFlags, _configuration []*Library) ([]*Library, *Error) {
 	
 	if (len (_flags.Paths) > 0) && (len (_configuration) > 0) {
-		return errorw (0x374ece0f, nil)
+		return nil, errorw (0x374ece0f, nil)
 	}
 	
 	_libraries := make ([]*Library, 0, 16)
@@ -1637,7 +1715,7 @@ func mainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _global
 	if len (_flags.Paths) > 0 {
 		_library, _error := mainLibraryForPaths (_flags.Paths)
 		if _error != nil {
-			return _error
+			return nil, _error
 		}
 		_libraries = append (_libraries, _library)
 	}
@@ -1651,14 +1729,20 @@ func mainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _global
 	}
 	
 	if len (_libraries) == 0 {
-		return errorw (0x00ea182b, nil)
+		return nil, errorw (0x00ea182b, nil)
 	}
 	
 	for _, _library := range _libraries {
 		if _error := LibraryInitialize (_library); _error != nil {
-			return _error
+			return nil, _error
 		}
 	}
+	
+	return _libraries, nil
+}
+
+
+func mainLibrariesLoad (_index *Index, _libraries []*Library) (*Error) {
 	
 	for _, _library := range _libraries {
 		
@@ -1703,16 +1787,21 @@ func mainLoadLibraries (_flags *LibraryFlags, _configuration []*Library, _global
 	}
 	
 	if false {
+		
 		// FIXME:  Make pre-rendering optional!
+		
 		_documents, _error := IndexDocumentsSelectAll (_index)
 		if _error != nil {
 			return _error
 		}
+		
 		for _, _document := range _documents {
+			
 			_, _error = DocumentRenderToText (_document)
 			if _error != nil {
 				return _error
 			}
+			
 			_, _error = DocumentRenderToHtml (_document)
 			if _error != nil {
 				return _error

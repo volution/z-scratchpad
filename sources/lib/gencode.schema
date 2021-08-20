@@ -1,0 +1,68 @@
+
+
+struct Document {
+	
+	Identifier string
+	Library string
+	Path string
+	PathInLibrary string
+	
+	Title string
+	TitleAlternatives []string
+	
+	SourceFingerprint string
+	
+	Format string
+	
+	BodyLines []string
+	BodyEmpty bool
+	BodyFingerprint string
+	
+	EditEnabled bool
+	Timestamp time
+}
+
+
+struct Library {
+	
+	Identifier string
+	Name string
+	
+	Paths []string
+	
+	EditEnabled bool
+	
+	CreateEnabled bool
+	CreatePath string
+	CreateNameTimestampLength uint8
+	CreateNameRandomLength uint8
+	CreateExtension string
+	
+	SnapshotEnabled bool
+	SnapshotExtension string
+	
+	IncludeGlobPatterns []string
+	ExcludeGlobPatterns []string
+	
+	IncludeRegexPatterns []string
+	ExcludeRegexPatterns []string
+	
+	UseLibraryAsIdentifierPrefix bool
+	UsePathInLibraryAsIdentifier bool
+	UseFileNameAsIdentifier bool
+	UsePathFingerprintAsIdentifier bool
+	UseFileExtensionAsFormat bool
+}
+
+
+struct IndexGob {
+	Documents []*Document
+	Libraries []*Library
+	LibraryDocuments []IndexLibraryDocumentsGob
+}
+
+struct IndexLibraryDocumentsGob {
+	Library string
+	Documents []string
+}
+
