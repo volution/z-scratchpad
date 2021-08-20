@@ -410,7 +410,8 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	if _globals.UniqueIdentifier == "" {
 		if _globals.ConfigurationPath != "" {
 			_token := fmt.Sprintf ("%s\000%s", UNAME_NODE, _globals.ConfigurationPath)
-			_globals.UniqueIdentifier = fingerprintString (_token) [:32]
+			_fingerprint := fingerprintString (_token)
+			_globals.UniqueIdentifier = _fingerprint
 		}
 	}
 	

@@ -106,7 +106,7 @@ func DocumentInitializeIdentifier_0 (_document *Document, _useLibraryPrefix bool
 	
 	if (_document.Path != "") && _usePathFingerprint {
 		_fingerprint := fingerprintString (_document.Path)
-		_documentName = _fingerprint[:32]
+		_documentName = _fingerprint
 		goto _resolve
 	}
 	

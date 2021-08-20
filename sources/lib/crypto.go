@@ -3,11 +3,11 @@
 package zscratchpad
 
 
-import "crypto/sha1"
 import crand "crypto/rand"
 import "encoding/hex"
-import "hash"
 import "runtime"
+
+import "github.com/zeebo/blake3"
 
 
 
@@ -19,14 +19,16 @@ func fingerprintString (_value string) (string) {
 }
 
 func fingerprintBytes (_value []byte) (string) {
-	_hasher := sha1.New ()
+	_hasher_0 := blacke3HasherPrototype
+	_hasher := &_hasher_0
 	_hasher.Write (_value)
 	return fingerprintFinalize (_hasher)
 }
 
 
 func fingerprintStringLines (_values []string) (string) {
-	_hasher := sha1.New ()
+	_hasher_0 := blacke3HasherPrototype
+	_hasher := &_hasher_0
 	_separator := []byte { '\n' }
 	for _, _value := range _values {
 		_hasher.Write (StringToBytes (_value))
@@ -37,14 +39,19 @@ func fingerprintStringLines (_values []string) (string) {
 }
 
 
-func fingerprintFinalize (_hasher hash.Hash) (string) {
-	var _data_0 [sha1.Size]byte
+func fingerprintFinalize (_hasher *blake3.Hasher) (string) {
+	if _hasher.Size () != 32 {
+		panic (0x4ac694be)
+	}
+	var _data_0 [32]byte
 	_data := NoEscapeBytes (_data_0[:])
 	_hasher.Sum (_data[:0])
-	_fingerprint := hex.EncodeToString (_data)
+	_fingerprint := hex.EncodeToString (_data[:16])
 	runtime.KeepAlive (_data_0)
 	return _fingerprint
 }
+
+var blacke3HasherPrototype blake3.Hasher = * blake3.New ()
 
 
 
