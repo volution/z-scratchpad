@@ -1942,6 +1942,11 @@ func mainLibrariesLoad (_libraries []*Library, _libraryDocuments [][][2]string) 
 				return nil, _error
 			}
 			
+			_error = DocumentInitializeTitle (_document, _library)
+			if _error != nil {
+				return nil, _error
+			}
+			
 			_documents = append (_documents, _document)
 		}
 	}

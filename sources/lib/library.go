@@ -39,6 +39,7 @@ type Library struct {
 	IncludeRegexPatterns []string `toml:"include_regex"`
 	ExcludeRegexPatterns []string `toml:"exclude_regex"`
 	
+	UseTitlePrefix string `toml:"use_title_prefix"`
 	UseLibraryAsIdentifierPrefix bool `toml:"use_library_as_identifier_prefix"`
 	UsePathInLibraryAsIdentifier bool `toml:"use_path_in_library_as_identifier"`
 	UseFileNameAsIdentifier bool `toml:"use_file_name_as_identifier"`

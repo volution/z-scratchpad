@@ -267,6 +267,9 @@ func editSessionFinalize (_session *editSession) (*Error) {
 		_session.error = _error
 		return editSessionClose (_session)
 	}
+	if _error := DocumentInitializeTitle (_session.documentNew, _session.library); _error != nil {
+		return editSessionClose (_session)
+	}
 	
 	if _session.editor.index == nil {
 		return editSessionClose (_session)

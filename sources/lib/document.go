@@ -216,6 +216,25 @@ var DocumentIdentifierRegex *regexp.Regexp = regexp.MustCompile (`^` + DocumentI
 
 
 
+func DocumentInitializeTitle (_document *Document, _library *Library) (*Error) {
+	if (_library != nil) && (_document.Library != _library.Identifier) {
+		return errorw (0x767046ec, nil)
+	}
+	if (_library == nil) || (_library.UseTitlePrefix == "") {
+		return nil
+	}
+	if _document.Title != "" {
+		_document.Title = _library.UseTitlePrefix + _document.Title
+	}
+	for _index := range _document.TitleAlternatives {
+		_document.TitleAlternatives[_index] = _library.UseTitlePrefix + _document.TitleAlternatives[_index]
+	}
+	return nil
+}
+
+
+
+
 func DocumentLoadFromPath (_path string) (*Document, *Error) {
 	
 	var _file *os.File
