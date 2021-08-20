@@ -8,10 +8,12 @@ import "io"
 import "os"
 import "path"
 import "regexp"
-import "sort"
 import "strings"
 import "time"
 import "unicode/utf8"
+
+
+import "github.com/akutz/sortfold"
 
 
 
@@ -395,7 +397,7 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 		}
 	}
 	
-	sort.Strings (_titles)
+	sortfold.Strings (_titles)
 	
 	_sourceFingerprint := fingerprintString (_source)
 	_bodyFingerprint := fingerprintStringLines (_bodyLines)

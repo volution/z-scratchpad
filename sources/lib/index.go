@@ -12,6 +12,9 @@ import "time"
 import "syscall"
 
 
+import "github.com/akutz/sortfold"
+
+
 
 
 type Index struct {
@@ -408,10 +411,12 @@ func DocumentsSort (_documents []*Document) () {
 
 func compareByNameOrIdentifier (_leftTitle, _leftIdentifier, _rightTitle, _rightIdentifier string) (bool) {
 	if (_leftTitle != "") && (_rightTitle != "") {
-		if _leftTitle == _rightTitle {
+		_order := sortfold.CompareFold (_leftTitle, _rightTitle)
+		if _order == 0 {
 			return _leftIdentifier < _rightIdentifier
+		} else {
+			return _order < 0
 		}
-		return _leftTitle < _rightTitle
 	} else if (_leftTitle == "") && (_rightTitle == "") {
 		return _leftIdentifier < _rightIdentifier
 	} else if (_leftTitle != "") {

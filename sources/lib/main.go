@@ -13,13 +13,13 @@ import "path/filepath"
 import "runtime"
 import "runtime/debug"
 import "runtime/pprof"
-import "sort"
 import "strings"
 import "time"
 
 
 import "github.com/jessevdk/go-flags"
 import "github.com/pelletier/go-toml"
+import "github.com/akutz/sortfold"
 
 
 
@@ -1332,7 +1332,7 @@ func mainListSelect (_options [][2]string, _editor *Editor) ([][2]string, *Error
 		}
 	}
 	
-	sort.Strings (_labels)
+	sortfold.Strings (_labels)
 	
 	_selection_0, _error := EditorSelect (_editor, _labels)
 	if _error != nil {
@@ -1372,7 +1372,7 @@ func mainListOutput (_options [][2]string, _format string, _globals *Globals) (*
 		_listSet[_value] = true
 	}
 	
-	sort.Strings (_list)
+	sortfold.Strings (_list)
 	
 	_buffer := BytesBufferNewSize (128 * 1024)
 	defer BytesBufferRelease (_buffer)
