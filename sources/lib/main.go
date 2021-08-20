@@ -1706,7 +1706,20 @@ func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libr
 			_databasePath = *_configuration.DatabasePath
 		}
 		if (_databasePath == "") && (_globals.UniqueIdentifier != "") {
-			_databasePath = path.Join ("{TMPDIR}", "z-scratchpad--" + _globals.UniqueIdentifier + ".db")
+			_databasePath = path.Join ("{CACHEDIR}", _globals.UniqueIdentifier + ".db")
+		}
+		if (_databasePath != "") && strings.HasPrefix (_databasePath, "{CACHEDIR}") {
+			_cachePath, _error := os.UserCacheDir ()
+			if _error != nil {
+				return nil, errorw (0xf1aa16da, _error)
+			}
+			_cachePath = path.Join (_cachePath, "z-scratchpad")
+			_error = os.MkdirAll (_cachePath, 0o750)
+			if _error != nil {
+				return nil, errorw (0xc65eca13, _error)
+			}
+			_databasePath = _databasePath[10:]
+			_databasePath = path.Join (_cachePath, _databasePath)
 		}
 		if (_databasePath != "") && strings.HasPrefix (_databasePath, "{TMPDIR}") {
 			_databasePath = _databasePath[8:]
