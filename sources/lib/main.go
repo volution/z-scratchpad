@@ -9,10 +9,12 @@ import "fmt"
 import "net"
 import "os"
 import "path"
+import "path/filepath"
 import "runtime"
 import "runtime/pprof"
 import "sort"
 import "strings"
+import "time"
 
 
 import "github.com/jessevdk/go-flags"
@@ -28,6 +30,7 @@ type GlobalFlags struct {
 }
 
 type GlobalConfiguration struct {
+	UniqueIdentifier *string `toml:"unique_identifier"`
 	WorkingDirectory *string `toml:"working_directory"`
 	TerminalEnabled *bool `toml:"terminal_enabled"`
 	XorgEnabled *bool `toml:"xorg_enabled"`
@@ -40,6 +43,7 @@ type IndexFlags struct {
 }
 
 type IndexConfiguration struct {
+	DatabaseEnabled *bool `toml:"database_enabled"`
 	DatabasePath *string `toml:"database_path"`
 }
 
@@ -174,12 +178,15 @@ type MainFlags struct {
 }
 
 type MainConfiguration struct {
+	
 	Global *GlobalConfiguration `toml:"globals"`
 	Index *IndexConfiguration `toml:"index"`
 	Editor *EditorConfiguration `toml:"editor"`
 	Libraries []*Library `toml:"library"`
+	
 	Server *ServerConfiguration `toml:"server"`
 	Browser *BrowserConfiguration `toml:"browser"`
+	
 	Menus []*Menu `toml:"menu"`
 }
 
@@ -361,6 +368,14 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		if _path == "" {
 			return errorw (0x9a6f64a7, nil)
 		}
+		_path, _error := filepath.Abs (_path)
+		if _error != nil {
+			return errorw (0xb9029faf, nil)
+		}
+		_path, _error = filepath.EvalSymlinks (_path)
+		if _error != nil {
+			return errorw (0x260be8f0, nil)
+		}
 		_dataBytes, _error := os.ReadFile (_path)
 		if _error != nil {
 			return errorw (0xf2be5f5f, _error)
@@ -383,11 +398,17 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 				_configuration.Libraries = []*Library { _library }
 			}
 		}
+		_globals.ConfigurationPath = _path
 	}
 	
-	if _flags.Global.WorkingDirectory != nil {
-		_flags.Global.WorkingDirectory = nil
-		_configuration.Global.WorkingDirectory = nil
+	if _configuration.Global.UniqueIdentifier != nil {
+		_globals.UniqueIdentifier = *_configuration.Global.UniqueIdentifier
+	}
+	if _globals.UniqueIdentifier == "" {
+		if _globals.ConfigurationPath != "" {
+			_token := fmt.Sprintf ("%s\000%s", UNAME_NODE, _globals.ConfigurationPath)
+			_globals.UniqueIdentifier = fingerprintString (_token) [:32]
+		}
 	}
 	
 	if _configuration.Server.UrlBase == nil {
@@ -439,10 +460,17 @@ func mainParserNew (_flags *MainFlags) (*flags.Parser, *Error) {
 
 func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConfiguration, _globals *Globals) (*Error) {
 	
-	if (_flags.Global.WorkingDirectory != nil) || (_configuration.Global.WorkingDirectory != nil) {
-		_path := flag2StringOrDefault (_flags.Global.WorkingDirectory, _configuration.Global.WorkingDirectory, "")
+	if _configuration.Global.WorkingDirectory != nil {
+		_path := *_configuration.Global.WorkingDirectory
 		if _path == "" {
 			return errorw (0xe7c58968, nil)
+		}
+		if _path == "{CONF}" {
+			if _globals.ConfigurationPath != "" {
+				_path = path.Dir (_globals.ConfigurationPath)
+			} else {
+				return errorw (0x7b7b780e, nil)
+			}
 		}
 		if _error := os.Chdir (_path); _error != nil {
 			return errorw (0x5aae8d30, _error)
@@ -1641,14 +1669,26 @@ func MainHelp (_flags *HelpFlags, _globals *Globals, _editor *Editor) (*Error) {
 
 func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libraries []*Library, _globals *Globals) (*Index, *Error) {
 	
+	_beginTimestamp := time.Now ()
+	
 	_index, _error := IndexNew (_globals)
 	if _error != nil {
 		return nil, _error
 	}
 	
 	_databasePath := ""
-	if _configuration.DatabasePath != nil {
-		_databasePath = *_configuration.DatabasePath
+	_databaseEnabled := flagBoolOrDefault (_configuration.DatabaseEnabled, true)
+	if _databaseEnabled {
+		if _configuration.DatabasePath != nil {
+			_databasePath = *_configuration.DatabasePath
+		}
+		if (_databasePath == "") && (_globals.UniqueIdentifier != "") {
+			_databasePath = path.Join ("{TMPDIR}", "z-scratchpad--" + _globals.UniqueIdentifier + ".db")
+		}
+		if (_databasePath != "") && strings.HasPrefix (_databasePath, "{TMPDIR}") {
+			_databasePath = _databasePath[8:]
+			_databasePath = path.Join (_globals.TemporaryDirectory, _databasePath)
+		}
 	}
 	
 	_databaseShouldLoad := ! flagBoolOrDefault (_flags.LoadDisabled, false)
@@ -1679,12 +1719,12 @@ func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libr
 			_databaseShouldWalk = false
 			_databaseShouldStore = false
 		} else {
-			logf ('i', 0x1dff7d9a, "database not loaded due to incompatible versions;")
+			logf ('i', 0x1dff7d9a, "index database not loaded due to incompatible versions;")
 		}
 	}
 	
 	if _databaseShouldWalk {
-		if _error := mainLibrariesLoad (_index, _libraries); _error != nil {
+		if _error := mainIndexWalkAndLoad (_index, _libraries); _error != nil {
 			return nil, _error
 		}
 		_databaseLoaded = true
@@ -1700,7 +1740,34 @@ func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libr
 		}
 	}
 	
+	_elapsed := time.Since (_beginTimestamp)
+	_elapsedMilliseconds := _elapsed.Milliseconds ()
+	if (_databaseShouldWalk && (_elapsedMilliseconds >= 200)) || (!_databaseShouldWalk && (_elapsedMilliseconds > 75)) {
+		logf ('d', 0x67aaf8be, "loading index took %d milliseconds...", _elapsedMilliseconds)
+	}
+	
 	return _index, nil
+}
+
+
+func mainIndexWalkAndLoad (_index *Index, _libraries []*Library) (*Error) {
+	
+	_documentPaths, _error := mainLibrariesWalk (_libraries)
+	if _error != nil {
+		return _error
+	}
+	
+	_documents, _error := mainLibrariesLoad (_libraries, _documentPaths)
+	if _error != nil {
+		return _error
+	}
+	
+	_error = mainLibrariesInclude (_index, _libraries, _documents)
+	if _error != nil {
+		return _error
+	}
+	
+	return nil
 }
 
 
@@ -1742,26 +1809,39 @@ func mainLibrariesResolve (_flags *LibraryFlags, _configuration []*Library) ([]*
 }
 
 
-func mainLibrariesLoad (_index *Index, _libraries []*Library) (*Error) {
+func mainLibrariesWalk (_libraries []*Library) ([][][2]string, *Error) {
+	
+	_documents := make ([][][2]string, 0, len (_libraries))
 	
 	for _, _library := range _libraries {
 		
-		_error := IndexLibraryInclude (_index, _library)
+		_libraryDocuments, _error := libraryDocumentsWalk (_library)
 		if _error != nil {
-			return _error
+			return nil, _error
 		}
 		
-		_documentPaths, _error := libraryDocumentsWalk (_library)
+		_documents = append (_documents, _libraryDocuments)
+	}
+	
+	return _documents, nil
+}
+
+
+func mainLibrariesLoad (_libraries []*Library, _libraryDocuments [][][2]string) ([]*Document, *Error) {
+	
+	_documents := make ([]*Document, 0, 16 * 1024)
+	
+	for _libraryIndex := range _libraries {
+		
+		_library := _libraries[_libraryIndex]
+		_libraryDocumentPaths := _libraryDocuments[_libraryIndex]
+		
+		_libraryDocuments, _error := libraryDocumentsLoad (_library, _libraryDocumentPaths)
 		if _error != nil {
-			return _error
+			return nil, _error
 		}
 		
-		_documents, _error := libraryDocumentsLoad (_library, _documentPaths)
-		if _error != nil {
-			return _error
-		}
-		
-		for _, _document := range _documents {
+		for _, _document := range _libraryDocuments {
 			
 			if _document.Library == "" {
 				_document.Library = _library.Identifier
@@ -1771,41 +1851,35 @@ func mainLibrariesLoad (_index *Index, _libraries []*Library) (*Error) {
 			
 			_error = DocumentInitializeIdentifier (_document, _library)
 			if _error != nil {
-				return _error
+				return nil, _error
 			}
 			
 			_error = DocumentInitializeFormat (_document, _library)
 			if _error != nil {
-				return _error
+				return nil, _error
 			}
 			
-			_error = IndexDocumentInclude (_index, _document)
-			if _error != nil {
-				return _error
-			}
+			_documents = append (_documents, _document)
 		}
 	}
 	
-	if false {
-		
-		// FIXME:  Make pre-rendering optional!
-		
-		_documents, _error := IndexDocumentsSelectAll (_index)
+	return _documents, nil
+}
+
+
+func mainLibrariesInclude (_index *Index, _libraries []*Library, _documents []*Document) (*Error) {
+	
+	for _, _library := range _libraries {
+		_error := IndexLibraryInclude (_index, _library)
 		if _error != nil {
 			return _error
 		}
+	}
+	for _, _document := range _documents {
 		
-		for _, _document := range _documents {
-			
-			_, _error = DocumentRenderToText (_document)
-			if _error != nil {
-				return _error
-			}
-			
-			_, _error = DocumentRenderToHtml (_document)
-			if _error != nil {
-				return _error
-			}
+		_error := IndexDocumentInclude (_index, _document)
+		if _error != nil {
+			return _error
 		}
 	}
 	

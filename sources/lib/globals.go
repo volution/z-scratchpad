@@ -38,6 +38,10 @@ type Globals struct {
 	Environment map[string]string
 	EnvironmentList []string
 	
+	ConfigurationPath string
+	UniqueIdentifier string
+	TemporaryDirectory string
+	
 	DevNull *os.File
 }
 
@@ -58,6 +62,12 @@ func GlobalsNew (_executable string, _environment map[string]string) (*Globals, 
 			Executable : _executable,
 			Environment : _environment,
 		}
+	
+	_globals.TemporaryDirectory = os.TempDir ()
+	if _globals.TemporaryDirectory == "" {
+		return nil, errorw (0x77b3b743, nil)
+	}
+	_globals.Environment["TMPDIR"] = _globals.TemporaryDirectory
 	
 	_globals.StdinIsTty = isTerminal (_globals.Stdin)
 	_globals.StdoutIsTty = isTerminal (_globals.Stdout)

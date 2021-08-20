@@ -9,6 +9,7 @@ import "fmt"
 import "os"
 import "sort"
 import "time"
+import "syscall"
 
 
 
@@ -58,12 +59,36 @@ func IndexLoadFromPath (_index *Index, _path string) (bool, *Error) {
 	}
 	defer _file.Close ()
 	
-	_buffer := BytesBufferNewSize (64 * 1024 * 1024)
-	defer BytesBufferRelease (_buffer)
+	_buffer := (*bytes.Buffer) (nil)
 	
-	_, _error = _buffer.ReadFrom (_file)
-	if _error != nil {
-		return false, errorw (0xc25b03c8, _error)
+	if true {
+		
+		_stat, _error := _file.Stat ()
+		if _error != nil {
+			return false, errorw (0xab7f7fce, _error)
+		}
+		_size := _stat.Size ()
+		if _size == 0 {
+			return false, errorw (0x2ee0990b, _error)
+		}
+		
+		_memory, _error := syscall.Mmap (int (_file.Fd ()), 0, int (_size), syscall.PROT_READ, syscall.MAP_SHARED)
+		if _error != nil {
+			return false, errorw (0x486ddaae, _error)
+		}
+		defer syscall.Munmap (_memory)
+		
+		_buffer = bytes.NewBuffer (_memory)
+		
+	} else {
+		
+		_buffer := BytesBufferNewSize (64 * 1024 * 1024)
+		defer BytesBufferRelease (_buffer)
+		
+		_, _error = _buffer.ReadFrom (_file)
+		if _error != nil {
+			return false, errorw (0xc25b03c8, _error)
+		}
 	}
 	
 	return IndexLoadFromBuffer (_index, _buffer)

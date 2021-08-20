@@ -36,6 +36,7 @@ use_file_extension_as_format = true
 
 
 [globals]
+working_directory = "{CONF}"
 terminal_enabled = true
 xorg_enabled = true
 
