@@ -293,6 +293,7 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 	var _titles []string
 	
 	_body := _source
+	_headerPrefix := ""
 	for {
 		
 		if _body == "" {
@@ -308,13 +309,23 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 			break
 		}
 		
-		if ! strings.HasPrefix (_header, "## ") {
-			break
+		if _headerPrefix != "" {
+			if ! strings.HasPrefix (_header, _headerPrefix) {
+				break
+			}
+		} else {
+			if strings.HasPrefix (_header, "## ") {
+				_headerPrefix = "## "
+			} else if strings.HasPrefix (_header, "# ") {
+				_headerPrefix = "# "
+			} else {
+				break
+			}
 		}
 		
 		_body = _rest
 		
-		_header = _header[3:]
+		_header = _header[len (_headerPrefix):]
 		_header = stringTrimSpaces (_header)
 		
 		if _header == "" {
