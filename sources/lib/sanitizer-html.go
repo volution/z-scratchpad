@@ -32,6 +32,7 @@ func DocumentSanitizeHtml (_document *Document, _unsafe string) (string, *Docume
 	_parser.RequireNoFollowOnLinks (true)
 	_parser.RequireNoReferrerOnLinks (true)
 	_parser.RequireCrossOriginAnonymous (true)
+	_parser.AllowAttrs("class") .Globally ()
 	
 	_unsafeBuffer := bytes.NewBufferString (_unsafe)
 	

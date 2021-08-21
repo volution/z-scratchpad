@@ -244,7 +244,8 @@ main.document ul > li::marker {
 	content : "\25aa\00a0";
 }
 
-main.document-format-gemini ul > li::marker {
+main.document-format-gemini ul.links > li::marker {
+	font-size : 1.25em;
 	content : "\21d2\00a0";
 }
 
