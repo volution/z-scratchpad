@@ -357,9 +357,9 @@ func EditorSelect (_editor *Editor, _options []string) ([]string, *Error) {
 	
 	if _terminal {
 		if _tmuxConnection, _ := _globals.Environment["TMUX"]; _tmuxConnection != "" {
-			if _tmuxPane, _error := exec.LookPath ("tmux-pane"); _error == nil {
-				_command.Args = append ([]string { _tmuxPane, "--", _command.Path }, _command.Args[1:] ...)
-				_command.Path = _tmuxPane
+			if _tmuxPopup, _error := exec.LookPath ("tmux-popup"); _error == nil {
+				_command.Args = append ([]string { _tmuxPopup, "--", _command.Path }, _command.Args[1:] ...)
+				_command.Path = _tmuxPopup
 			}
 		}
 	}
