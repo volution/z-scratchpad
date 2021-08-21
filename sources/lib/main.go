@@ -1982,7 +1982,7 @@ func mainLibraryForPaths (_paths []string) (*Library, *Error) {
 			Paths : _paths,
 			UsePathInLibraryAsIdentifier : true,
 			UseFileExtensionAsFormat : true,
-			IncludeGlobPatterns : []string { "**/*.{txt,md}" },
+			IncludeGlobPatterns : []string { "**/*.{md,markdown,gmi,gemini,txt,text}" },
 			EditEnabled : true,
 			CreateEnabled : true,
 			CreatePath : _paths[0],

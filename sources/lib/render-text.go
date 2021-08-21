@@ -29,7 +29,10 @@ func DocumentRenderToText (_document *Document) (string, *Error) {
 			_render, _error = documentRenderSnippetsToText (_document.BodyLines)
 		
 		case "commonmark" :
-			_render, _error = documentRenderCommonMarkToText (_document.BodyLines)
+			_render, _error = documentRenderCommonmarkToText (_document.BodyLines)
+		
+		case "gemini" :
+			_render, _error = documentRenderGeminiToText (_document.BodyLines)
 		
 		default :
 			return "", errorf (0x215b1603, "format invalid `%s`", _document.Format)
@@ -47,7 +50,12 @@ func DocumentRenderToText (_document *Document) (string, *Error) {
 
 
 
-func documentRenderCommonMarkToText (_source []string) (string, *Error) {
+func documentRenderCommonmarkToText (_source []string) (string, *Error) {
+	// FIXME:  Implement rendering to plain text!
+	return documentRenderAnyToText (_source)
+}
+
+func documentRenderGeminiToText (_source []string) (string, *Error) {
 	// FIXME:  Implement rendering to plain text!
 	return documentRenderAnyToText (_source)
 }

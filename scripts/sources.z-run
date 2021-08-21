@@ -186,6 +186,7 @@
 			--filter="${_sources}/go.*" \
 			--filter="${_sources}/cmd/**" \
 			--filter="${_sources}/lib/**" \
+			--filter="${_sources}/extensions/**" \
 			--filter="${_sources}/embedded/*.go" \
 			--filter="${_sources}/embedded/templates/**" \
 			--filter="${_sources}/embedded/assets/**" \

@@ -151,9 +151,11 @@ func DocumentInitializeFormat_0 (_document *Document, _useFileExtension bool) (*
 		if _, _extension, _error := pathSplitFileNameAndExtension (_document.Path); _error == nil {
 			_format := ""
 			switch _extension {
-				case "md" :
+				case "md", "markdown" :
 					_format = "commonmark"
-				case "txt" :
+				case "gmi", "gemini" :
+					_format = "gemini"
+				case "txt", "text" :
 					_format = "text"
 			}
 			if _format != "" {
@@ -399,7 +401,7 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 	}
 	if _format != "" {
 		switch _format {
-			case "commonmark", "snippets", "text" :
+			case "commonmark", "gemini", "snippets", "text" :
 				// NOP
 			case "markdown" :
 				_format = "commonmark"

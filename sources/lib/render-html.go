@@ -32,7 +32,10 @@ func DocumentRenderToHtml (_document *Document) (string, *Error) {
 			_render, _error = documentRenderSnippetsToHtml (_document.BodyLines)
 		
 		case "commonmark" :
-			_render, _error = documentRenderCommonMarkToHtml (_document.BodyLines)
+			_render, _error = documentRenderCommonmarkToHtml (_document.BodyLines)
+		
+		case "gemini" :
+			_render, _error = documentRenderGeminiToHtml (_document.BodyLines)
 		
 		default :
 			return "", errorf (0xaf60ea6d, "format invalid `%s`", _document.Format)
@@ -56,8 +59,12 @@ func DocumentRenderToHtml (_document *Document) (string, *Error) {
 
 
 
-func documentRenderCommonMarkToHtml (_source []string) (string, *Error) {
-	return parseAndRenderCommonMarkToHtml (_source)
+func documentRenderCommonmarkToHtml (_source []string) (string, *Error) {
+	return parseAndRenderCommonmarkToHtml (_source)
+}
+
+func documentRenderGeminiToHtml (_source []string) (string, *Error) {
+	return parseAndRenderGeminiToHtml (_source)
 }
 
 func documentRenderSnippetsToHtml (_source []string) (string, *Error) {

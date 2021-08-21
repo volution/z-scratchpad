@@ -229,16 +229,23 @@ main.document dl {
 	margin-bottom : 1.50rem;
 }
 
-main.document p + ul,
-main.document p + ol,
-main.document p + dl {
+main.document-format-commonmark p + ul,
+main.document-format-commonmark p + ol,
+main.document-format-commonmark p + dl {
 	margin-top : -1.25rem;
 }
 
 main.document ul > li::marker,
 main.document ol > li::marker {
-	content : "\25aa\00a0";
 	font-size : 1em;
+}
+
+main.document ul > li::marker {
+	content : "\25aa\00a0";
+}
+
+main.document-format-gemini ul > li::marker {
+	content : "\21d2\00a0";
 }
 
 main.document ul > li:not(:first-child),
@@ -303,6 +310,7 @@ main.document pre {
 }
 
 main.document-format-commonmark pre,
+main.document-format-gemini pre,
 main.document-format-snippets pre {
 	margin-top : 1.50rem;
 	margin-bottom : 1.50rem;
@@ -320,17 +328,21 @@ main.document li > pre {
 }
 
 main.document-format-commonmark pre,
+main.document-format-gemini pre,
 main.document-format-snippets pre {
 	background : hsl(0, 0%, 12%);
 }
 main.document-format-commonmark code,
+main.document-format-gemini code,
 main.document-format-snippets code {
 	background : hsl(0, 0%, 18%);
 }
 
 main.document-format-commonmark pre:hover,
+main.document-format-gemini pre:hover,
 main.document-format-snippets pre:hover,
 main.document-format-commonmark code:hover,
+main.document-format-gemini code:hover,
 main.document-format-snippets code:hover {
 	background : hsl(30, 50%, 15%);
 }

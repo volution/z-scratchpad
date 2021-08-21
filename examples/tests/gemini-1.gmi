@@ -1,0 +1,42 @@
+## gemini (with extension)
+
+# How to create text/gemini documents
+
+## Headings
+
+Headings are supported at three different levels denoted by starting a line of text with 1-3 '#' characters followed by a space and some text:
+
+# I am the biggest heading
+## I am the mid-size heading
+### I am the smallest heading
+
+Some clients/browsers will create tables of contents for documents based on these headings, others will show them in different font sizes, while other will just display the text as is. When displayed as is a viewer can still see that they are hedings and what their neting level is by the number of '#' characters they see preceding the text.
+
+
+## Links
+
+Links are created by starting a line with `=> ` followed by the url, a space, and the text you would like the user to see:
+
+=> https://gemlog.blue Start creating your own gemlog!
+=> https://gemlog.blue Visit us over gemini
+
+You may have noticed that gemini supports links to other protocols (the above example includes a web link, beginning with `https`, and a gemini link, beginning with `gemini`). This crosslinking support is one of the great strengths of the gemini protocol.
+
+
+## Block Quotes
+
+> Lines that start with > are treated as "block quotes".
+
+
+## Pre-formatted text
+
+Preformatted text lines are the most complicated type of line in text/gemini. They function as a sort of toggle. You toggle on preformatted mode with three back tick characters (``` at the beginning of the line) and toggle off with three more. The starting line of ``` can also include "alt" text after the back ticks. This will usually not be shown to the user, but is useful for search engines, screen readers, or users using clients that allow it to be shown.
+
+Using pre-formatted text mode you can display ascii art, poetry with irregular spacing, code, etc. without the client reworking the spaces in your lines.
+
+``` Ascii art: smiley face
+0  0
+ L
+\__/
+```
+

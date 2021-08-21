@@ -15,7 +15,7 @@ import goldmark_text "github.com/yuin/goldmark/text"
 
 
 
-func parseAndRenderCommonMarkToHtml (_sourceLines []string) (string, *Error) {
+func parseAndRenderCommonmarkToHtml (_sourceLines []string) (string, *Error) {
 	
 	_sourceBuffer := BytesBufferNewSize (128 * 1024)
 	defer BytesBufferRelease (_sourceBuffer)
