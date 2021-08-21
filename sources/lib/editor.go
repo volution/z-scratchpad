@@ -244,31 +244,35 @@ func editSessionFinalize (_session *editSession) (*Error) {
 		return editSessionClose (_session)
 	}
 	
-	if _session.documentOld != nil {
-		_session.documentNew.Library = _session.documentOld.Library
-		_session.documentNew.PathInLibrary = _session.documentOld.PathInLibrary
-		_session.documentNew.EditEnabled = _session.documentOld.EditEnabled
-		if _session.documentNew.Format == "" {
-			_session.documentNew.Format = _session.documentOld.Format
-		}
-	} else {
-		if _session.library != nil {
-			_session.documentNew.Library = _session.library.Identifier
-			_session.documentNew.PathInLibrary = _session.pathInLibrary
-			_session.documentNew.EditEnabled = _session.library.EditEnabled
+	if _session.documentNew != nil {
+		if _session.documentOld != nil {
+			_session.documentNew.Library = _session.documentOld.Library
+			_session.documentNew.PathInLibrary = _session.documentOld.PathInLibrary
+			_session.documentNew.EditEnabled = _session.documentOld.EditEnabled
+			if _session.documentNew.Format == "" {
+				_session.documentNew.Format = _session.documentOld.Format
+			}
+		} else {
+			if _session.library != nil {
+				_session.documentNew.Library = _session.library.Identifier
+				_session.documentNew.PathInLibrary = _session.pathInLibrary
+				_session.documentNew.EditEnabled = _session.library.EditEnabled
+			}
 		}
 	}
 	
-	if _error := DocumentInitializeIdentifier (_session.documentNew, _session.library); _error != nil {
-		_session.error = _error
-		return editSessionClose (_session)
-	}
-	if _error := DocumentInitializeFormat (_session.documentNew, _session.library); _error != nil {
-		_session.error = _error
-		return editSessionClose (_session)
-	}
-	if _error := DocumentInitializeTitle (_session.documentNew, _session.library); _error != nil {
-		return editSessionClose (_session)
+	if _session.documentNew != nil {
+		if _error := DocumentInitializeIdentifier (_session.documentNew, _session.library); _error != nil {
+			_session.error = _error
+			return editSessionClose (_session)
+		}
+		if _error := DocumentInitializeFormat (_session.documentNew, _session.library); _error != nil {
+			_session.error = _error
+			return editSessionClose (_session)
+		}
+		if _error := DocumentInitializeTitle (_session.documentNew, _session.library); _error != nil {
+			return editSessionClose (_session)
+		}
 	}
 	
 	if _session.editor.index == nil {
@@ -282,12 +286,19 @@ func editSessionFinalize (_session *editSession) (*Error) {
 		
 //		logf ('d', 0x44c67acc, "[editor-session]  reindexing document for `%s`...", _session.path)
 		
-		if _error := IndexDocumentUpdate (_session.editor.index, _session.documentNew, _session.documentOld); _error != nil {
-			_session.error = _error
-			return editSessionClose (_session)
+		if _session.documentNew != nil {
+			if _error := IndexDocumentUpdate (_session.editor.index, _session.documentNew, _session.documentOld); _error != nil {
+				_session.error = _error
+				return editSessionClose (_session)
+			}
+		} else {
+			if _error := IndexDocumentExclude (_session.editor.index, _session.documentOld); _error != nil {
+				_session.error = _error
+				return editSessionClose (_session)
+			}
 		}
 		
-	} else {
+	} else if _session.documentNew != nil {
 		
 //		logf ('d', 0x5ee2c034, "[editor-session]  indexing document for `%s`...", _session.path)
 		

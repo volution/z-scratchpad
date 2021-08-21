@@ -278,8 +278,10 @@ func DocumentLoadFromPath (_path string) (*Document, *Error) {
 		return nil, _error
 	}
 	
-	_document.Path = _path
-	_document.Timestamp = _timestamp
+	if _document != nil {
+		_document.Path = _path
+		_document.Timestamp = _timestamp
+	}
 	
 	return _document, nil
 }
@@ -296,6 +298,7 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 	
 	_body := _source
 	_headerPrefix := ""
+	_headerEmpty := true
 	for {
 		
 		if _body == "" {
@@ -326,6 +329,7 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 		}
 		
 		_body = _rest
+		_headerEmpty = false
 		
 		_header = _header[len (_headerPrefix):]
 		_header = stringTrimSpaces (_header)
@@ -388,6 +392,9 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 		_bodyLines = _bodyLines[: len (_bodyLines) - _bodyLinesEmpty]
 	}
 	
+	if _headerEmpty && _bodyEmpty {
+		return nil, nil
+	}
 	
 	if _identifier != "" {
 		if ! DocumentIdentifierWithoutLibraryRegex.MatchString (_identifier) {

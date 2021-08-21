@@ -213,6 +213,9 @@ func libraryDocumentsLoad (_library *Library, _documentPaths [][2]string) ([]*Do
 	
 	for _, _documentPath := range _documentPaths {
 		if _document, _error := DocumentLoadFromPath (_documentPath[0]); _error == nil {
+			if _document == nil {
+				continue
+			}
 			_document.PathInLibrary = _documentPath[1]
 			_documents = append (_documents, _document)
 		} else {
