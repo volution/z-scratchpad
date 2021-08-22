@@ -132,7 +132,8 @@ type ServerConfiguration struct {
 	EditEnabled *bool `toml:"edit_enabled"`
 	CreateEnabled *bool `toml:"create_enabled"`
 	BrowseEnabled *bool `toml:"browse_enabled"`
-	ConfirmOpenExternal *bool `toml:"confirm_open_external"`
+	OpenExternalConfirm *bool `toml:"open_external_confirm"`
+	OpenExternalConfirmSkipForSchemas *[]string `toml:"open_external_confirm_skip_for_schemas"`
 }
 
 
@@ -1422,7 +1423,8 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 	_editEnabled := flag2BoolOrDefault (_flags.EditEnabled, _configuration.EditEnabled, false)
 	_createEnabled := flag2BoolOrDefault (_flags.CreateEnabled, _configuration.CreateEnabled, false)
 	_browseEnabled := flag2BoolOrDefault (_flags.BrowseEnabled, _configuration.BrowseEnabled, false)
-	_confirmOpenExternal := flagBoolOrDefault (_configuration.ConfirmOpenExternal, true)
+	_openExternalConfirm := flagBoolOrDefault (_configuration.OpenExternalConfirm, true)
+	_openExternalConfirmSkipForSchemas := flagStringsOrDefault (_configuration.OpenExternalConfirmSkipForSchemas, nil)
 	
 	_endpoint := fmt.Sprintf ("%s:%d", _endpointIp, _endpointPort)
 	
@@ -1443,7 +1445,8 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 	_server.EditEnabled = _server.EditEnabled && _editEnabled
 	_server.CreateEnabled = _server.CreateEnabled && _createEnabled
 	_server.BrowseEnabled = _server.BrowseEnabled && _browseEnabled
-	_server.ConfirmOpenExternal = _server.ConfirmOpenExternal || _confirmOpenExternal
+	_server.OpenExternalConfirm = _server.OpenExternalConfirm || _openExternalConfirm
+	_server.OpenExternalConfirmSkipForSchemas = append (_server.OpenExternalConfirmSkipForSchemas, _openExternalConfirmSkipForSchemas ...)
 	
 	_error = ServerRun (_server)
 	if _error != nil {
@@ -2071,6 +2074,13 @@ func flagStringOrDefault (_value *string, _default string) (string) {
 	return _default
 }
 
+func flagStringsOrDefault (_value *[]string, _default []string) ([]string) {
+	if _value != nil {
+		return *_value
+	}
+	return _default
+}
+
 
 func flag2BoolOrDefault (_value_1 *bool, _value_2 *bool, _default bool) (bool) {
 	if _value_1 != nil {
@@ -2093,6 +2103,16 @@ func flag2Uint16OrDefault (_value_1 *uint16, _value_2 *uint16, _default uint16) 
 }
 
 func flag2StringOrDefault (_value_1 *string, _value_2 *string, _default string) (string) {
+	if _value_1 != nil {
+		return *_value_1
+	}
+	if _value_2 != nil {
+		return *_value_2
+	}
+	return _default
+}
+
+func flag2StringsOrDefault (_value_1 *[]string, _value_2 *[]string, _default []string) ([]string) {
 	if _value_1 != nil {
 		return *_value_1
 	}

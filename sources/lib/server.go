@@ -30,7 +30,9 @@ type Server struct {
 	EditEnabled bool
 	CreateEnabled bool
 	BrowseEnabled bool
-	ConfirmOpenExternal bool
+	
+	OpenExternalConfirm bool
+	OpenExternalConfirmSkipForSchemas []string
 	
 	reloadToken string
 	
@@ -437,6 +439,7 @@ func ServerHandleDocumentEdit (_server *Server, _identifierUnsafe string, _respo
 
 func ServerHandleUrlLaunch (_server *Server, _urlEncoded string, _response http.ResponseWriter) (*Error) {
 	// FIXME:  We should add some type of signature so that we aren't injected malicious URL's!
+	// FIXME:  We should make sure this is via a `POST` request!
 	_urlLaunch_0, _error := base64.RawURLEncoding.DecodeString (_urlEncoded)
 	if _error != nil {
 		return errorw (0x06ca25ef, _error)
@@ -458,14 +461,20 @@ func ServerHandleUrlLaunch (_server *Server, _urlEncoded string, _response http.
 
 func ServerHandleUrlOpen (_server *Server, _urlEncoded string, _response http.ResponseWriter) (*Error) {
 	// FIXME:  We should add some type of signature so that we aren't injected malicious URL's!
-	if !_server.ConfirmOpenExternal {
-		return ServerHandleUrlLaunch (_server, _urlEncoded, _response)
-	}
 	_urlOpen_0, _error := base64.RawURLEncoding.DecodeString (_urlEncoded)
+	_urlOpen := string (_urlOpen_0)
 	if _error != nil {
 		return errorw (0x34d08c61, _error)
 	}
-	_urlOpen := string (_urlOpen_0)
+	if !_server.OpenExternalConfirm {
+		return ServerHandleUrlLaunch (_server, _urlEncoded, _response)
+	} else {
+		for _, _schema := range _server.OpenExternalConfirmSkipForSchemas {
+			if strings.HasPrefix (_urlOpen, _schema + ":") {
+				return ServerHandleUrlLaunch (_server, _urlEncoded, _response)
+			}
+		}
+	}
 	_context := struct {
 			Server *Server
 			UrlEncoded string

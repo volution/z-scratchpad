@@ -69,7 +69,8 @@ endpoint_port = 8080
 edit_enabled = true
 create_enabled = true
 browse_enabled = true
-confirm_open_external = false
+open_external_confirm = true
+open_external_confirm_skip_for_schemas = ["http", "https"]
 
 [browser]
 terminal_open_internal_command = ["x-www", "ask", "open", "{{url}}"]
