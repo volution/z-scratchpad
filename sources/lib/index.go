@@ -22,6 +22,7 @@ type Index struct {
 	documents map[string]*Document
 	libraries map[string]*Library
 	libraryDocuments map[string]map[string]bool
+	documentsRefresh bool
 	dirtyCallback func () ()
 }
 
@@ -46,6 +47,7 @@ func IndexNew (_globals *Globals) (*Index, *Error) {
 			documents : make (map[string]*Document, 16 * 1024),
 			libraries : make (map[string]*Library, 128),
 			libraryDocuments : make (map[string]map[string]bool, 128),
+			documentsRefresh : true,
 		}
 	return _index, nil
 }

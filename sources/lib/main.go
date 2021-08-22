@@ -41,11 +41,13 @@ type IndexFlags struct {
 	LoadDisabled *bool `long:"index-disable-load"`
 	StoreDisabled *bool `long:"index-disable-store"`
 	WalkDisabled *bool `long:"index-disable-walk"`
+	RefreshDisabled *bool `long:"index-disable-refresh"`
 }
 
 type IndexConfiguration struct {
 	DatabaseEnabled *bool `toml:"database_enabled"`
 	DatabasePath *string `toml:"database_path"`
+	DocumentsRefresh *bool `toml:"documents_refresh"`
 }
 
 type LibraryFlags struct {
@@ -1749,6 +1751,12 @@ func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libr
 	_databaseShouldStore := ! flagBoolOrDefault (_flags.StoreDisabled, false)
 	_databaseShouldWalk := ! flagBoolOrDefault (_flags.WalkDisabled, false)
 	_databaseShouldDirty := true
+	
+	_documentsRefresh := true
+	_documentsRefresh = _documentsRefresh && ! flagBoolOrDefault (_flags.WalkDisabled, false)
+	_documentsRefresh = _documentsRefresh && ! flagBoolOrDefault (_flags.RefreshDisabled, false)
+	_documentsRefresh = _documentsRefresh && flagBoolOrDefault (_configuration.DocumentsRefresh, true)
+	_index.documentsRefresh = _index.documentsRefresh && _documentsRefresh
 	
 	if _databasePath == "" {
 		_databaseShouldLoad = false

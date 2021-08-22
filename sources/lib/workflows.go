@@ -3,6 +3,7 @@
 package zscratchpad
 
 
+import "os"
 import "time"
 
 
@@ -180,6 +181,9 @@ func WorkflowDocumentResolve (_identifierUnsafe string, _index *Index) (*Documen
 	if _document == nil {
 		return nil, errorw (0x054e7a60, nil)
 	}
+	if _index.documentsRefresh {
+		return WorkflowDocumentRefresh (_document, _index)
+	}
 	return _document, nil
 }
 
@@ -197,5 +201,84 @@ func WorkflowDocumentAndLibraryResolve (_identifierUnsafe string, _index *Index)
 		return nil, nil, _error
 	}
 	return _document, _library, nil
+}
+
+
+
+
+func WorkflowDocumentRefresh (_document *Document, _index *Index) (*Document, *Error) {
+	
+	_path := _document.Path
+	if _path == "" {
+		return _document, nil
+	}
+	
+	if _stat, _error := os.Stat (_path); _error == nil {
+		if _stat.ModTime () == _document.Timestamp {
+			return _document, nil
+		}
+	} else {
+		return nil, errorw (0x4eee8052, _error)
+	}
+	
+	return WorkflowDocumentReload (_document, _index)
+}
+
+
+func WorkflowDocumentReload (_documentOld *Document, _index *Index) (*Document, *Error) {
+	
+	_path := _documentOld.Path
+	if _path == "" {
+		return nil, errorw (0xffd44d56, nil)
+	}
+	
+	_documentNew := (*Document) (nil)
+	if _document_0, _error := DocumentLoadFromPath (_path); _error == nil {
+		_documentNew = _document_0
+	} else {
+		return nil, _error
+	}
+	
+	if _documentNew == nil {
+		return nil, nil
+	}
+	
+	_documentNew.Library = _documentOld.Library
+	_documentNew.PathInLibrary = _documentOld.PathInLibrary
+	_documentNew.EditEnabled = _documentOld.EditEnabled
+	if _documentNew.Format == "" {
+		_documentNew.Format = _documentOld.Format
+	}
+	
+	_library, _error := IndexLibraryResolve (_index, _documentNew.Library)
+	if _error != nil {
+		return nil, _error
+	}
+	
+	if _error := DocumentInitializeIdentifier (_documentNew, _library); _error != nil {
+		return nil, _error
+	}
+	if _error := DocumentInitializeFormat (_documentNew, _library); _error != nil {
+		return nil, _error
+	}
+	if _error := DocumentInitializeTitle (_documentNew, _library); _error != nil {
+		return nil, _error
+	}
+	
+	_index.globals.MutexLock ()
+	defer _index.globals.MutexUnlock ()
+	
+	if _error := IndexDocumentUpdate (_index, _documentNew, _documentOld); _error != nil {
+		return nil, _error
+	}
+	
+	if _documentOld.Identifier != _documentNew.Identifier {
+		return nil, errorw (0x0fbda748, nil)
+	}
+	if _documentOld.Library != _documentNew.Library {
+		return nil, errorw (0xd67618cf, nil)
+	}
+	
+	return _documentNew, nil
 }
 
