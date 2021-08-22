@@ -16,17 +16,19 @@
 			<hr/><hr/>
 		</header>
 		
-		<main class="document dialogue">
-			<p>
-				Delegate the following <strong>external</strong> URL to the browser launcher?
-				<br/>
-				<a href="/ul/{{ .UrlEncoded }}">{{ .UrlOpen }}</a>
-			</p>
-			<p>
-				Open the following <strong>external</strong> URL in this browser tab?
-				<br/>
-				<a href="{{ .UrlOpen }}" rel="nofollow noreferrer">{{ .UrlOpen }}</a>
-			</p>
+		<main class="dialogue">
+			<section>
+				<div>
+					<p><strong>Delegate the following external URL to the browser launcher?</strong></p>
+					<ul><li><a href="/ul/{{ .UrlEncoded }}"><strong>{{ .UrlOpen }}</strong></a></li></ul>
+				</div>
+			</section>
+			<section>
+				<div>
+					<p>Open the following external URL in this window?</p>
+					<ul><li><a href="{{ .UrlOpen }}" rel="nofollow noreferrer">{{ .UrlOpen }}</a></li></ul>
+				</div>
+			</section>
 		</main>
 		
 		<footer>

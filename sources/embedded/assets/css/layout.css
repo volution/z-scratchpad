@@ -24,7 +24,6 @@ html:root > body > main {
 	margin-bottom : 4.50rem;
 	padding-top : 4.50rem;
 	padding-bottom : 4.50rem;
-	background : hsl(0, 0%, 15%);
 }
 
 html:root > body > header {
@@ -111,16 +110,19 @@ html:root > body > footer > hr {
 
 
 
+main.index > *,
 main.document > *,
 main.dialogue > * {
 	display : block;
 }
 
+main.index > *:first-child,
 main.document > *:first-child,
 main.dialogue > *:first-child {
 	margin-top : 0px;
 }
 
+main.index > *:last-child,
 main.document > *:last-child,
 main.dialogue > *:last-child {
 	margin-bottom : 0px;
@@ -129,10 +131,12 @@ main.dialogue > *:last-child {
 
 
 
+main.index,
 main.document,
 main.dialogue {
 	padding-left : 2ch;
 	padding-right : 2ch;
+	background-color : hsl(0, 0%, 15%);
 }
 
 main.document-format-snippets,
@@ -147,6 +151,15 @@ main.dialogue {
 	padding-left : 2ch;
 	padding-right : 2ch;
 	background-color : hsl(45, 100%, 15%);
+}
+
+
+
+
+main.index > *,
+main.dialogue > * {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
 }
 
 
@@ -344,6 +357,12 @@ main.document-format-text pre {
 	padding-bottom : 1ch;
 	padding-left : 1ch;
 	padding-right : 1ch;
+}
+
+main.document-format-snippets pre,
+main.document-format-text pre {
+	padding-left : 2ch;
+	padding-right : 2ch;
 }
 
 main.document blockquote > pre,

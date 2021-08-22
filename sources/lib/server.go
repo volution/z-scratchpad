@@ -491,11 +491,11 @@ func ServerHandleUrlOpen (_server *Server, _urlEncoded string, _response http.Re
 	_context := struct {
 			Server *Server
 			UrlEncoded string
-			UrlOpen string
+			UrlOpen html_template.URL
 		} {
 			_server,
 			_urlEncoded,
-			_urlOpen,
+			html_template.URL (_urlOpen),
 		}
 	return respondWithHtmlTemplate (_response, _server.templates.urlOpenHtml, _context, true)
 }

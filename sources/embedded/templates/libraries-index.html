@@ -16,16 +16,18 @@
 			<hr/><hr/>
 		</header>
 		
-		<main>
-			{{ if .Libraries }}
-				<ul>
-					{{ range $_, $library := .Libraries }}
-						<li class="search-candidate">{{ template "library-html-a-link" $library }}</li>
-					{{ end }}
-				</ul>
-			{{ else }}
-				<p>No libraries!</p>
-			{{ end }}
+		<main class="index">
+			<section>
+				{{ if .Libraries }}
+					<ul>
+						{{ range $_, $library := .Libraries }}
+							<li class="search-candidate">{{ template "library-html-a-link" $library }}</li>
+						{{ end }}
+					</ul>
+				{{ else }}
+					<p>No libraries!</p>
+				{{ end }}
+			</section>
 		</main>
 		
 		<footer>

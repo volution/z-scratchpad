@@ -18,16 +18,18 @@
 			<hr/><hr/>
 		</header>
 		
-		<main>
-			{{ if .Documents }}
-				<ul>
-					{{ range $_, $document := .Documents }}
-						<li class="search-candidate">{{ template "document-html-a-link" $document }}</li>
-					{{ end }}
-				</ul>
-			{{ else }}
-				<p>No documents!</p>
-			{{ end }}
+		<main class="index">
+			<section>
+				{{ if .Documents }}
+					<ul>
+						{{ range $_, $document := .Documents }}
+							<li class="search-candidate">{{ template "document-html-a-link" $document }}</li>
+						{{ end }}
+					</ul>
+				{{ else }}
+					<p>No documents!</p>
+				{{ end }}
+			</section>
 		</main>
 		
 		<footer>

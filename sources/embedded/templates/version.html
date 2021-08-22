@@ -13,8 +13,8 @@
 			<h1>{version}</h1>
 		</header>
 		
-		<main>
-			<pre>
+		<main class="document document-format-text">
+			<pre><code>
 * version       : {{ .BuildVersion }}
 * build target  : {{ .BuildTarget }}, {{ .BuildTargetOs }}-{{ .BuildTargetArch }}, {{ .BuildCompilerVersion }}, {{ .BuildCompilerType }}
 * build number  : {{ .BuildNumber }}, {{ .BuildTimestamp }}
@@ -22,7 +22,7 @@
 * sources git   : {{ .BuildGitHash }}
 * sources hash  : {{ .BuildSourcesHash }}
 * uname system  : {{ .UnameSystem }}, {{ .UnameRelease }}, {{ .UnameMachine }}
-			</pre>
+			</code></pre>
 		</main>
 		
 	</body>
