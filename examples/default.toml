@@ -38,6 +38,7 @@ use_file_extension_as_format = true
 identifier = "loremipsum"
 name = "Lorem Ipsum"
 paths = ["./loremipsum"]
+disabled = true
 edit_enabled = false
 create_enabled = false
 snapshot_enabled = true

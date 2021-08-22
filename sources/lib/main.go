@@ -1882,6 +1882,18 @@ func mainLibrariesResolve (_flags *LibraryFlags, _configuration []*Library) ([]*
 		return nil, errorw (0x00ea182b, nil)
 	}
 	
+	for _index := 0; _index < len (_libraries); _index += 1 {
+		if ! _libraries[_index].Disabled {
+			continue
+		}
+		if _index < len (_libraries) - 1 {
+			copy (_libraries[_index :], _libraries[_index + 1 :])
+			_libraries[_index + 1] = nil
+			_index -= 1
+		}
+		_libraries = _libraries[: len (_libraries) - 1]
+	}
+	
 	for _, _library := range _libraries {
 		if _error := LibraryInitialize (_library); _error != nil {
 			return nil, _error

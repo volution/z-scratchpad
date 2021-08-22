@@ -22,6 +22,7 @@ type Library struct {
 	
 	Paths []string `toml:"paths"`
 	
+	Disabled bool `toml:"disabled"`
 	EditEnabled bool `toml:"edit_enabled"`
 	
 	CreateEnabled bool `toml:"create_enabled"`
