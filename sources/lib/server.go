@@ -123,10 +123,10 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 	}
 	
 	if _path == "/__/heartbeat" {
-		return respondWithBuffer (_response, "text/plain", bytes.NewBufferString ("OK\n"))
+		return respondWithTextString (_response, "OK\n")
 	}
 	if _path == "/__/reload" {
-		return respondWithBuffer (_response, "text/plain", bytes.NewBufferString (_server.reloadToken))
+		return respondWithTextString (_response, _server.reloadToken)
 	}
 	
 	if _path == "/" {
@@ -150,6 +150,10 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 	if strings.HasPrefix (_path, "/d/") {
 		_identifier := _path[3:]
 		return ServerHandleDocumentView (_server, _identifier, _response)
+	}
+	if strings.HasPrefix (_path, "/df/") {
+		_identifier := _path[4:]
+		return ServerHandleDocumentFingerprint (_server, _identifier, _response)
 	}
 	if strings.HasPrefix (_path, "/dx/html/") {
 		_identifier := _path[9:]
@@ -334,6 +338,15 @@ func ServerHandleDocumentView (_server *Server, _identifierUnsafe string, _respo
 			html_template.HTML (_documentHtml),
 		}
 	return respondWithHtmlTemplate (_response, _server.templates.documentViewHtml, _context, true)
+}
+
+
+func ServerHandleDocumentFingerprint (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
+	_document, _error := serverDocumentResolve (_server, _identifierUnsafe)
+	if _error != nil {
+		return _error
+	}
+	return respondWithTextString (_response, _document.SourceFingerprint)
 }
 
 
@@ -562,12 +575,12 @@ func ServerHandleVersion (_server *Server, _response http.ResponseWriter) (*Erro
 
 
 func ServerHandleSourcesMd5 (_server *Server, _response http.ResponseWriter) (*Error) {
-	return respondWithBuffer (_response, "text/plain; charset=utf-8", bytes.NewBufferString (BUILD_SOURCES_MD5))
+	return respondWithTextString (_response, BUILD_SOURCES_MD5)
 }
 
 func ServerHandleSourcesCpio (_server *Server, _response http.ResponseWriter) (*Error) {
 	_response.Header () .Add ("Content-Encoding", "gzip")
-	return respondWithBuffer (_response, "text/plain; charset=utf-8", bytes.NewBuffer (BUILD_SOURCES_CPIO_GZ))
+	return respondWithBuffer (_response, "application/x-cpio", bytes.NewBuffer (BUILD_SOURCES_CPIO_GZ))
 }
 
 
@@ -668,6 +681,9 @@ func respondWithHtmlTemplate (_response http.ResponseWriter, _template *html_tem
 	return respondWithHtmlBuffer (_response, _buffer)
 }
 
+
+
+
 func respondWithTextTemplate (_response http.ResponseWriter, _template *text_template.Template, _context interface{}) (*Error) {
 	_buffer := bytes.NewBuffer (nil)
 	if _error := _template.Execute (_buffer, _context); _error != nil {
@@ -675,6 +691,8 @@ func respondWithTextTemplate (_response http.ResponseWriter, _template *text_tem
 	}
 	return respondWithBuffer (_response, "text/plain; charset=utf-8", _buffer)
 }
+
+
 
 
 func respondWithHtmlString (_response http.ResponseWriter, _body string) (*Error) {
@@ -689,6 +707,21 @@ func respondWithHtmlBytes (_response http.ResponseWriter, _body []byte) (*Error)
 
 func respondWithHtmlBuffer (_response http.ResponseWriter, _body *bytes.Buffer) (*Error) {
 	return respondWithBuffer (_response, "text/html; charset=utf-8", _body)
+}
+
+
+func respondWithTextString (_response http.ResponseWriter, _body string) (*Error) {
+	_buffer := bytes.NewBufferString (_body)
+	return respondWithTextBuffer (_response, _buffer)
+}
+
+func respondWithTextBytes (_response http.ResponseWriter, _body []byte) (*Error) {
+	_buffer := bytes.NewBuffer (_body)
+	return respondWithTextBuffer (_response, _buffer)
+}
+
+func respondWithTextBuffer (_response http.ResponseWriter, _body *bytes.Buffer) (*Error) {
+	return respondWithBuffer (_response, "text/plain; charset=utf-8", _body)
 }
 
 

@@ -65,6 +65,10 @@
 {{- end }}
 
 
+{{ define "library-html-head-js" }}
+{{ end }}
+
+
 
 
 {{ define "document-html-head-title" -}}
@@ -149,6 +153,13 @@
 {{- end }}
 
 
+{{ define "document-html-head-js" }}
+	<script async="true">
+		window.addEventListener ("DOMContentLoaded", (_event) => window.zscratchpadReloadInitialize ("/df/{{ .Identifier }}", 1000));
+	</script>
+{{ end }}
+
+
 
 
 {{ define "global-html-header-nav" -}}
@@ -200,5 +211,8 @@
 {{ define "global-html-head-js" }}
 	<script src="/assets/js/search.js" defer="true"></script>
 	<script src="/assets/js/reload.js" defer="true"></script>
+	<script async="true">
+		window.addEventListener ("DOMContentLoaded", (_event) => window.zscratchpadReloadInitialize ("/__/reload", 1000));
+	</script>
 {{ end }}
 

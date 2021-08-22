@@ -117,7 +117,11 @@
 				}
 			});
 		
-		_queryInput.focus ();
+		window.addEventListener ("load", (_event) => {
+				if (window.scrollY == 0) {
+					_focus ();
+				}
+			});
 	}
 	
 	

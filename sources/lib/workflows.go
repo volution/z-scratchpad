@@ -265,9 +265,6 @@ func WorkflowDocumentReload (_documentOld *Document, _index *Index) (*Document, 
 		return nil, _error
 	}
 	
-	_index.globals.MutexLock ()
-	defer _index.globals.MutexUnlock ()
-	
 	if _error := IndexDocumentUpdate (_index, _documentNew, _documentOld); _error != nil {
 		return nil, _error
 	}
