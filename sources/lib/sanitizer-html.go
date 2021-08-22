@@ -32,7 +32,10 @@ func DocumentSanitizeHtml (_document *Document, _unsafe string) (string, *Docume
 	_parser.RequireNoFollowOnLinks (true)
 	_parser.RequireNoReferrerOnLinks (true)
 	_parser.RequireCrossOriginAnonymous (true)
-	_parser.AllowAttrs("class") .Globally ()
+	_parser.AllowAttrs ("class") .Globally ()
+	
+	// FIXME:  Make this configurable!
+	_parser.AllowURLSchemes ("mailto", "http", "https", "ftp", "file", "gopher", "gemini", "s", "sd", "sl", "w")
 	
 	_unsafeBuffer := bytes.NewBufferString (_unsafe)
 	
@@ -87,6 +90,32 @@ func DocumentSanitizeUrl (_url *url.URL) (*Error) {
 	_url.Scheme = strings.ToLower (_url.Scheme)
 	_url.Host = strings.ToLower (_url.Host)
 	
+	if (_url.Scheme == "s") || (_url.Scheme == "sd") || (_url.Scheme == "sl") {
+		if _url.Opaque == "" {
+			return errorw (0xe54d28c0, nil)
+		}
+		_path := ""
+		switch _url.Scheme {
+			case "s" :
+				_path = "/"
+			case "sd" :
+				_path = "/d/"
+			case "sl" :
+				_path = "/l/"
+		}
+		_path += _url.Opaque
+		*_url = url.URL {
+				Path : _path,
+			}
+	} else if _url.Scheme == "w" {
+		if _url.Opaque == "" {
+			return errorw (0x5e327a52, nil)
+		}
+		*_url = url.URL {
+				Path : "/w/" + _url.Opaque,
+			}
+	}
+	
 	if (_url.Scheme == "") && (_url.Host != "") {
 		_url.Scheme = "http"
 	}
@@ -108,6 +137,7 @@ func DocumentSanitizeUrl (_url *url.URL) (*Error) {
 	if _url.Path == "" {
 		return errorw (0x1a8fa951, nil)
 	}
+	
 	_path := _url.Path
 	if _path == "/" {
 		return nil
@@ -131,6 +161,11 @@ func DocumentSanitizeUrl (_url *url.URL) (*Error) {
 		return nil
 	}
 	if strings.HasPrefix (_path, "/i/") {
+		// _identifier := _path[4:]
+		// FIXME: ...
+		return nil
+	}
+	if strings.HasPrefix (_path, "/w/") {
 		// _identifier := _path[4:]
 		// FIXME: ...
 		return nil
