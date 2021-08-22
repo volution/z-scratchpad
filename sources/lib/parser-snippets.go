@@ -32,13 +32,13 @@ type SnippetEmptyBlock struct {
 
 func (_block *SnippetTextBlock) RenderHtmlInto (_buffer *bytes.Buffer) (*Error) {
 	
-	_buffer.WriteString ("<pre>\n")
+	_buffer.WriteString ("<pre><code>")
 	for _, _line := range _block.Lines {
 		_line = html.EscapeString (_line)
 		_buffer.WriteString (_line)
 		_buffer.WriteString ("\n")
 	}
-	_buffer.WriteString ("</pre>\n")
+	_buffer.WriteString ("</code></pre>\n")
 	
 	return nil
 }

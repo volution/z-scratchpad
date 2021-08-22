@@ -79,13 +79,13 @@ func documentRenderTextToHtml (_source []string) (string, *Error) {
 	_buffer := BytesBufferNewSize (128 * 1024)
 	defer BytesBufferRelease (_buffer)
 	
-	_buffer.WriteString ("<pre>\n")
+	_buffer.WriteString ("<pre><code>")
 	for _, _line := range _source {
 		_line = html.EscapeString (_line)
 		_buffer.WriteString (_line)
 		_buffer.WriteString ("\n")
 	}
-	_buffer.WriteString ("</pre>\n")
+	_buffer.WriteString ("</code></pre>\n")
 	
 	_output := string (_buffer.Bytes ())
 	
