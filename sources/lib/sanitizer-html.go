@@ -301,8 +301,47 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 	if _node.Type == html.ElementNode {
 		_error := (*Error) (nil)
 		switch _node.DataAtom {
+			
 			case atom.A :
+				
+				_href := ""
+				for _, _attribute := range _node.Attr {
+					if _attribute.Key == "href" {
+						_href = _attribute.Val
+						break
+					}
+				}
+				_href = strings.TrimSpace (_href)
+				
 				_error = _mangleAttribute (_node, "href", "", true)
+				
+				{
+					_hasContent := (func (_node *html.Node) (bool)) (nil)
+					_hasContent = func (_node *html.Node) (bool) {
+							if _node.Type == html.TextNode {
+								if strings.TrimSpace (_node.Data) != "" {
+									return true
+								}
+							}
+							for _child := _node.FirstChild; _child != nil; _child = _child.NextSibling {
+								if _hasContent (_child) {
+									return true
+								}
+							}
+							return false
+						}
+					if ! _hasContent (_node) {
+						_label := _href
+						if _label == "" {
+							_label = "<link>"
+						}
+						_node.AppendChild (& html.Node {
+								Type : html.TextNode,
+								Data : _label,
+							})
+					}
+				}
+				
 			case atom.Area :
 				_error = _mangleAttribute (_node, "href", "alt", true)
 			case atom.Blockquote, atom.Q, atom.Ins, atom.Del :
