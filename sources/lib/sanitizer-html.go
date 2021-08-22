@@ -170,7 +170,9 @@ func DocumentSanitizeUrl (_url *url.URL) (*Error) {
 		// FIXME: ...
 		return nil
 	}
-	return errorw (0x13ced7ac, nil)
+	logf ('e', 0x1849c719, "`%s`", _url)
+	*_url = url.URL { Path : "/ue/" }
+	return nil
 }
 
 
