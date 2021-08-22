@@ -83,7 +83,7 @@
 						break;
 					
 					case "Enter" :
-						_activateResult ();
+						_activateResult (_event);
 						_event.stopPropagation ();
 						_event.preventDefault ();
 						break;
@@ -120,6 +120,10 @@
 		window.addEventListener ("load", (_event) => {
 				if (window.scrollY == 0) {
 					_focus ();
+				}
+				{
+					let _query = _queryInput.value;
+					_search (_query);
 				}
 			});
 	}
@@ -365,14 +369,34 @@
 	
 	
 	
-	function _activateResult () {
+	function _activateResult (_event) {
+		
 		let _highlighted = _resultsList.querySelector (".search-result-highlight");
 		if (_highlighted === null) {
 			return;
 		}
-//		console.debug ("[dd][53034474]");
+		
 		_queryInput.select ();
-		_highlighted.firstChild.click ();
+		
+		let _target = _highlighted.firstChild;
+		if (_target === null) {
+			return;
+		}
+		
+		if ((_target.tagName == "A") && (_target.href != "")) {
+			let _newTab = false;
+			if ((_event !== undefined) && _event.ctrlKey) {
+				_newTab = true;
+			}
+			let _options = "noopener=yes,noreferrer=yes";
+			if (_newTab) {
+				window.open (_target.href, "_blank", _options);
+			} else {
+				window.open (_target.href, "_top", _options);
+			}
+		} else {
+			_target.click ();
+		}
 	}
 	
 	
