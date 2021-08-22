@@ -94,3 +94,22 @@ Links without label or target:
 * [no-target]()
 * (<a></a>) | (<a href=""></a>) | <a href="https://example.com/"></a>
 
+
+
+
+## Tests
+
+* [document with \[ and \] in title](sd:some-document)
+* [document with \[ in title](sd:some-document)
+* [document with \] in title](sd:some-document)
+* [document with ( and ) in title](sd:some-document)
+* [document with ( in title](sd:some-document)
+* [document with ) in title](sd:some-document)
+* [document with { and } in title](sd:some-document)
+* [document with { in title](sd:some-document)
+* [document with } in title](sd:some-document)
+* [document with 1 \ \ in title ](sd:some-document)
+* [document with 2 \ \\ in title](sd:some-document)
+* [document with 3 \ \\\ in title](sd:some-document)
+* [document with 4 \ \\\\ in title](sd:some-document)
+
