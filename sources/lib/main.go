@@ -70,14 +70,14 @@ type EditorConfiguration struct {
 type ListFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Type *string `long:"type" short:"t" choice:"library" choice:"document"`
-	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path"`
+	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"commonmark-link"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
 }
 
 type SearchFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Type *string `long:"type" short:"t" choice:"library" choice:"document"`
-	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path"`
+	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"commonmark-link"`
 	How *string `long:"how" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
 	Action *string `long:"action" short:"a" chouce:"output" choice:"edit" choice:"export" choice:"browse"`
@@ -86,7 +86,7 @@ type SearchFlags struct {
 
 type GrepFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
-	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path"`
+	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"commonmark-link"`
 	Where *string `long:"where" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json" choice:"context"`
 	Terms []string `long:"term" short:"t" value-name:"{term}"`
@@ -1171,6 +1171,12 @@ func mainListOptions (_libraryIdentifier string, _type string, _labelSource stri
 						}
 					case "path" :
 						_values = _library.Paths
+					case "commonmark-link" :
+						_valueEscaped := _library.Name
+						_valueEscaped = strings.ReplaceAll (_valueEscaped, "\\", "\\\\")
+						_valueEscaped = strings.ReplaceAll (_valueEscaped, "[", "\\[")
+						_valueEscaped = strings.ReplaceAll (_valueEscaped, "]", "\\]")
+						_value = fmt.Sprintf ("[%s](sl:%s)", _valueEscaped, _library.Identifier)
 					case "body" :
 						return nil, errorw (0xabd3314f, nil)
 					default :
@@ -1261,6 +1267,12 @@ func mainListOptions (_libraryIdentifier string, _type string, _labelSource stri
 						}
 					case "path" :
 						_value = _document.Path
+					case "commonmark-link" :
+						_valueEscaped := _document.Title
+						_valueEscaped = strings.ReplaceAll (_valueEscaped, "\\", "\\\\")
+						_valueEscaped = strings.ReplaceAll (_valueEscaped, "[", "\\[")
+						_valueEscaped = strings.ReplaceAll (_valueEscaped, "]", "\\]")
+						_value = fmt.Sprintf ("[%s](sd:%s)", _valueEscaped, _document.Identifier)
 					case "body" :
 						_values = make ([]string, 0, 1024)
 						for _, _line := range _document.BodyLines {
