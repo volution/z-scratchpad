@@ -1534,7 +1534,11 @@ func MainBrowse (_flags *BrowseFlags, _globals *Globals, _index *Index, _editor 
 	if _libraryIdentifier != "" {
 		return WorkflowLibraryBrowse (_libraryIdentifier, _index, _browser, true)
 	}
-	return WorkflowIndexBrowse (_index, _browser, true)
+	if _authenticate {
+		return BrowserHomeOpen (_browser, true)
+	} else {
+		return BrowserIndexOpen (_browser, true)
+	}
 }
 
 

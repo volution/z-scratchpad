@@ -40,63 +40,62 @@ func BrowserNew (_globals *Globals, _index *Index) (*Browser, *Error) {
 
 func BrowserDocumentOpen (_browser *Browser, _library *Library, _document *Document, _synchronous bool) (*Error) {
 	
-	if _browser.ServerUrlBase == "" {
-		return errorw (0x2de8cc31, nil)
-	}
-	
 	_url := "/d/" + _document.Identifier
-	_url = strings.TrimRight (_browser.ServerUrlBase, "/") + _url
 	
-	if _browser.ServerAuthenticationSecret != "" {
-		if _token, _error := generateHmac (_browser.ServerAuthenticationSecret, "/__/authenticate/{query}"); _error == nil {
-			_url += "?authenticate=" + _token
-		} else {
-			return _error
-		}
-	}
-	
-	return browserUrlOpen (_browser, _url, true, _synchronous)
+	return BrowserUrlServerOpen (_browser, _url, _synchronous)
 }
 
 
 func BrowserLibraryOpen (_browser *Browser, _library *Library, _synchronous bool) (*Error) {
 	
-	if _browser.ServerUrlBase == "" {
-		return errorw (0x9f457963, nil)
-	}
-	
 	_url := "/l/" + _library.Identifier
-	_url = strings.TrimRight (_browser.ServerUrlBase, "/") + _url
 	
-	if _browser.ServerAuthenticationSecret != "" {
-		if _token, _error := generateHmac (_browser.ServerAuthenticationSecret, "/__/authenticate/{query}"); _error == nil {
-			_url += "?authenticate=" + _token
-		} else {
-			return _error
-		}
-	}
-	
-	return browserUrlOpen (_browser, _url, true, _synchronous)
+	return BrowserUrlServerOpen (_browser, _url, _synchronous)
 }
 
 
 func BrowserIndexOpen (_browser *Browser, _synchronous bool) (*Error) {
 	
-	if _browser.ServerUrlBase == "" {
-		return errorw (0x82107e2f, nil)
+	_url := "/i/"
+	
+	return BrowserUrlServerOpen (_browser, _url, _synchronous)
+}
+
+
+func BrowserHomeOpen (_browser *Browser, _synchronous bool) (*Error) {
+	
+	_url := "/"
+	
+	return BrowserUrlServerOpen (_browser, _url, _synchronous)
+}
+
+
+func BrowserUrlServerOpen (_browser *Browser, _url string, _synchronous bool) (*Error) {
+	
+	if ! strings.HasPrefix (_url, "/") {
+		return errorw (0x2df1ba81, nil)
 	}
 	
-	_url := "/i/"
+	if _browser.ServerUrlBase == "" {
+		return errorw (0xb682d39c, nil)
+	}
+	
 	_url = strings.TrimRight (_browser.ServerUrlBase, "/") + _url
 	
 	if _browser.ServerAuthenticationSecret != "" {
 		if _token, _error := generateHmac (_browser.ServerAuthenticationSecret, "/__/authenticate/{query}"); _error == nil {
+			// FIXME: Perhaps check if there are other arguments!
 			_url += "?authenticate=" + _token
 		} else {
 			return _error
 		}
 	}
 	
+	return BrowserUrlInternalOpen (_browser, _url, _synchronous)
+}
+
+
+func BrowserUrlInternalOpen (_browser *Browser, _url string, _synchronous bool) (*Error) {
 	return browserUrlOpen (_browser, _url, true, _synchronous)
 }
 
