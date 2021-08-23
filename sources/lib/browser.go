@@ -15,6 +15,7 @@ type Browser struct {
 	index *Index
 	
 	ServerUrlBase string
+	ServerAuthenticationSecret string
 	
 	TerminalOpenInternalCommand []string
 	XorgOpenInternalCommand []string
@@ -46,6 +47,14 @@ func BrowserDocumentOpen (_browser *Browser, _library *Library, _document *Docum
 	_url := "/d/" + _document.Identifier
 	_url = strings.TrimRight (_browser.ServerUrlBase, "/") + _url
 	
+	if _browser.ServerAuthenticationSecret != "" {
+		if _token, _error := generateHmac (_browser.ServerAuthenticationSecret, "/__/authenticate/{query}"); _error == nil {
+			_url += "?authenticate=" + _token
+		} else {
+			return _error
+		}
+	}
+	
 	return browserUrlOpen (_browser, _url, true, _synchronous)
 }
 
@@ -59,6 +68,14 @@ func BrowserLibraryOpen (_browser *Browser, _library *Library, _synchronous bool
 	_url := "/l/" + _library.Identifier
 	_url = strings.TrimRight (_browser.ServerUrlBase, "/") + _url
 	
+	if _browser.ServerAuthenticationSecret != "" {
+		if _token, _error := generateHmac (_browser.ServerAuthenticationSecret, "/__/authenticate/{query}"); _error == nil {
+			_url += "?authenticate=" + _token
+		} else {
+			return _error
+		}
+	}
+	
 	return browserUrlOpen (_browser, _url, true, _synchronous)
 }
 
@@ -71,6 +88,14 @@ func BrowserIndexOpen (_browser *Browser, _synchronous bool) (*Error) {
 	
 	_url := "/i/"
 	_url = strings.TrimRight (_browser.ServerUrlBase, "/") + _url
+	
+	if _browser.ServerAuthenticationSecret != "" {
+		if _token, _error := generateHmac (_browser.ServerAuthenticationSecret, "/__/authenticate/{query}"); _error == nil {
+			_url += "?authenticate=" + _token
+		} else {
+			return _error
+		}
+	}
 	
 	return browserUrlOpen (_browser, _url, true, _synchronous)
 }

@@ -136,6 +136,9 @@ type ServerConfiguration struct {
 	BrowseEnabled *bool `toml:"browse_enabled"`
 	OpenExternalConfirm *bool `toml:"open_external_confirm"`
 	OpenExternalConfirmSkipForSchemas *[]string `toml:"open_external_confirm_skip_for_schemas"`
+	AuthenticationCookieName *string `toml:"authentication_cookie_name"`
+	AuthenticationCookieTimeout *uint `toml:"authentication_cookie_timeout"`
+	AuthenticationCookieSecret *string `toml:"authentication_cookie_secret"`
 }
 
 
@@ -144,10 +147,12 @@ type BrowseFlags struct {
 	Document *string `long:"document" short:"d" value-name:"{identifier}"`
 	SelectLibrary *bool `long:"select-library" short:"S"`
 	SelectDocument *bool `long:"select" short:"s"`
+	Authenticate *bool `long:"authenticate" short:"a"`
 }
 
 type BrowserConfiguration struct {
 	UrlBase *string `toml:"url_base"`
+	AuthenticationSecret *string `toml:"authentication_secret"`
 	TerminalOpenInternalCommand *[]string `toml:"terminal_open_internal_command"`
 	XorgOpenInternalCommand *[]string `toml:"xorg_open_internal_command"`
 	TerminalOpenExternalCommand *[]string `toml:"terminal_open_external_command"`
@@ -436,6 +441,10 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 	}
 	if _configuration.Browser.UrlBase == nil {
 		_configuration.Browser.UrlBase = _configuration.Server.UrlBase
+	}
+	
+	if (_configuration.Browser.AuthenticationSecret == nil) && (_configuration.Server.AuthenticationCookieSecret != nil) {
+		_configuration.Browser.AuthenticationSecret = _configuration.Server.AuthenticationCookieSecret
 	}
 	
 	_command := ""
@@ -1442,8 +1451,6 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 	
 	_endpoint := fmt.Sprintf ("%s:%d", _endpointIp, _endpointPort)
 	
-	logf ('i', 0x210494be, "[server]  listening on `%s`...", _endpoint)
-	
 	_listener, _error_0 := net.Listen ("tcp", _endpoint)
 	if _error_0 != nil {
 		return errorw (0xedeea766, _error_0)
@@ -1461,6 +1468,24 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 	_server.BrowseEnabled = _server.BrowseEnabled && _browseEnabled
 	_server.OpenExternalConfirm = _server.OpenExternalConfirm || _openExternalConfirm
 	_server.OpenExternalConfirmSkipForSchemas = append (_server.OpenExternalConfirmSkipForSchemas, _openExternalConfirmSkipForSchemas ...)
+	
+	if _configuration.UrlBase != nil {
+		_server.UrlBase = *_configuration.UrlBase
+	} else {
+		return errorw (0xf9bef449, nil)
+	}
+	
+	if _configuration.AuthenticationCookieName != nil {
+		_server.AuthenticationCookieName = *_configuration.AuthenticationCookieName
+	}
+	if _configuration.AuthenticationCookieTimeout != nil {
+		_server.AuthenticationCookieTimeout = *_configuration.AuthenticationCookieTimeout
+	}
+	if _configuration.AuthenticationCookieSecret != nil {
+		_server.AuthenticationCookieSecret = *_configuration.AuthenticationCookieSecret
+	}
+	
+	logf ('i', 0x210494be, "[server]  access URL `%s`;  listening on `%s`;", _server.UrlBase, _endpoint)
 	
 	_error = ServerRun (_server)
 	if _error != nil {
@@ -1492,6 +1517,15 @@ func MainBrowse (_flags *BrowseFlags, _globals *Globals, _index *Index, _editor 
 	}
 	if _error != nil {
 		return _error
+	}
+	
+	_authenticate := flagBoolOrDefault (_flags.Authenticate, false)
+	if _authenticate {
+		if _browser.ServerAuthenticationSecret == "" {
+			return errorw (0x8602b60d, nil)
+		}
+	} else {
+		_browser.ServerAuthenticationSecret = ""
 	}
 	
 	if _documentIdentifier != "" {
@@ -1545,6 +1579,9 @@ func mainBrowserNew (_configuration *BrowserConfiguration, _globals *Globals, _i
 		_browser.ServerUrlBase = *_configuration.UrlBase
 	} else {
 		return nil, errorw (0xa88827e6, nil)
+	}
+	if _configuration.AuthenticationSecret != nil {
+		_browser.ServerAuthenticationSecret = *_configuration.AuthenticationSecret
 	}
 	
 	return _browser, nil

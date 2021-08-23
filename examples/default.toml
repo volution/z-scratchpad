@@ -71,10 +71,11 @@ create_enabled = true
 browse_enabled = true
 open_external_confirm = true
 open_external_confirm_skip_for_schemas = ["http", "https"]
+authentication_cookie_secret = "1512327d5b5067b42fcfdbd6e990035f"
 
 [browser]
-terminal_open_internal_command = ["x-www", "ask", "open", "{{url}}"]
-xorg_open_internal_command = ["x-www", "ask", "open", "{{url}}"]
+terminal_open_internal_command = ["x-www", "guest:*", "open", "{{url}}"]
+xorg_open_internal_command = ["x-www", "guest:*", "open", "{{url}}"]
 terminal_open_external_command = ["x-www", "perhaps:ask", "open", "{{url}}"]
 xorg_open_external_command = ["x-www", "perhaps:ask", "open", "{{url}}"]
 

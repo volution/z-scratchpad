@@ -34,6 +34,11 @@ type Server struct {
 	OpenExternalConfirm bool
 	OpenExternalConfirmSkipForSchemas []string
 	
+	UrlBase string
+	AuthenticationCookieName string
+	AuthenticationCookieTimeout uint
+	AuthenticationCookieSecret string
+	
 	reloadToken string
 	
 }
@@ -68,6 +73,10 @@ func ServerNew (_globals *Globals, _index *Index, _editor *Editor, _browser *Bro
 	_server.EditEnabled = true
 	_server.CreateEnabled = true
 	_server.BrowseEnabled = true
+	
+	_server.AuthenticationCookieName = "zscratchpad_authentication"
+	_server.AuthenticationCookieTimeout = 28 * 24 * 3600
+	_server.AuthenticationCookieSecret = generateRandomToken ()
 	
 	_handler := & serverHandler {
 			server : _server,
@@ -125,6 +134,78 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 	if _path == "/__/heartbeat" {
 		return respondWithTextString (_response, "OK\n")
 	}
+	
+	_setAuthenticationCookie := func (_server *Server, _response http.ResponseWriter) (*Error) {
+			_mac, _error := generateHmac (_server.AuthenticationCookieSecret, "/__/authenticate/{cookie}")
+			if _error != nil {
+				return _error
+			}
+			_cookie := & http.Cookie {
+					Name : _server.AuthenticationCookieName,
+					Value : _mac,
+					Path : "/",
+					MaxAge : int (_server.AuthenticationCookieTimeout),
+					HttpOnly : true,
+					SameSite : http.SameSiteStrictMode,
+				}
+			http.SetCookie (_response, _cookie)
+			return nil
+		}
+	
+	if _path == "/__/authenticate" {
+		_mac, _error := generateHmac (_server.AuthenticationCookieSecret, "/__/authenticate/{token}")
+		if _error != nil {
+			return _error
+		}
+		logf ('i', 0x04cc15c3, "[server]  authentication token: `%s`;", _mac)
+		logf ('i', 0x04cc15c3, "[server]  authentication URL: `%s/__/authenticate/%s`;", strings.TrimRight (_server.UrlBase, "/"), _mac)
+		return respondWithTextString (_response, "NOK")
+	}
+	if strings.HasPrefix (_path, "/__/authenticate/") {
+		_mac := _path[17:]
+		if _error := verifyHmac (_server.AuthenticationCookieSecret, "/__/authenticate/{token}", _mac, 60 * 1000); _error != nil {
+			return _error
+		}
+		if _error := _setAuthenticationCookie (_server, _response); _error != nil {
+			return _error
+		}
+		return respondWithTextString (_response, "OK")
+	}
+	if _path == "/__/deauthenticate" {
+		_cookie := & http.Cookie {
+				Name : _server.AuthenticationCookieName,
+				Value : "",
+				Path : "/",
+				MaxAge : int (_server.AuthenticationCookieTimeout),
+				HttpOnly : true,
+				SameSite : http.SameSiteStrictMode,
+			}
+		http.SetCookie (_response, _cookie)
+		return respondWithTextString (_response, "OK")
+	}
+	
+	if _tokens, _ := _request.URL.Query () ["authenticate"]; _tokens != nil {
+		if len (_tokens) != 1 {
+			return errorw (0xc54dcef5, nil)
+		}
+		if _error := verifyHmac (_server.AuthenticationCookieSecret, "/__/authenticate/{query}", _tokens[0], 6 * 1000); _error != nil {
+			return _error
+		}
+		if _error := _setAuthenticationCookie (_server, _response); _error != nil {
+			return _error
+		}
+		return respondWithRedirect (_response, _path)
+	} else if _cookie, _error := _request.Cookie (_server.AuthenticationCookieName); _error == nil {
+		if _error := verifyHmac (_server.AuthenticationCookieSecret, "/__/authenticate/{cookie}", _cookie.Value, _server.AuthenticationCookieTimeout * 1000); _error != nil {
+			return _error
+		}
+		if _error := _setAuthenticationCookie (_server, _response); _error != nil {
+			return _error
+		}
+	} else {
+		return errorw (0xcf851b50, _error)
+	}
+	
 	if _path == "/__/reload" {
 		return respondWithTextString (_response, _server.reloadToken)
 	}
@@ -739,6 +820,18 @@ func respondWithBuffer (_response http.ResponseWriter, _contentType string, _bod
 	if _, _error := _body.WriteTo (_response); _error != nil {
 		return errorw (0xfaf6816b, _error)
 	}
+	
+	return nil
+}
+
+
+func respondWithRedirect (_response http.ResponseWriter, _url string) (*Error) {
+	
+	_headers := _response.Header ()
+	
+	_headers.Add ("Location", _url)
+	
+	_response.WriteHeader (http.StatusTemporaryRedirect)
 	
 	return nil
 }
