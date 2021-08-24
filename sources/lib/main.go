@@ -854,8 +854,12 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor *Editor) (*Error) {
 	
 	_identifier := ""
+	_exitOnEmpty := false
 	_error := (*Error) (nil)
 	if _flags.Document != nil {
+		if _flags.Select != nil {
+			return errorw (0x6c15ba50, nil)
+		}
 		// FIXME: _identifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.Select, _index, _editor)
 		if _flags.Library != nil {
 			_identifier = fmt.Sprintf ("%s:%s", *_flags.Library, *_flags.Document)
@@ -866,9 +870,13 @@ func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor 
 		}
 	} else if (_flags.Library != nil) || (_flags.Select != nil) {
 		_identifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.Select, _index, _editor)
+		_exitOnEmpty = true
 	}
 	if _error != nil {
 		return _error
+	}
+	if _exitOnEmpty && (_identifier == "") {
+		return nil
 	}
 	
 	return WorkflowDocumentCreate (_identifier, _index, _editor, true)
