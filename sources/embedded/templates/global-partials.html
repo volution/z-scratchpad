@@ -26,9 +26,14 @@
 		<p>Library navigation</p>
 		<ul>
 			{{ if . }}
-				<li class="search-candidate"><a href="/dc/{{ .Identifier }}">{create}</a></li>
+				{{ if .CreateEnabled }}
+					<li class="search-candidate"><a href="/dc/{{ .Identifier }}">{create}</a></li>
+				{{ end }}
 			{{ else }}
 				<li class="search-candidate"><a href="/dc/">{create}</a></li>
+			{{ end }}
+			{{ if . }}
+				<li class="search-candidate"><a href="/l/{{ .Identifier }}">{library}</a></li>
 			{{ end }}
 			<li class="search-candidate"><a href="/l/">{libraries}</a></li>
 			<li class="search-candidate"><a href="/d/">{documents}</a></li>
@@ -43,9 +48,14 @@
 		<p>Library navigation</p>
 		<ul>
 			{{ if . }}
-				<li><a href="/dc/{{ .Identifier }}">{create}</a></li>
+				{{ if .CreateEnabled }}
+					<li><a href="/dc/{{ .Identifier }}">{create}</a></li>
+				{{ end }}
 			{{ else }}
 				<li><a href="/dc/">{create}</a></li>
+			{{ end }}
+			{{ if . }}
+				<li><a href="/l/{{ .Identifier }}">{library}</a></li>
 			{{ end }}
 			<li><a href="/l/">{libraries}</a></li>
 			<li><a href="/d/">{documents}</a></li>
@@ -121,7 +131,9 @@
 	<nav>
 		<p>Document navigation</p>
 		<ul>
-			<li class="search-candidate"><a href="/de/{{ .Identifier }}">{edit}</a></li>
+			{{ if .EditEnabled }}
+				<li class="search-candidate"><a href="/de/{{ .Identifier }}">{edit}</a></li>
+			{{ end }}
 			<li class="search-candidate"><a href="/dx/source/{{ .Identifier }}">{source}</a></li>
 			<li class="search-candidate"><a href="/dx/html/{{ .Identifier }}">{export HTML}</a></li>
 			<li class="search-candidate"><a href="/dx/text/{{ .Identifier }}">{export txt}</a></li>
@@ -134,7 +146,9 @@
 	<nav>
 		<p>Document navigation</p>
 		<ul>
-			<li><a href="/de/{{ .Identifier }}">{edit}</a></li>
+			{{ if .EditEnabled }}
+				<li><a href="/de/{{ .Identifier }}">{edit}</a></li>
+			{{ end }}
 			<li><a href="/dx/source/{{ .Identifier }}">{source}</a></li>
 			<li><a href="/dx/html/{{ .Identifier }}">{export HTML}</a></li>
 			<li><a href="/dx/text/{{ .Identifier }}">{export txt}</a></li>
