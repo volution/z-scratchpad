@@ -1508,14 +1508,20 @@ func MainBrowse (_flags *BrowseFlags, _globals *Globals, _index *Index, _editor 
 	
 	_libraryIdentifier := ""
 	_documentIdentifier := ""
+	_exitOnEmpty := false
 	_error := (*Error) (nil)
 	if (_flags.Document != nil) || (_flags.SelectDocument != nil) {
 		_documentIdentifier, _error = mainResolveDocumentIdentifier (_flags.Library, _flags.Document, _flags.SelectDocument, _index, _editor)
+		_exitOnEmpty = true
 	} else if (_flags.Library != nil) || (_flags.SelectLibrary != nil) {
 		_libraryIdentifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.SelectLibrary, _index, _editor)
+		_exitOnEmpty = true
 	}
 	if _error != nil {
 		return _error
+	}
+	if _exitOnEmpty && (_libraryIdentifier == "") && (_documentIdentifier == "") {
+		return nil
 	}
 	
 	_authenticate := flagBoolOrDefault (_flags.Authenticate, false)
