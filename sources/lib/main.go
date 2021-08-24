@@ -864,9 +864,8 @@ func MainCreate (_flags *CreateFlags, _globals *Globals, _index *Index, _editor 
 		} else {
 			_identifier = *_flags.Document
 		}
-	} else if _flags.Library != nil {
-		// FIXME: _identifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.Select, _index, _editor)
-		_identifier = *_flags.Library
+	} else if (_flags.Library != nil) || (_flags.Select != nil) {
+		_identifier, _error = mainResolveLibraryIdentifier (_flags.Library, _flags.Select, _index, _editor)
 	}
 	if _error != nil {
 		return _error
@@ -1952,9 +1951,9 @@ func mainLibrariesResolve (_flags *LibraryFlags, _configuration []*Library) ([]*
 		}
 		if _index < len (_libraries) - 1 {
 			copy (_libraries[_index :], _libraries[_index + 1 :])
-			_libraries[_index + 1] = nil
 			_index -= 1
 		}
+		_libraries[len (_libraries) - 1] = nil
 		_libraries = _libraries[: len (_libraries) - 1]
 	}
 	
