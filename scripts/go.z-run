@@ -52,7 +52,9 @@
 	_gcflags="$( printf -- '%s ' "${_gcflags[@]}" )"
 	_ldflags="$( printf -- '%s ' "${_ldflags[@]}" )"
 	
-	exec -- "${ZRUN[@]}" ':: go / tool' \
+	exec -- \
+		nice -n 19 -- \
+	"${ZRUN[@]}" ':: go / tool' \
 			build \
 			-o "${_outputs}/main--debug" \
 			-tags "${_tags}" \
@@ -102,6 +104,7 @@
 		mv -T -- "${_outputs}/main--release${_suffix}" "${_outputs}/main--release${_suffix}.old"
 	fi
 	
+	nice -n 19 -- \
 	"${ZRUN[@]}" ':: go / tool' \
 			build \
 			-o "${_outputs}/main--release${_suffix}.new" \
