@@ -281,11 +281,16 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 	
 	if strings.HasPrefix (_path, "/cs/") {
 		_data := _path[4:]
-		if _data, _error := url.PathUnescape (_data); _error == nil {
-			return ServerHandleClipboardStore (_server, _data, _response)
-		} else {
-			return errorw (0xbbb03ba2, _error)
+		_data_0, _error := base64.RawURLEncoding.DecodeString (_data)
+		if _error != nil {
+			return errorw (0x0cedd6db, _error)
 		}
+		_data = string (_data_0)
+		_data, _error = url.PathUnescape (_data)
+		if _error != nil {
+			return errorw (0x59d3edfb, _error)
+		}
+		return ServerHandleClipboardStore (_server, _data, _response)
 	}
 	
 	if _path == "/__/version" {

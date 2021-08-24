@@ -960,7 +960,7 @@ func EditorResolveClipboardStoreCommand (_editor *Editor) (*exec.Cmd, bool, *Err
 				case "z-scratchpad--clipboard" :
 					_arguments = append (_arguments, "store")
 				case "xclip" :
-					_arguments = append (_arguments, "-selection", "clipboard", "-in")
+					_arguments = append (_arguments, "-in", "-selection", "clipboard", "-silent")
 				case "pbcopy" :
 					// NOP
 				default :

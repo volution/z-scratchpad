@@ -58,7 +58,11 @@
 		var _selectionText = _selection.toString ();
 		
 		if (true) {
-			fetch ("/cs/" + encodeURIComponent (_selectionText))
+			var _selectionEncoded = _selectionText;
+			_selectionEncoded = encodeURIComponent (_selectionEncoded);
+			_selectionEncoded = btoa (_selectionEncoded);
+			_selectionEncoded = _selectionEncoded.replaceAll ("+", "-") .replaceAll ("/", "_") .replaceAll ("=", "");
+			fetch ("/cs/" + _selectionEncoded)
 				.then (_response => {
 					if (_response.status != 204) {
 						console.error ("[ee][76677dbf]", _response.status);
