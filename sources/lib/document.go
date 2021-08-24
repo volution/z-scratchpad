@@ -222,7 +222,7 @@ var DocumentIdentifierRegex *regexp.Regexp = regexp.MustCompile (`^` + DocumentI
 
 func DocumentInitializeTitle (_document *Document, _library *Library) (*Error) {
 	if (_library != nil) && (_document.Library != _library.Identifier) {
-		return errorw (0x767046ec, nil)
+		return errorw (0x6966f128, nil)
 	}
 	if (_library == nil) || (_library.UseTitlePrefix == "") {
 		return nil

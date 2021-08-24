@@ -62,6 +62,8 @@ xorg_select_command = ["rofi", "-dmenu", "-p", "", "-i", "-no-custom",
 		"-location", "0", "-width", "-80", "-l", "16",
 		"-font", "JetBrains Mono NL 24px",
 	]
+terminal_clipboard_store_command = ["x-selection", "clipboard", "input"]
+xorg_clipboard_store_command = ["x-selection", "clipboard", "input"]
 
 [server]
 endpoint_ip = "127.9.212.148"
@@ -69,6 +71,7 @@ endpoint_port = 8080
 edit_enabled = true
 create_enabled = true
 browse_enabled = true
+clipboard_enabled = true
 open_external_confirm = true
 open_external_confirm_skip_for_schemas = ["http", "https"]
 authentication_cookie_secret = "1512327d5b5067b42fcfdbd6e990035f"

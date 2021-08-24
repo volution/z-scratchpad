@@ -26,6 +26,8 @@ type Editor struct {
 	XorgEditCommand []string
 	TerminalSelectCommand []string
 	XorgSelectCommand []string
+	TerminalClipboardStoreCommand []string
+	XorgClipboardStoreCommand []string
 	
 }
 
@@ -480,6 +482,78 @@ func EditorSelect (_editor *Editor, _options []string) ([]string, *Error) {
 
 
 
+func EditorClipboardStore (_editor *Editor, _data string) (*Error) {
+	
+	_globals := _editor.globals
+	
+	if !_globals.TerminalEnabled && !_globals.XorgEnabled {
+		return errorw (0x3fe34413, nil)
+	}
+	
+	_command := (*exec.Cmd) (nil)
+	_terminal := false
+	if _command_0, _terminal_0, _error := EditorResolveClipboardStoreCommand (_editor); _error == nil {
+		_command = _command_0
+		_terminal = _terminal_0
+	} else {
+		return _error
+	}
+	
+	if _terminal {
+		if ! _globals.TerminalMutexTryLock () {
+			return errorw (0x95568e71, nil)
+		}
+		defer _globals.TerminalMutexUnlock ()
+	}
+	
+	_stdin, _error := _command.StdinPipe ()
+	if _error != nil {
+		return errorw (0xfb20cdd2, _error)
+	}
+	// NOTE:  Due to race conditions within the goroutine, we leave this to be closed by the garbage collector.
+	// defer _stdin.Close ()
+	
+	_command.Stdout = _globals.DevNull
+	
+	if _error := _command.Start (); _error != nil {
+		return errorw (0x9b8c586d, _error)
+	}
+	
+	_waiter := & sync.WaitGroup {}
+	
+	_waiter.Add (1)
+	_stdinError := (*Error) (nil)
+	go func () () {
+			_buffer := bytes.NewBufferString (_data)
+			if _, _error := _buffer.WriteTo (_stdin); _error != nil {
+				_stdinError = errorw (0x7b54b646, _error)
+			}
+			if _error := _stdin.Close (); _error != nil {
+				_stdinError = errorw (0x2e7132d2, _error)
+			}
+			_waiter.Done ()
+		} ()
+	
+	_waiter.Wait ()
+	
+	if _error := _command.Wait (); _error != nil {
+		if _error, _isExitError := _error.(*exec.ExitError); _isExitError {
+			return errorw (0x17e65bdb, _error)
+		} else {
+			return errorw (0x99e1a345, _error)
+		}
+	}
+	
+	if _stdinError != nil {
+		return _stdinError
+	}
+	
+	return nil
+}
+
+
+
+
 func EditorResolveEditCommand (_editor *Editor) (*exec.Cmd, bool, *Error) {
 	
 	_globals := _editor.globals
@@ -779,6 +853,133 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, bool, *Erro
 	} else {
 		
 		return nil, nil, false, errorw (0xdced1bf6, nil)
+	}
+}
+
+
+
+
+func EditorResolveClipboardStoreCommand (_editor *Editor) (*exec.Cmd, bool, *Error) {
+	
+	_globals := _editor.globals
+	
+	if _globals.TerminalEnabled {
+		
+		_executable := ""
+		_executableName := ""
+		_argumentsUseCommand := false
+		if _executable == "" {
+			if len (_editor.TerminalClipboardStoreCommand) > 0 {
+				_executableName_0 := _editor.TerminalClipboardStoreCommand[0]
+				if _executableName_0 == "" {
+					return nil, false, errorw (0x03b21301, nil)
+				}
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					_argumentsUseCommand = true
+				} else {
+					return nil, false, errorw (0x32c357b4, _error)
+				}
+			}
+		}
+		if _executable == "" {
+			for _, _executableName_0 := range []string { "z-scratchpad--clipboard" } {
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					break
+				}
+			}
+		}
+		if _executable == "" {
+			return nil, false, errorw (0x2eac5bc4, nil)
+		}
+		
+		_arguments := make ([]string, 0, 32)
+		_arguments = append (_arguments, _executable)
+		if _argumentsUseCommand {
+			_arguments = append (_arguments, _editor.TerminalClipboardStoreCommand[1:] ...)
+		} else {
+			switch _executableName {
+				case "z-scratchpad--clipboard" :
+					_arguments = append (_arguments, "store")
+				default :
+					// NOP
+			}
+		}
+		
+		_command := & exec.Cmd {
+				Path : _executable,
+				Args : _arguments,
+				Env : _globals.EnvironmentList,
+				Stderr : _globals.TerminalTty,
+			}
+		
+		return _command, true, nil
+		
+	} else if _globals.XorgEnabled {
+		
+		_executable := ""
+		_executableName := ""
+		_argumentsUseCommand := false
+		if _executable == "" {
+			if len (_editor.XorgClipboardStoreCommand) > 0 {
+				_executableName_0 := _editor.XorgClipboardStoreCommand[0]
+				if _executableName_0 == "" {
+					return nil, false, errorw (0x121b9062, nil)
+				}
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					_argumentsUseCommand = true
+				} else {
+					return nil, false, errorw (0xfed2a954, _error)
+				}
+			}
+		}
+		if _executable == "" {
+			for _, _executableName_0 := range []string { "z-scratchpad--clipboard", "xclip", "pbcopy" } {
+				if _executable_0, _error := exec.LookPath (_executableName_0); _error == nil {
+					_executable = _executable_0
+					_executableName = _executableName_0
+					break
+				}
+			}
+		}
+		if _executable == "" {
+			return nil, false, errorw (0xf6758a13, nil)
+		}
+		
+		_arguments := make ([]string, 0, 32)
+		_arguments = append (_arguments, _executable)
+		if _argumentsUseCommand {
+			_arguments = append (_arguments, _editor.XorgClipboardStoreCommand[1:] ...)
+		} else {
+			switch _executableName {
+				case "z-scratchpad--clipboard" :
+					_arguments = append (_arguments, "store")
+				case "xclip" :
+					_arguments = append (_arguments, "-selection", "clipboard", "-in")
+				case "pbcopy" :
+					// NOP
+				default :
+					// NOP
+			}
+		}
+		
+		_command := & exec.Cmd {
+				Path : _executable,
+				Args : _arguments,
+				Env : _globals.EnvironmentList,
+				Stderr : _globals.DevNull,
+			}
+		
+		return _command, false, nil
+		
+	} else {
+		
+		return nil, false, errorw (0x6959f3b1, nil)
 	}
 }
 

@@ -66,6 +66,8 @@ type EditorConfiguration struct {
 	XorgEditCommand *[]string `toml:"xorg_edit_command"`
 	TerminalSelectCommand *[]string `toml:"terminal_select_command"`
 	XorgSelectCommand *[]string `toml:"xorg_select_command"`
+	TerminalClipboardStoreCommand *[]string `toml:"terminal_clipboard_store_command"`
+	XorgClipboardStoreCommand *[]string `toml:"xorg_clipboard_store_command"`
 }
 
 
@@ -125,6 +127,7 @@ type ServerFlags struct {
 	EditEnabled *bool `long:"server-edit-enabled"`
 	CreateEnabled *bool `long:"server-create-enabled"`
 	BrowseEnabled *bool `long:"server-browse-enabled"`
+	ClipboardEnabled *bool `long:"server-clipboard-enabled"`
 }
 
 type ServerConfiguration struct {
@@ -134,6 +137,7 @@ type ServerConfiguration struct {
 	EditEnabled *bool `toml:"edit_enabled"`
 	CreateEnabled *bool `toml:"create_enabled"`
 	BrowseEnabled *bool `toml:"browse_enabled"`
+	ClipboardEnabled *bool `toml:"clipboard_enabled"`
 	OpenExternalConfirm *bool `toml:"open_external_confirm"`
 	OpenExternalConfirmSkipForSchemas *[]string `toml:"open_external_confirm_skip_for_schemas"`
 	AuthenticationCookieName *string `toml:"authentication_cookie_name"`
@@ -580,6 +584,21 @@ func MainWithFlags (_command string, _flags *MainFlags, _configuration *MainConf
 			return errorw (0x8b6b008b, nil)
 		}
 		_editor.XorgSelectCommand = _command
+	}
+	
+	if _configuration.Editor.TerminalClipboardStoreCommand != nil {
+		_command := *_configuration.Editor.TerminalClipboardStoreCommand
+		if len (_command) == 0 {
+			return errorw (0x957bc35d, nil)
+		}
+		_editor.TerminalClipboardStoreCommand = _command
+	}
+	if _configuration.Editor.XorgClipboardStoreCommand != nil {
+		_command := *_configuration.Editor.XorgClipboardStoreCommand
+		if len (_command) == 0 {
+			return errorw (0xd4b2e03d, nil)
+		}
+		_editor.XorgClipboardStoreCommand = _command
 	}
 	
 	_browser, _error := mainBrowserNew (_configuration.Browser, _globals, _index)
@@ -1453,6 +1472,7 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 	_editEnabled := flag2BoolOrDefault (_flags.EditEnabled, _configuration.EditEnabled, false)
 	_createEnabled := flag2BoolOrDefault (_flags.CreateEnabled, _configuration.CreateEnabled, false)
 	_browseEnabled := flag2BoolOrDefault (_flags.BrowseEnabled, _configuration.BrowseEnabled, false)
+	_clipboardEnabled := flag2BoolOrDefault (_flags.ClipboardEnabled, _configuration.ClipboardEnabled, false)
 	_openExternalConfirm := flagBoolOrDefault (_configuration.OpenExternalConfirm, true)
 	_openExternalConfirmSkipForSchemas := flagStringsOrDefault (_configuration.OpenExternalConfirmSkipForSchemas, nil)
 	
@@ -1473,6 +1493,7 @@ func MainServer (_flags *ServerFlags, _configuration *ServerConfiguration, _glob
 	_server.EditEnabled = _server.EditEnabled && _editEnabled
 	_server.CreateEnabled = _server.CreateEnabled && _createEnabled
 	_server.BrowseEnabled = _server.BrowseEnabled && _browseEnabled
+	_server.ClipboardEnabled = _server.ClipboardEnabled && _clipboardEnabled
 	_server.OpenExternalConfirm = _server.OpenExternalConfirm || _openExternalConfirm
 	_server.OpenExternalConfirmSkipForSchemas = append (_server.OpenExternalConfirmSkipForSchemas, _openExternalConfirmSkipForSchemas ...)
 	
@@ -1753,10 +1774,11 @@ func MainHelp (_flags *HelpFlags, _globals *Globals, _editor *Editor) (*Error) {
 	_parser.WriteHelp (_buffer)
 	_buffer.WriteByte ('\n')
 	if _, _error := _buffer.WriteTo (_globals.Stdout); _error != nil {
-		return errorw (0xf4170873, _error)
+		return errorw (0x7626a566, _error)
 	}
 	return nil
 }
+
 
 
 
@@ -2089,7 +2111,7 @@ func mainProfileCpu (_path string) (func () (*Error), *Error) {
 	logf ('i', 0x0b2ca2b0, "profiling CPU, writing output to `%s`...", _path)
 	_output, _error := os.OpenFile (_path, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o640)
 	if _error != nil {
-		return nil, errorw (0xd1f70512, _error)
+		return nil, errorw (0x8704258a, _error)
 	}
 	_error = pprof.StartCPUProfile (_output)
 	if _error != nil {

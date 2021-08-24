@@ -9,6 +9,7 @@ import "encoding/xml"
 import "io"
 import "net"
 import "net/http"
+import "net/url"
 import "strings"
 
 import html_template "html/template"
@@ -30,6 +31,7 @@ type Server struct {
 	EditEnabled bool
 	CreateEnabled bool
 	BrowseEnabled bool
+	ClipboardEnabled bool
 	
 	OpenExternalConfirm bool
 	OpenExternalConfirmSkipForSchemas []string
@@ -73,6 +75,7 @@ func ServerNew (_globals *Globals, _index *Index, _editor *Editor, _browser *Bro
 	_server.EditEnabled = true
 	_server.CreateEnabled = true
 	_server.BrowseEnabled = true
+	_server.ClipboardEnabled = true
 	
 	_server.AuthenticationCookieName = "zscratchpad_authentication"
 	_server.AuthenticationCookieTimeout = 28 * 24 * 3600
@@ -158,7 +161,7 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 			return _error
 		}
 		logf ('i', 0x04cc15c3, "[server]  authentication token: `%s`;", _mac)
-		logf ('i', 0x04cc15c3, "[server]  authentication URL: `%s/__/authenticate/%s`;", strings.TrimRight (_server.UrlBase, "/"), _mac)
+		logf ('i', 0x2a34dc7a, "[server]  authentication URL: `%s/__/authenticate/%s`;", strings.TrimRight (_server.UrlBase, "/"), _mac)
 		return respondWithTextString (_response, "NOK")
 	}
 	if strings.HasPrefix (_path, "/__/authenticate/") {
@@ -274,6 +277,15 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 	if strings.HasPrefix (_path, "/ue/") {
 		_url := _path[4:]
 		return ServerHandleUrlError (_server, _url, _response)
+	}
+	
+	if strings.HasPrefix (_path, "/cs/") {
+		_data := _path[4:]
+		if _data, _error := url.PathUnescape (_data); _error == nil {
+			return ServerHandleClipboardStore (_server, _data, _response)
+		} else {
+			return errorw (0xbbb03ba2, _error)
+		}
 	}
 	
 	if _path == "/__/version" {
@@ -603,6 +615,23 @@ func ServerHandleUrlError (_server *Server, _urlEncoded string, _response http.R
 
 
 
+func ServerHandleClipboardStore (_server *Server, _data string, _response http.ResponseWriter) (*Error) {
+	if !_server.ClipboardEnabled {
+		return errorw (0x7569419a, nil)
+	}
+	if _server.editor == nil {
+		return errorw (0x8fae00cd, nil)
+	}
+	if _error := EditorClipboardStore (_server.editor, _data); _error != nil {
+		return _error
+	}
+	http.Error (_response, "", http.StatusNoContent)
+	return nil
+}
+
+
+
+
 func ServerHandleVersion (_server *Server, _response http.ResponseWriter) (*Error) {
 	_context := struct {
 			
@@ -717,7 +746,7 @@ func respondWithHtmlTemplate (_response http.ResponseWriter, _template *html_tem
 		_loopStart : for {
 			_token, _error := _decoder.Token ()
 			if _error != nil {
-				return errorw (0x8adce50b, _error)
+				return errorw (0x09480384, _error)
 			}
 			switch _token := _token.(type) {
 				case xml.StartElement :

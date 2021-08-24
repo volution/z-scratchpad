@@ -24,7 +24,7 @@
 		}
 		for (let _target of document.querySelectorAll ("main.document code")) {
 			_target.addEventListener ("click", (_event) => {
-					if (_event.detail == 3) {
+					if (_event.detail == 2) {
 						_handle (_target, _event);
 					}
 				});
@@ -48,12 +48,29 @@
 	}
 	
 	function _copy (_source) {
+		
 		var _selection = window.getSelection ();
 		_selection.removeAllRanges ();
 		var _range = document.createRange ();
 		_range.selectNodeContents (_source);
 		_selection.addRange (_range);
-		window.navigator.clipboard.writeText (_selection.toString ());
+		
+		var _selectionText = _selection.toString ();
+		
+		if (true) {
+			fetch ("/cs/" + encodeURIComponent (_selectionText))
+				.then (_response => {
+					if (_response.status != 204) {
+						console.error ("[ee][76677dbf]", _response.status);
+					}})
+				.catch (_error => {
+						console.error ("[ee][46101c4c]", _error);
+					});
+		} else {
+			if (window.navigator.clipboard !== undefined) {
+				window.navigator.clipboard.writeText (_selectionText);
+			}
+		}
 	}
 	
 	
