@@ -418,6 +418,15 @@ main.document a * {
 }
 
 
+main.document {
+	word-spacing : -0.33ch;
+}
+
+main.document pre {
+	word-spacing : 0px;
+}
+
+
 
 
 main.document img,
