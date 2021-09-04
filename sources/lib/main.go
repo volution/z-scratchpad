@@ -125,6 +125,7 @@ type DumpFlags struct {}
 
 
 type ServerFlags struct {
+	UrlBase *string `long:"server-url"`
 	EndpointIp *string `long:"server-ip" value-name:"{ip}"`
 	EndpointPort *uint16 `long:"server-port" value-name:"{port}"`
 	EditEnabled *bool `long:"server-edit-enabled"`
@@ -150,11 +151,13 @@ type ServerConfiguration struct {
 
 
 type BrowseFlags struct {
+	UrlBase *string `long:"server-url"`
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Document *string `long:"document" short:"d" value-name:"{identifier}"`
 	SelectLibrary *bool `long:"select-library" short:"S"`
 	SelectDocument *bool `long:"select" short:"s"`
 	Authenticate *bool `long:"authenticate" short:"a"`
+	QrcodeDisplay *bool `long:"qrcode"`
 }
 
 type BrowserConfiguration struct {
@@ -430,6 +433,9 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 		}
 	}
 	
+	if _flags.Server.UrlBase != nil {
+		_configuration.Server.UrlBase = _flags.Server.UrlBase
+	}
 	if _configuration.Server.UrlBase == nil {
 		_endpointIp := flag2StringOrDefault (_flags.Server.EndpointIp, _configuration.Server.EndpointIp, "127.0.0.1")
 		_endpointPort := flag2Uint16OrDefault (_flags.Server.EndpointPort, _configuration.Server.EndpointPort, 49894)
@@ -445,6 +451,9 @@ func Main (_executable string, _arguments []string, _environment map[string]stri
 			_urlBase = fmt.Sprintf ("http://%s:%d/", _endpointIp, _endpointPort)
 		}
 		_configuration.Server.UrlBase = &_urlBase
+	}
+	if _flags.Browse.UrlBase != nil {
+		_configuration.Browser.UrlBase = _flags.Browse.UrlBase
 	}
 	if _configuration.Browser.UrlBase == nil {
 		_configuration.Browser.UrlBase = _configuration.Server.UrlBase
@@ -1564,6 +1573,9 @@ func MainBrowse (_flags *BrowseFlags, _globals *Globals, _index *Index, _editor 
 	} else {
 		_browser.ServerAuthenticationSecret = ""
 	}
+	
+	_qrcodeDisplay := flagBoolOrDefault (_flags.QrcodeDisplay, false)
+	_browser.QrcodeDisplay = _qrcodeDisplay
 	
 	if _documentIdentifier != "" {
 		return WorkflowDocumentBrowse (_documentIdentifier, _index, _browser, true)

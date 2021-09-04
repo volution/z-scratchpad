@@ -22,6 +22,8 @@ type Browser struct {
 	
 	TerminalOpenExternalCommand []string
 	XorgOpenExternalCommand []string
+	
+	QrcodeDisplay bool
 }
 
 
@@ -112,6 +114,14 @@ func browserUrlOpen (_browser *Browser, _url string, _internal bool, _synchronou
 	}
 	
 	_globals := _browser.globals
+	
+	if _browser.QrcodeDisplay {
+		if !_globals.TerminalEnabled {
+			return errorw (0x80c57c45, nil)
+		}
+//		logf ('i', 0x31846dd1, "%s", _url)
+		return QrcodeTerminalDisplay (_url, _globals.Stdout)
+	}
 	
 	_command, _terminal, _error := BrowserResolveOpenCommand (_browser, _internal)
 	if _error != nil {
