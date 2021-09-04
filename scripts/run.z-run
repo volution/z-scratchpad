@@ -26,6 +26,7 @@
 :: run / menu :: exec -- "${ZRUN[@]}" ':: run / exec' menu "${@}"
 :: run / server :: exec -- "${ZRUN[@]}" ':: run / exec' server "${@}"
 :: run / browse :: exec -- "${ZRUN[@]}" ':: run / exec' browse "${@}"
+:: run / browse / authenticate :: exec -- "${ZRUN[@]}" ':: run / exec' browse -a "${@}"
 :: run / browse / select / library :: exec -- "${ZRUN[@]}" ':: run / exec' browse -S "${@}"
 :: run / browse / select / document :: exec -- "${ZRUN[@]}" ':: run / exec' browse -s "${@}"
 :: run / list :: exec -- "${ZRUN[@]}" ':: run / exec' list "${@}"
