@@ -175,9 +175,6 @@ func WorkflowDocumentResolve (_identifierUnsafe string, _index *Index) (*Documen
 	if _document == nil {
 		return nil, errorw (0x054e7a60, nil)
 	}
-	if _index.documentsRefresh {
-		return WorkflowDocumentRefresh (_document, _index)
-	}
 	return _document, nil
 }
 

@@ -18,12 +18,20 @@ import "github.com/akutz/sortfold"
 
 
 type Index struct {
+	
 	globals *Globals
+	
 	documents map[string]*Document
 	libraries map[string]*Library
 	libraryDocuments map[string]map[string]bool
-	documentsRefresh bool
-	dirtyCallback func () ()
+	
+	librariesRefreshEnabled bool
+	librariesRefreshCallback func (*Index) (*Error)
+	documentRefreshEnabled bool
+	documentRefreshCallback func (*Index, *Document) (*Document, *Error)
+	dirtyEnabled bool
+	dirtyCallback func (*Index) (*Error)
+	refreshTimestamp time.Time
 }
 
 
@@ -47,7 +55,9 @@ func IndexNew (_globals *Globals) (*Index, *Error) {
 			documents : make (map[string]*Document, 16 * 1024),
 			libraries : make (map[string]*Library, 128),
 			libraryDocuments : make (map[string]map[string]bool, 128),
-			documentsRefresh : true,
+			librariesRefreshEnabled : true,
+			documentRefreshEnabled : true,
+			dirtyEnabled : true,
 		}
 	return _index, nil
 }
@@ -157,6 +167,12 @@ func IndexStoreToPath (_index *Index, _path string) (*Error) {
 		return errorw (0x4170a0f9, _error)
 	}
 	
+	_timestamp := _index.refreshTimestamp
+	_error = os.Chtimes (_pathTemp, _timestamp, _timestamp)
+	if _error != nil {
+		return errorw (0x0622fe0f, _error)
+	}
+	
 	_error = os.Rename (_pathTemp, _path)
 	if _error != nil {
 		return errorw (0x45fd20b2, _error)
@@ -258,6 +274,12 @@ func IndexStoreData (_index *Index, _gob *IndexGob) (*Error) {
 }
 
 
+func IndexClearData (_index *Index) () {
+	_index.documents = make (map[string]*Document, 16 * 1024)
+	_index.libraries = make (map[string]*Library, 128)
+	_index.libraryDocuments = make (map[string]map[string]bool, 128)
+}
+
 
 
 
@@ -270,8 +292,10 @@ func IndexLibraryInclude (_index *Index, _library *Library) (*Error) {
 	}
 	_index.libraries[_library.Identifier] = _library
 	_index.libraryDocuments[_library.Identifier] = make (map[string]bool, 16 * 1024)
-	if _index.dirtyCallback != nil {
-		_index.dirtyCallback ()
+	if _index.dirtyEnabled && (_index.dirtyCallback != nil) {
+		if _error := _index.dirtyCallback (_index); _error != nil {
+			return _error
+		}
 	}
 	return nil
 }
@@ -295,8 +319,10 @@ func IndexDocumentInclude (_index *Index, _document *Document) (*Error) {
 	}
 	_index.documents[_document.Identifier] = _document
 	_index.libraryDocuments[_document.Library][_document.Identifier] = true
-	if _index.dirtyCallback != nil {
-		_index.dirtyCallback ()
+	if _index.dirtyEnabled && (_index.dirtyCallback != nil) {
+		if _error := _index.dirtyCallback (_index); _error != nil {
+			return _error
+		}
 	}
 	return nil
 }
@@ -317,8 +343,10 @@ func IndexDocumentExclude (_index *Index, _document *Document) (*Error) {
 	}
 	delete (_index.documents, _document.Identifier)
 	delete (_index.libraryDocuments[_document.Library], _document.Identifier)
-	if _index.dirtyCallback != nil {
-		_index.dirtyCallback ()
+	if _index.dirtyEnabled && (_index.dirtyCallback != nil) {
+		if _error := _index.dirtyCallback (_index); _error != nil {
+			return _error
+		}
 	}
 	return nil
 }
@@ -338,6 +366,11 @@ func IndexDocumentUpdate (_index *Index, _documentNew *Document, _documentOld *D
 
 
 func IndexLibrariesSelectAll (_index *Index) ([]*Library, *Error) {
+	if _index.librariesRefreshEnabled && (_index.librariesRefreshCallback != nil) {
+		if _error := _index.librariesRefreshCallback (_index); _error != nil {
+			return nil, _error
+		}
+	}
 	_libraries := make ([]*Library, 0, len (_index.libraries))
 	for _, _library := range _index.libraries {
 		_libraries = append (_libraries, _library)
@@ -347,15 +380,34 @@ func IndexLibrariesSelectAll (_index *Index) ([]*Library, *Error) {
 }
 
 func IndexDocumentsSelectAll (_index *Index) ([]*Document, *Error) {
+	if _index.librariesRefreshEnabled && (_index.librariesRefreshCallback != nil) {
+		if _error := _index.librariesRefreshCallback (_index); _error != nil {
+			return nil, _error
+		}
+	}
 	_documents := make ([]*Document, 0, len (_index.documents))
 	for _, _document := range _index.documents {
-		_documents = append (_documents, _document)
+		if _index.documentRefreshEnabled && (_index.documentRefreshCallback != nil) {
+			if _document_0, _error := _index.documentRefreshCallback (_index, _document); _error == nil {
+				_document = _document_0
+			} else {
+				return nil, _error
+			}
+		}
+		if _document != nil {
+			_documents = append (_documents, _document)
+		}
 	}
 	DocumentsSort (_documents)
 	return _documents, nil
 }
 
 func IndexDocumentsSelectInLibrary (_index *Index, _libraryIdentifier string) ([]*Document, *Error) {
+	if _index.librariesRefreshEnabled && (_index.librariesRefreshCallback != nil) {
+		if _error := _index.librariesRefreshCallback (_index); _error != nil {
+			return nil, _error
+		}
+	}
 	_documents := make ([]*Document, 0, len (_index.documents))
 	_libraryDocuments, _libraryExists := _index.libraryDocuments[_libraryIdentifier]
 	if !_libraryExists {
@@ -366,7 +418,16 @@ func IndexDocumentsSelectInLibrary (_index *Index, _libraryIdentifier string) ([
 		if _document == nil {
 			return nil, errorw (0xef6c0449, nil)
 		}
-		_documents = append (_documents, _document)
+		if _index.documentRefreshEnabled && (_index.documentRefreshCallback != nil) {
+			if _document_0, _error := _index.documentRefreshCallback (_index, _document); _error == nil {
+				_document = _document_0
+			} else {
+				return nil, _error
+			}
+		}
+		if _document != nil {
+			_documents = append (_documents, _document)
+		}
 	}
 	DocumentsSort (_documents)
 	return _documents, nil
@@ -379,6 +440,11 @@ func IndexLibraryResolve (_index *Index, _identifier string) (*Library, *Error) 
 	if _identifier == "" {
 		return nil, errorw (0xabe00a27, nil)
 	}
+	if _index.librariesRefreshEnabled && (_index.librariesRefreshCallback != nil) {
+		if _error := _index.librariesRefreshCallback (_index); _error != nil {
+			return nil, _error
+		}
+	}
 	_library, _ := _index.libraries[_identifier]
 	return _library, nil
 }
@@ -387,7 +453,22 @@ func IndexDocumentResolve (_index *Index, _identifier string) (*Document, *Error
 	if _identifier == "" {
 		return nil, errorw (0x25e42042, nil)
 	}
+	if _index.librariesRefreshEnabled && (_index.librariesRefreshCallback != nil) {
+		if _error := _index.librariesRefreshCallback (_index); _error != nil {
+			return nil, _error
+		}
+	}
 	_document, _ := _index.documents[_identifier]
+	if _document == nil {
+		return nil, nil
+	}
+	if _index.documentRefreshEnabled && (_index.documentRefreshCallback != nil) {
+		if _document_0, _error := _index.documentRefreshCallback (_index, _document); _error == nil {
+			_document = _document_0
+		} else {
+			return nil, _error
+		}
+	}
 	return _document, nil
 }
 

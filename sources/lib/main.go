@@ -38,16 +38,19 @@ type GlobalConfiguration struct {
 }
 
 type IndexFlags struct {
+	WalkDisabled *bool `long:"index-disable-walk"`
+	DatabaseDisabled *bool `long:"index-disable-database"`
 	LoadDisabled *bool `long:"index-disable-load"`
 	StoreDisabled *bool `long:"index-disable-store"`
-	WalkDisabled *bool `long:"index-disable-walk"`
+	DirtyDisabled *bool `long:"index-disable-dirty"`
 	RefreshDisabled *bool `long:"index-disable-refresh"`
 }
 
 type IndexConfiguration struct {
 	DatabaseEnabled *bool `toml:"database_enabled"`
 	DatabasePath *string `toml:"database_path"`
-	DocumentsRefresh *bool `toml:"documents_refresh"`
+	LibrariesRefreshEnabled *bool `toml:"libraries_refresh_enabled"`
+	DocumentsRefreshEnabled *bool `toml:"documents_refresh_enabled"`
 }
 
 type LibraryFlags struct {
@@ -1784,16 +1787,20 @@ func MainHelp (_flags *HelpFlags, _globals *Globals, _editor *Editor) (*Error) {
 
 func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libraries []*Library, _globals *Globals) (*Index, *Error) {
 	
-	_beginTimestamp := time.Now ()
-	
 	_index, _error := IndexNew (_globals)
 	if _error != nil {
 		return nil, _error
 	}
 	
+	_databaseCanWalk := ! flagBoolOrDefault (_flags.WalkDisabled, false)
+	_databaseEnabled := ! flagBoolOrDefault (_flags.DatabaseDisabled, false) && flagBoolOrDefault (_configuration.DatabaseEnabled, true)
+	_databaseCanLoad := ! flagBoolOrDefault (_flags.LoadDisabled, false)
+	_databaseCanStore := ! flagBoolOrDefault (_flags.StoreDisabled, false)
+	_databaseCanDirty := ! flagBoolOrDefault (_flags.DirtyDisabled, false)
+	_databaseCanRefresh := ! flagBoolOrDefault (_flags.RefreshDisabled, false)
+	
 	_databasePath := ""
 	_databaseDirtyPath := ""
-	_databaseEnabled := flagBoolOrDefault (_configuration.DatabaseEnabled, true)
 	if _databaseEnabled {
 		if _configuration.DatabasePath != nil {
 			_databasePath = *_configuration.DatabasePath
@@ -1823,84 +1830,56 @@ func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libr
 		_databaseDirtyPath = _databasePath + "-dirty"
 	}
 	
-	_databaseShouldLoad := ! flagBoolOrDefault (_flags.LoadDisabled, false)
-	_databaseShouldStore := ! flagBoolOrDefault (_flags.StoreDisabled, false)
-	_databaseShouldWalk := ! flagBoolOrDefault (_flags.WalkDisabled, false)
-	_databaseShouldDirty := true
-	
-	_documentsRefresh := true
-	_documentsRefresh = _documentsRefresh && ! flagBoolOrDefault (_flags.WalkDisabled, false)
-	_documentsRefresh = _documentsRefresh && ! flagBoolOrDefault (_flags.RefreshDisabled, false)
-	_documentsRefresh = _documentsRefresh && flagBoolOrDefault (_configuration.DocumentsRefresh, true)
-	_index.documentsRefresh = _index.documentsRefresh && _documentsRefresh
-	
 	if _databasePath == "" {
-		_databaseShouldLoad = false
-		_databaseShouldStore = false
-		_databaseShouldDirty = false
+		_databaseEnabled = false
 	}
 	if _databaseDirtyPath == "" {
-		_databaseShouldDirty = false
+		_databaseCanDirty = false
 	}
 	
-	if _databaseShouldLoad {
-		_dataStat := os.FileInfo (nil)
-		_dirtyStat := os.FileInfo (nil)
-		if _stat, _error := os.Stat (_databasePath); _error == nil {
-			_dataStat = _stat
-		} else if ! os.IsNotExist (_error) {
-			return nil, errorw (0xc35078ab, _error)
-		}
-		if _databaseDirtyPath != "" {
-			if _stat, _error := os.Stat (_databaseDirtyPath); _error == nil {
-				_dirtyStat = _stat
-			} else if ! os.IsNotExist (_error) {
-				return nil, errorw (0xfb9afa94, _error)
-			}
-		}
-		if _dataStat == nil {
-			_databaseShouldLoad = false
-		} else if (_dirtyStat != nil) && _dataStat.ModTime () .Before (_dirtyStat.ModTime ()) {
-			logf ('d', 0xd23ee348, "not loading dirty database...")
-			_databaseShouldLoad = false
-		}
+	_databaseCanLoad = _databaseCanLoad && _databaseEnabled
+	_databaseCanStore = _databaseCanStore && _databaseEnabled
+	_databaseCanDirty = _databaseCanDirty && _databaseEnabled
+	_databaseCanRefresh = _databaseCanRefresh && _databaseEnabled
+	
+	if _error := mainIndexLoad (_index, _libraries, _databasePath, _databaseDirtyPath, _databaseCanWalk, _databaseCanLoad, _databaseCanStore, _databaseCanDirty); _error != nil {
+		return nil, _error
 	}
 	
-	_databaseLoaded := false
-	if _databaseShouldLoad {
-		if _loaded, _error := IndexLoadFromPath (_index, _databasePath); _error != nil {
-			return nil, _error
-		} else if _loaded {
-			_databaseLoaded = true
-			_databaseShouldWalk = false
-			_databaseShouldStore = false
-		} else {
-			logf ('i', 0x1dff7d9a, "index database not loaded due to incompatible versions;")
-		}
+	_librariesRefresh := _databaseEnabled && _databaseCanWalk && _databaseCanRefresh && _index.librariesRefreshEnabled
+	_librariesRefresh = _librariesRefresh && flagBoolOrDefault (_configuration.LibrariesRefreshEnabled, true)
+	_index.librariesRefreshEnabled = _librariesRefresh
+	if _librariesRefresh {
+		_index.librariesRefreshCallback = func (_index_0 *Index) (*Error) {
+					if _index_0 != _index {
+						return errorw (0x7bfcc92c, nil)
+					}
+					if !_databaseCanLoad {
+						return nil
+					}
+					return mainIndexLoad (_index, _libraries, _databasePath, _databaseDirtyPath, _databaseCanWalk, _databaseCanLoad, _databaseCanStore, _databaseCanDirty)
+				}
 	}
 	
-	if _databaseShouldWalk {
-		if _error := mainIndexWalkAndLoad (_index, _libraries); _error != nil {
-			return nil, _error
-		}
-		_databaseLoaded = true
+	_documentsRefresh := _databaseEnabled && _databaseCanWalk && _databaseCanRefresh && _index.documentRefreshEnabled
+	_documentsRefresh = _documentsRefresh && flagBoolOrDefault (_configuration.DocumentsRefreshEnabled, true)
+	_index.documentRefreshEnabled = _documentsRefresh
+	if _documentsRefresh {
+		_index.documentRefreshCallback = func (_index_0 *Index, _document *Document) (*Document, *Error) {
+					if _index_0 != _index {
+						return nil, errorw (0x435c1cc3, nil)
+					}
+					return WorkflowDocumentRefresh (_document, _index)
+				}
 	}
 	
-	if ! _databaseLoaded {
-		return nil, errorw (0xacfdaefc, nil)
-	}
-	
-	if _databaseShouldStore {
-		if _error := IndexStoreToPath (_index, _databasePath); _error != nil {
-			return nil, _error
-		}
-	}
-	
-	if _databaseShouldDirty {
+	_databaseCanDirty = _databaseCanDirty && _index.dirtyEnabled
+	_index.dirtyEnabled = _databaseCanDirty
+	if _databaseCanDirty {
 		_markDirty := func () (*Error) {
 //				logf ('d', 0xfcc0490e, "marking dirty database...")
+				_timestamp := time.Now ()
 				if _, _error := os.Stat (_databaseDirtyPath); _error == nil {
-					_timestamp := time.Now ()
 					if _error := os.Chtimes (_databaseDirtyPath, _timestamp, _timestamp); _error != nil {
 						return errorw (0x392bb23b, _error)
 					}
@@ -1910,25 +1889,107 @@ func mainIndexNew (_flags *IndexFlags, _configuration *IndexConfiguration, _libr
 					} else {
 						return errorw (0xb0f0682c, _error)
 					}
+					if _error := os.Chtimes (_databaseDirtyPath, _timestamp, _timestamp); _error != nil {
+						return errorw (0xfe939aea, _error)
+					}
 				} else {
 					return errorw (0xe29e9be2, _error)
 				}
+				_index.refreshTimestamp = _timestamp
 				return nil
 			}
-		_index.dirtyCallback = func () () {
-				if _error := _markDirty (); _error != nil {
-					logError ('e', _error)
+		_index.dirtyCallback = func (_index_0 *Index) (*Error) {
+				if _index_0 != _index {
+					return errorw (0x086e68ac, nil)
 				}
+				return _markDirty ()
 			}
+	}
+	
+	return _index, nil
+}
+
+
+func mainIndexLoad (_index *Index, _libraries []*Library, _databasePath string, _databaseDirtyPath string, _databaseCanWalk bool, _databaseCanLoad bool, _databaseCanStore bool, _databaseCanDirty bool) (*Error) {
+	
+	_beginTimestamp := time.Now ()
+	
+	_databaseShouldWalk := _databaseCanWalk
+	_databaseShouldLoad := _databaseCanLoad
+	_databaseShouldStore := _databaseCanStore
+	_databaseTimestamp := time.Time {}
+	
+	if _databaseShouldLoad {
+		if _stat, _error := os.Stat (_databasePath); _error == nil {
+			_databaseTimestamp = _stat.ModTime ()
+		} else if ! os.IsNotExist (_error) {
+			return errorw (0xc35078ab, _error)
+		} else {
+			_databaseShouldLoad = false
+		}
+	}
+	if _databaseShouldLoad && _databaseCanDirty {
+		if _stat, _error := os.Stat (_databaseDirtyPath); _error == nil {
+			if _stat.ModTime () .After (_databaseTimestamp) {
+//				logf ('d', 0xd23ee348, "index database not loaded (dirty);")
+				_databaseShouldLoad = false
+				_databaseTimestamp = _stat.ModTime ()
+			}
+		} else if ! os.IsNotExist (_error) {
+			return errorw (0xfb9afa94, _error)
+		}
+	}
+	
+	if _databaseShouldLoad {
+		if ! _databaseTimestamp.After (_index.refreshTimestamp) {
+//			logf ('d', 0xe1b51623, "index database not loaded (unchanged);")
+			return nil
+		}
+	}
+	
+	_databaseLoaded := false
+	if _databaseShouldLoad {
+		if _loaded, _error := IndexLoadFromPath (_index, _databasePath); _error != nil {
+			return _error
+		} else if _loaded {
+//			logf ('d', 0xae0fba86, "index database loaded;")
+			_databaseLoaded = true
+			_databaseShouldWalk = false
+			_databaseShouldStore = false
+		} else {
+//			logf ('i', 0x1dff7d9a, "index database not loaded due to incompatible versions;")
+		}
+	}
+	
+	if _databaseShouldWalk {
+		_databaseTimestamp = time.Now ()
+		if _error := mainIndexWalkAndLoad (_index, _libraries); _error != nil {
+			return _error
+		}
+//		logf ('d', 0xb6d41aa3, "index database walked;")
+		_databaseLoaded = true
+	}
+	
+	if !_databaseLoaded {
+		return errorw (0xacfdaefc, nil)
+	}
+	
+	_index.refreshTimestamp = _databaseTimestamp
+	
+	if _databaseShouldStore {
+		if _error := IndexStoreToPath (_index, _databasePath); _error != nil {
+			return _error
+		}
+//		logf ('d', 0x3c58b633, "index database stored;")
 	}
 	
 	_elapsed := time.Since (_beginTimestamp)
 	_elapsedMilliseconds := _elapsed.Milliseconds ()
 	if (_databaseShouldWalk && (_elapsedMilliseconds >= 200)) || (!_databaseShouldWalk && (_elapsedMilliseconds > 75)) {
-		logf ('d', 0x67aaf8be, "loading index took %d milliseconds...", _elapsedMilliseconds)
+		logf ('d', 0x67aaf8be, "index loading took %d milliseconds;", _elapsedMilliseconds)
 	}
 	
-	return _index, nil
+	return nil
 }
 
 
@@ -2068,6 +2129,11 @@ func mainLibrariesLoad (_libraries []*Library, _libraryDocuments [][][2]string) 
 
 func mainLibrariesInclude (_index *Index, _libraries []*Library, _documents []*Document) (*Error) {
 	
+	IndexClearData (_index)
+	
+	_dirtyEnabled := _index.dirtyEnabled
+	_index.dirtyEnabled = false
+	
 	for _, _library := range _libraries {
 		_error := IndexLibraryInclude (_index, _library)
 		if _error != nil {
@@ -2081,6 +2147,8 @@ func mainLibrariesInclude (_index *Index, _libraries []*Library, _documents []*D
 			return _error
 		}
 	}
+	
+	_index.dirtyEnabled = _dirtyEnabled
 	
 	return nil
 }
