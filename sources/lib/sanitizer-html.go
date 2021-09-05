@@ -24,7 +24,7 @@ type DocumentSanitizeHtmlOutcome struct {
 
 
 
-func DocumentSanitizeHtml (_document *Document, _unsafe string) (string, *DocumentSanitizeHtmlOutcome, *Error) {
+func DocumentSanitizeHtml (_document *Document, _unsafe string, _mangle bool) (string, *DocumentSanitizeHtmlOutcome, *Error) {
 	
 	_parser := bluemonday.UGCPolicy()
 	
@@ -56,7 +56,7 @@ func DocumentSanitizeHtml (_document *Document, _unsafe string) (string, *Docume
 			urlsLabel : make (map[string][]string, 1024),
 		}
 	
-	if _error := extractLinks (_node, _extractLinksContext); _error != nil {
+	if _error := extractLinks (_node, _extractLinksContext, _mangle); _error != nil {
 		return "", nil, _error
 	}
 	
@@ -178,7 +178,7 @@ func DocumentSanitizeUrl (_url *url.URL) (*Error) {
 
 
 
-func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
+func extractLinks (_node *html.Node, _context *extractLinksContext, _mangle bool) (*Error) {
 	
 	_mangleAttribute := func (_node *html.Node, _urlAttribute string, _labelAttribute string, _action bool) (*Error) {
 		
@@ -234,10 +234,12 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 			_url = & url.URL { Path : "/ue/" }
 		}
 		
-		if _error := DocumentSanitizeUrl (_url); _error != nil {
-			logErrorf ('e', 0x4e98912e, _error, "`%s`", _urlUnsafe)
-			_urlUnsafe = "/ue/"
-			_url = & url.URL { Path : "/ue/" }
+		if _mangle {
+			if _error := DocumentSanitizeUrl (_url); _error != nil {
+				logErrorf ('e', 0x4e98912e, _error, "`%s`", _urlUnsafe)
+				_urlUnsafe = "/ue/"
+				_url = & url.URL { Path : "/ue/" }
+			}
 		}
 		
 		_urlString := _url.String ()
@@ -247,10 +249,17 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 			_urlType = "error"
 		} else if strings.HasPrefix (_urlString, "/") {
 			_urlType = "internal"
+		} else if (_urlString == ".") || (_urlString == "..") || strings.HasPrefix (_urlString, "./") || strings.HasPrefix (_urlString, "../") {
+			_urlType = "relative"
 		} else if strings.HasPrefix (_urlString, "#") {
 			_urlType = "anchor"
-		} else {
+		} else if _url.Scheme != "" {
 			_urlType = "external"
+		} else {
+			_urlType = "error"
+			_urlUnsafe = "/ue/"
+			_urlString = "/ue/"
+			_url = & url.URL { Path : "/ue/" }
 		}
 		
 		_urlOpenString := _urlString
@@ -259,8 +268,14 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 		}
 		
 		_urlUseString := _urlString
-		if _action {
-			_urlUseString = _urlOpenString
+		if _mangle {
+			if _action {
+				_urlUseString = _urlOpenString
+			}
+		} else {
+			if _urlType == "error" {
+				_urlUseString = "#error"
+			}
 		}
 		
 		for _index, _attribute := range _node.Attr {
@@ -357,7 +372,7 @@ func extractLinks (_node *html.Node, _context *extractLinksContext) (*Error) {
 	}
 	
 	for _child := _node.FirstChild; _child != nil; _child = _child.NextSibling {
-		if _error := extractLinks (_child, _context); _error != nil {
+		if _error := extractLinks (_child, _context, _mangle); _error != nil {
 			return _error
 		}
 	}
@@ -461,6 +476,9 @@ func validateAnchors (_node *html.Node, _anchors map[string]bool) (*Error) {
 		
 		_anchor = _anchor[1:]
 		if _anchor == "" {
+			return nil
+		}
+		if _anchor == "error" {
 			return nil
 		}
 		

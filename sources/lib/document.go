@@ -37,6 +37,7 @@ type Document struct {
 	BodyFingerprint string
 	
 	RenderHtml string
+	RenderHtmlExport string
 	RenderText string
 	
 	HtmlLinks map[string][]string
@@ -504,6 +505,16 @@ func DocumentDump (_stream io.Writer, _document *Document, _includeIdentifiers b
 		fmt.Fprintf (_buffer, "-- render HTML:\n")
 		fmt.Fprintf (_buffer, "~~~~~~~~\n")
 		_lines, _ := stringSplitLines (_document.RenderHtml)
+		for _, _line := range _lines {
+			fmt.Fprintf (_buffer, "    %s\n", _line)
+		}
+		fmt.Fprintf (_buffer, "~~~~~~~~\n")
+	}
+	
+	if _includeRender && (_document.RenderHtmlExport != "") {
+		fmt.Fprintf (_buffer, "-- render HTML (export):\n")
+		fmt.Fprintf (_buffer, "~~~~~~~~\n")
+		_lines, _ := stringSplitLines (_document.RenderHtmlExport)
 		for _, _line := range _lines {
 			fmt.Fprintf (_buffer, "    %s\n", _line)
 		}

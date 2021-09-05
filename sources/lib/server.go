@@ -243,6 +243,10 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 		_identifier := _path[9:]
 		return ServerHandleDocumentExportHtml (_server, _identifier, _response)
 	}
+	if strings.HasPrefix (_path, "/dx/html-github/") {
+		_identifier := _path[16:]
+		return ServerHandleDocumentExportHtmlGithub (_server, _identifier, _response)
+	}
 	if strings.HasPrefix (_path, "/dx/text/") {
 		_identifier := _path[9:]
 		return ServerHandleDocumentExportText (_server, _identifier, _response)
@@ -420,7 +424,7 @@ func ServerHandleDocumentView (_server *Server, _identifierUnsafe string, _respo
 	if _error != nil {
 		return _error
 	}
-	_documentHtml, _error := DocumentRenderToHtml (_document)
+	_documentHtml, _error := DocumentRenderToHtml (_document, false)
 	if _error != nil {
 		return _error
 	}
@@ -453,7 +457,7 @@ func ServerHandleDocumentExportHtml (_server *Server, _identifierUnsafe string, 
 	if _error != nil {
 		return _error
 	}
-	_documentHtml, _error := DocumentRenderToHtml (_document)
+	_documentHtml, _error := DocumentRenderToHtml (_document, true)
 	if _error != nil {
 		return _error
 	}
@@ -467,6 +471,28 @@ func ServerHandleDocumentExportHtml (_server *Server, _identifierUnsafe string, 
 			html_template.HTML (_documentHtml),
 		}
 	return respondWithHtmlTemplate (_response, _server.templates.documentExportHtml, _context, true)
+}
+
+
+func ServerHandleDocumentExportHtmlGithub (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
+	_document, _error := serverDocumentResolve (_server, _identifierUnsafe)
+	if _error != nil {
+		return _error
+	}
+	_documentHtml, _error := DocumentRenderToHtml (_document, true)
+	if _error != nil {
+		return _error
+	}
+	_context := struct {
+			Server *Server
+			Document *Document
+			DocumentHtml html_template.HTML
+		} {
+			_server,
+			_document,
+			html_template.HTML (_documentHtml),
+		}
+	return respondWithHtmlTemplate (_response, _server.templates.documentExportHtmlGithub, _context, true)
 }
 
 

@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+	<head>
+		{{ template "document-html-head-title" .Document }}
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.css" />
+		<style>
+			body {
+				margin : 0px;
+				padding : 0px;
+			}
+			.markdown-body {
+				border: 1px solid #e1e4e8;
+				box-sizing: border-box;
+				min-width: 200px;
+				max-width: 980px;
+				margin: 0px auto;
+				padding: 45px;
+			}
+			@media (max-width: 767px) {
+				.markdown-body {
+					padding: 15px;
+				}
+			}
+		</style>
+		<style>
+			body {
+				background: rgb(34, 39, 46);
+			}
+			.markdown-body {
+				background: hsl(0, 0%, 100%);
+			}
+		</style>
+		<script>
+			(function () {
+				"use strict";
+				function _reload () {
+					if (window.location.search != "?reload") {
+						return;
+					}
+					if (window.history.scrollRestoration !== undefined) {
+						window.history.scrollRestoration = "auto";
+					}
+					window.history.go ();
+				}
+				window.setTimeout (_reload, 1000);
+			} ());
+		</script>
+	</head>
+	<body>
+		<main class="markdown-body">
+{{ .DocumentHtml }}
+		</main>
+	</body>
+</html>

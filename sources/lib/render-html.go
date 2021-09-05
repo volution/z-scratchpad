@@ -8,10 +8,16 @@ import "html"
 
 
 
-func DocumentRenderToHtml (_document *Document) (string, *Error) {
+func DocumentRenderToHtml (_document *Document, _export bool) (string, *Error) {
 	
-	if _document.RenderHtml != "" {
-		return _document.RenderHtml, nil
+	if _export {
+		if _document.RenderHtmlExport != "" {
+			return _document.RenderHtmlExport, nil
+		}
+	} else {
+		if _document.RenderHtml != "" {
+			return _document.RenderHtml, nil
+		}
 	}
 	
 	_format := _document.Format
@@ -45,15 +51,19 @@ func DocumentRenderToHtml (_document *Document) (string, *Error) {
 		return "", _error
 	}
 	
-	_render, _outcome, _error := DocumentSanitizeHtml (_document, _render)
+	_render, _outcome, _error := DocumentSanitizeHtml (_document, _render, !_export)
 	if _error != nil {
 		return "", _error
 	}
 	
-	_document.RenderHtml = _render
-	_document.HtmlLinks = _outcome.UrlsLabel
+	if _export {
+		_document.RenderHtmlExport = _render
+	} else {
+		_document.RenderHtml = _render
+		_document.HtmlLinks = _outcome.UrlsLabel
+	}
 	
-	return _document.RenderHtml, nil
+	return _render, nil
 }
 
 
