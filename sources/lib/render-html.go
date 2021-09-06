@@ -3,7 +3,50 @@
 package zscratchpad
 
 
+import "bytes"
 import "html"
+
+
+import html_template "html/template"
+
+
+
+
+func DocumentRenderToHtmlDocument (_document *Document, _export bool, _theme string, _templates *Templates, _buffer *bytes.Buffer) (*Error) {
+	_documentHtml, _error := DocumentRenderToHtml (_document, _export)
+	if _error != nil {
+		return _error
+	}
+	_themeCssAsset := ""
+	if _theme == "default" {
+		_theme = "github"
+	}
+	switch _theme {
+		case "github" :
+			_themeCssAsset = "assets/css-export/github-min.css"
+		case "modest" :
+			_themeCssAsset = "assets/css-export/modest-min.css"
+		default :
+			return errorw (0x922a8ee1, nil)
+	}
+	_, _themeCssData, _error := TemplatesAssetResolve (_templates, _themeCssAsset)
+	if _error != nil {
+		return _error
+	}
+	_context := struct {
+			Document *Document
+			DocumentHtml html_template.HTML
+			ThemeCss html_template.CSS
+		} {
+			_document,
+			html_template.HTML (_documentHtml),
+			html_template.CSS (_themeCssData),
+		}
+	if _error := _templates.documentExportHtmlDocument.Execute (_buffer, _context); _error != nil {
+		return errorw (0xf6bb6151, _error)
+	}
+	return nil
+}
 
 
 

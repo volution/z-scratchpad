@@ -36,7 +36,7 @@ type Templates struct {
 	documentViewText *text_template.Template
 	
 	documentExportHtml *html_template.Template
-	documentExportHtmlGithub *html_template.Template
+	documentExportHtmlDocument *html_template.Template
 	documentExportText *text_template.Template
 	documentExportSource *text_template.Template
 	
@@ -142,8 +142,8 @@ func TemplatesNew () (*Templates, *Error) {
 		return nil, errorw (0x91a8e5c7, _error)
 	}
 	
-	if _template, _error := html_template.New ("") .Parse (embedded.DocumentExportHtmlGithub); _error == nil {
-		_templates.documentExportHtmlGithub = _template
+	if _template, _error := html_template.New ("") .Parse (embedded.DocumentExportHtmlDocument); _error == nil {
+		_templates.documentExportHtmlDocument = _template
 	} else {
 		return nil, errorw (0xc10eb414, _error)
 	}
@@ -189,7 +189,7 @@ func TemplatesNew () (*Templates, *Error) {
 			_templates.libraryViewHtml,
 			_templates.documentViewHtml,
 			_templates.documentExportHtml,
-			_templates.documentExportHtmlGithub,
+			_templates.documentExportHtmlDocument,
 			_templates.urlOpenHtml,
 			_templates.urlErrorHtml,
 			_templates.versionHtml,

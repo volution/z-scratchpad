@@ -134,10 +134,10 @@
 			{{ if .EditEnabled }}
 				<li class="search-candidate"><a href="/de/{{ .Identifier }}">{edit}</a></li>
 			{{ end }}
-			<li class="search-candidate"><a href="/dx/source/{{ .Identifier }}">{source}</a></li>
-			<li class="search-candidate"><a href="/dx/html/{{ .Identifier }}">{export HTML}</a></li>
-			<li class="search-candidate"><a href="/dx/html-github/{{ .Identifier }}">{export HTML GitHub}</a></li>
+			<li class="search-candidate"><a href="/dx/html-document/{{ .Identifier }}">{export HTML doc}</a></li>
+			<li class="search-candidate"><a href="/dx/html-body/{{ .Identifier }}">{export HTML raw}</a></li>
 			<li class="search-candidate"><a href="/dx/text/{{ .Identifier }}">{export txt}</a></li>
+			<li class="search-candidate"><a href="/dx/source/{{ .Identifier }}">{source}</a></li>
 			<li class="search-candidate"><a href="/d/{{ .Identifier }}">{reload}</a></li>
 		</ul>
 	</nav>
@@ -150,10 +150,10 @@
 			{{ if .EditEnabled }}
 				<li><a href="/de/{{ .Identifier }}">{edit}</a></li>
 			{{ end }}
-			<li><a href="/dx/source/{{ .Identifier }}">{source}</a></li>
-			<li><a href="/dx/html/{{ .Identifier }}">{export HTML}</a></li>
-			<li><a href="/dx/html-github/{{ .Identifier }}">{export HTML GitHub}</a></li>
+			<li><a href="/dx/html-document/{{ .Identifier }}">{export HTML doc}</a></li>
+			<li><a href="/dx/html-body/{{ .Identifier }}">{export HTML raw}</a></li>
 			<li><a href="/dx/text/{{ .Identifier }}">{export txt}</a></li>
+			<li><a href="/dx/source/{{ .Identifier }}">{source}</a></li>
 			<li><a href="/d/{{ .Identifier }}">{reload}</a></li>
 		</ul>
 	</nav>

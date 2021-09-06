@@ -239,13 +239,13 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 		_identifier := _path[4:]
 		return ServerHandleDocumentFingerprint (_server, _identifier, _response)
 	}
-	if strings.HasPrefix (_path, "/dx/html/") {
-		_identifier := _path[9:]
+	if strings.HasPrefix (_path, "/dx/html-body/") {
+		_identifier := _path[14:]
 		return ServerHandleDocumentExportHtml (_server, _identifier, _response)
 	}
-	if strings.HasPrefix (_path, "/dx/html-github/") {
-		_identifier := _path[16:]
-		return ServerHandleDocumentExportHtmlGithub (_server, _identifier, _response)
+	if strings.HasPrefix (_path, "/dx/html-document/") {
+		_identifier := _path[18:]
+		return ServerHandleDocumentExportHtmlDocument (_server, _identifier, "default", _response)
 	}
 	if strings.HasPrefix (_path, "/dx/text/") {
 		_identifier := _path[9:]
@@ -474,25 +474,17 @@ func ServerHandleDocumentExportHtml (_server *Server, _identifierUnsafe string, 
 }
 
 
-func ServerHandleDocumentExportHtmlGithub (_server *Server, _identifierUnsafe string, _response http.ResponseWriter) (*Error) {
+func ServerHandleDocumentExportHtmlDocument (_server *Server, _identifierUnsafe string, _theme string, _response http.ResponseWriter) (*Error) {
 	_document, _error := serverDocumentResolve (_server, _identifierUnsafe)
 	if _error != nil {
 		return _error
 	}
-	_documentHtml, _error := DocumentRenderToHtml (_document, true)
-	if _error != nil {
+	_buffer := BytesBufferNewSize (128 * 1024)
+	defer BytesBufferRelease (_buffer)
+	if _error := DocumentRenderToHtmlDocument (_document, true, _theme, _server.templates, _buffer); _error != nil {
 		return _error
 	}
-	_context := struct {
-			Server *Server
-			Document *Document
-			DocumentHtml html_template.HTML
-		} {
-			_server,
-			_document,
-			html_template.HTML (_documentHtml),
-		}
-	return respondWithHtmlTemplate (_response, _server.templates.documentExportHtmlGithub, _context, true)
+	return respondWithHtmlBuffer (_response, _buffer)
 }
 
 

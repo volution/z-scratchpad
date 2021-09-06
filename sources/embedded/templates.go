@@ -55,8 +55,8 @@ var DocumentViewText string
 //go:embed templates/document-export.html
 var DocumentExportHtml string
 
-//go:embed templates/document-export.html-github
-var DocumentExportHtmlGithub string
+//go:embed templates/document-export.html-document
+var DocumentExportHtmlDocument string
 
 //go:embed templates/document-export.txt
 var DocumentExportText string

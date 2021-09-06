@@ -17,9 +17,6 @@ import "strings"
 import "time"
 
 
-import html_template "html/template"
-
-
 import "github.com/jessevdk/go-flags"
 import "github.com/pelletier/go-toml"
 import "github.com/akutz/sortfold"
@@ -120,7 +117,7 @@ type EditFlags struct {
 type ExportFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Document *string `long:"document" short:"d" value-name:"{identifier}"`
-	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html" choice:"html-github"`
+	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html" choice:"html-github" choice:"html-modest" choice:"html-body"`
 	Select *bool `long:"select" short:"s"`
 }
 
@@ -968,32 +965,25 @@ func mainExportOutput (_identifier string, _format string, _globals *Globals, _i
 				return _error
 			}
 		
-		case "html" :
+		case "html-body" :
 			if _output, _error := DocumentRenderToHtml (_document, true); _error == nil {
 				_buffer = bytes.NewBufferString (_output)
 			} else {
 				return _error
 			}
 		
-		case "html-github" :
+		case "html", "html-github", "html-modest" :
+			if _format == "html" {
+				_format = "html-default"
+			}
+			_theme := _format[5:]
 			_buffer = BytesBufferNewSize (128 * 1024)
 			defer BytesBufferRelease (_buffer)
-			if _output, _error := DocumentRenderToHtml (_document, true); _error == nil {
-				if _templates, _error := TemplatesNew (); _error == nil {
-					_context := struct {
-							Document *Document
-							DocumentHtml html_template.HTML
-						} {
-							_document,
-							html_template.HTML (_output),
-						}
-						if _error := _templates.documentExportHtmlGithub.Execute (_buffer, _context); _error != nil {
-							return errorw (0xf6bb6151, _error)
-						}
-				} else {
-					return _error
-				}
-			} else {
+			_templates, _error := TemplatesNew ()
+			if _error != nil {
+				return _error
+			}
+			if _error := DocumentRenderToHtmlDocument (_document, true, _theme, _templates, _buffer); _error != nil {
 				return _error
 			}
 		

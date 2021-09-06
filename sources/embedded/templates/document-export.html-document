@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+	<head>
+		<title>
+			{{- if .Document.Title -}}
+				{{ .Document.Title }}
+			{{- else -}}
+				[{{ .Document.Identifier }}]
+			{{- end -}}
+		</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<style>
+			{{ .ThemeCss }}
+		</style>
+		<script>
+			(function () {
+				"use strict";
+				function _reload () {
+					if (window.location.search != "?reload") {
+						return;
+					}
+					if (window.history.scrollRestoration !== undefined) {
+						window.history.scrollRestoration = "auto";
+					}
+					window.history.go ();
+				}
+				window.setTimeout (_reload, 1000);
+			} ());
+		</script>
+	</head>
+	<body>
+		<main class="markdown-body">
+			<header>
+				<h1>
+					{{- if .Document.Title -}}
+						{{ .Document.Title }}
+					{{- else -}}
+						[{{ .Document.Identifier }}]
+					{{- end -}}
+				</h1>
+				{{ if .Document.Timestamp.IsZero | not }}
+					<p>(Last changed on <time datetime="{{ .Document.Timestamp.Format "2006-01-02" }}">{{ .Document.Timestamp.Format "2006-01-02 15:04:05" }}</time>.)</p>
+				{{ end }}
+				<hr/>
+			</header>
+{{ .DocumentHtml }}
+		</main>
+	</body>
+</html>
