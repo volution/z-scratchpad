@@ -1,3 +1,30 @@
+
+/* NOTE:  Custom style. */
+
+html:root, body {
+	background: rgb(34, 39, 46);
+}
+.markdown-body {
+	background: hsl(0, 0%, 100%);
+}
+
+body {
+	margin : 0px;
+	padding : 0px;
+}
+.markdown-body {
+	box-sizing: border-box;
+	min-width: 200px;
+	max-width: 980px;
+	margin: 0px auto;
+	padding: 45px;
+}
+@media (max-width: 767px) {
+	.markdown-body {
+		padding: 15px;
+	}
+}
+
 /* NOTE:  https://github.com/sindresorhus/github-markdown-css */
 
 .markdown-body .octicon {
@@ -984,32 +1011,5 @@
 .markdown-body .task-list-item input {
   margin: 0 .2em .25em -1.6em;
   vertical-align: middle;
-}
-
-
-/* NOTE:  Custom style. */
-
-body {
-	margin : 0px;
-	padding : 0px;
-}
-.markdown-body {
-	box-sizing: border-box;
-	min-width: 200px;
-	max-width: 980px;
-	margin: 0px auto;
-	padding: 45px;
-}
-@media (max-width: 767px) {
-	.markdown-body {
-		padding: 15px;
-	}
-}
-
-html:root, body {
-	background: rgb(34, 39, 46);
-}
-.markdown-body {
-	background: hsl(0, 0%, 100%);
 }
 

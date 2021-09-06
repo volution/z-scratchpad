@@ -1,3 +1,10 @@
+
+/* NOTE:  Custom style. */
+
+html:root, body {
+	background: #ffffff;
+}
+
 /* NOTE:  https://github.com/markdowncss/modest */
 
 @media print {
@@ -218,11 +225,5 @@ blockquote {
 pre,
 code {
   background-color: #fafafa;
-}
-
-/* NOTE:  Custom style. */
-
-html:root, body {
-	background: #ffffff;
 }
 
