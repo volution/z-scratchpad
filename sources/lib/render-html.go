@@ -22,6 +22,8 @@ func DocumentRenderToHtmlDocument (_document *Document, _export bool, _theme str
 		_theme = "github"
 	}
 	switch _theme {
+		case "plain" :
+			_themeCssAsset = "assets/css-export/plain.css"
 		case "github" :
 			_themeCssAsset = "assets/css-export/github-min.css"
 		case "modest" :

@@ -1,0 +1,32 @@
+
+html:root, body {
+	margin : 0px;
+	padding : 0px;
+	background : rgb(34, 39, 46);
+}
+
+.markdown-body, .markdown-header {
+	box-sizing : border-box;
+	min-width : 200px;
+	max-width : 980px;
+	margin : 0px auto;
+}
+.markdown-body {
+	padding : 45px;
+	background : hsl(0, 0%, 100%);
+}
+.markdown-header {
+	padding : 4px;
+	color : hsl(0, 0%, 75%);
+	background : hsl(210, 100%, 10%);
+	font-size : 16px;
+	line-height : 24px;
+	font-family : monospace;
+	text-align : center;
+}
+@media (max-width : 767px) {
+	.markdown-body {
+		padding : 15px;
+	}
+}
+
