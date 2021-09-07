@@ -23,11 +23,13 @@ func DocumentRenderToHtmlDocument (_document *Document, _export bool, _theme str
 	}
 	switch _theme {
 		case "plain" :
-			_themeCssAsset = "assets/css-export/plain.css"
+			_themeCssAsset = "assets/css-export/plain-min.css"
 		case "github" :
 			_themeCssAsset = "assets/css-export/github-min.css"
 		case "modest" :
 			_themeCssAsset = "assets/css-export/modest-min.css"
+		case "tufte" :
+			_themeCssAsset = "assets/css-export/tufte-min.css"
 		default :
 			return errorw (0x922a8ee1, nil)
 	}

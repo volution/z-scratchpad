@@ -117,7 +117,7 @@ type EditFlags struct {
 type ExportFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Document *string `long:"document" short:"d" value-name:"{identifier}"`
-	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html" choice:"html-plain" choice:"html-github" choice:"html-modest" choice:"html-body"`
+	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html" choice:"html-plain" choice:"html-github" choice:"html-modest" choice:"html-tufte" choice:"html-body"`
 	Select *bool `long:"select" short:"s"`
 }
 
@@ -972,7 +972,7 @@ func mainExportOutput (_identifier string, _format string, _globals *Globals, _i
 				return _error
 			}
 		
-		case "html", "html-plain", "html-github", "html-modest" :
+		case "html", "html-plain", "html-github", "html-modest", "html-tufte" :
 			if _format == "html" {
 				_format = "html-default"
 			}

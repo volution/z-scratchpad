@@ -26,7 +26,7 @@ html:root, body {
 	font-family : monospace;
 	text-align : center;
 }
-@media (max-width : 767px) {
+@media screen and (max-width : 767px) {
 	.markdown-body {
 		padding : 15px;
 	}
