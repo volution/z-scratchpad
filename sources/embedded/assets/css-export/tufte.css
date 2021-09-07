@@ -55,12 +55,14 @@ html:root, body {
 }
 */
 
-@media (prefers-color-scheme: dark) {
+/*
+@media screen and (prefers-color-scheme: dark) {
     .document-body {
         background-color: #151515;
         color: #ddd;
     }
 }
+*/
 
 .document-body h1 {
     font-weight: 400;
@@ -150,11 +152,13 @@ html:root, body {
     }
 }
 
-@media (prefers-color-scheme: dark) {
+/*
+@media screen and (prefers-color-scheme: dark) {
     .document-body a:link {
         text-shadow: 0.03em 0 #151515, -0.03em 0 #151515, 0 0.03em #151515, 0 -0.03em #151515, 0.06em 0 #151515, -0.06em 0 #151515, 0.09em 0 #151515, -0.09em 0 #151515, 0.12em 0 #151515, -0.12em 0 #151515, 0.15em 0 #151515, -0.15em 0 #151515;
     }
 }
+*/
 
 .document-body a:link::selection,
 .document-body a:link::-moz-selection {
@@ -187,7 +191,7 @@ html:root, body {
     display: block;
 }
 
-@media (max-width: 760px) {
+@media screen and (max-width: 760px) {
 
     .document-body hr {
         width: 100%;
