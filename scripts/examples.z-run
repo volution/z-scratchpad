@@ -40,3 +40,22 @@
 
 :: examples / exec :: exec -- "${ZRUN[@]}" ':: run / exec' -C ./examples "${@}"
 
+
+
+
+<< examples / export / themes
+	test "${#}" -eq 0
+	_documents=(
+			'readme tests:readme'
+		)
+	_themes=( github modest tufte plain )
+	for _document_and_identifier in "${_documents[@]}" ; do
+		_document="${_document_and_identifier% *}"
+		_identifier="${_document_and_identifier#* }"
+		for _theme in "${_themes[@]}" ; do
+			_output="./examples/exports/${_document}--${_theme}.html"
+			"${ZRUN[@]}" ':: examples / exec' export -d "${_identifier}" -f "html-${_theme}" >| "${_output}"
+		done
+	done
+!!
+
