@@ -30,12 +30,12 @@
 		</script>
 	</head>
 	<body>
-		<header class="markdown-header">
+		<header class="document-header">
 			{{ if .Document.Title }}<span>{{ .Document.Title }}</span>{{ end }}
 			<span>[{{ .Document.Identifier }}]</span>
 			{{ if .Document.Timestamp.IsZero | not }}<span>(<time datetime="{{ .Document.Timestamp.Format "2006-01-02" }}">{{ .Document.Timestamp.Format "2006-01-02 15:04:05" }}</time>)</span>{{ end }}
 		</header>
-		<main class="markdown-body">
+		<main class="document-body">
 {{ .DocumentHtml }}
 		</main>
 	</body>
