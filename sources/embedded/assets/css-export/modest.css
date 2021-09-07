@@ -7,17 +7,17 @@ html:root, body {
 	background : rgb(34, 39, 46);
 }
 
-.markdown-body, .markdown-header {
+.document-body, .document-header {
 	box-sizing : border-box;
 	min-width : 200px;
 	max-width : 1400px;
 	margin : 0px auto;
 }
-.markdown-body {
+.document-body {
 	padding : 45px;
 	background : hsl(0, 0%, 100%);
 }
-.markdown-header {
+.document-header {
 	padding : 4px;
 	color : hsl(0, 0%, 75%);
 	background : hsl(210, 100%, 10%);
@@ -27,107 +27,107 @@ html:root, body {
 	text-align : center;
 }
 @media screen and (max-width : 767px) {
-	.markdown-body {
+	.document-body {
 		padding : 15px;
 	}
 }
 
 /* NOTE:  https://github.com/markdowncss/modest */
 
-.markdown-body pre,
-.markdown-body code {
+.document-body pre,
+.document-body code {
   font-family: Menlo, Monaco, "Courier New", monospace;
 }
 
-.markdown-body pre {
+.document-body pre {
   padding: .5rem;
   line-height: 1.25;
   overflow-x: scroll;
 }
 
-.markdown-body a,
-.markdown-body a:visited {
+.document-body a,
+.document-body a:visited {
   color: #3498db;
 }
 
-.markdown-body a:hover,
-.markdown-body a:focus,
-.markdown-body a:active {
+.document-body a:hover,
+.document-body a:focus,
+.document-body a:active {
   color: #2980b9;
 }
 
-.markdown-body {
+.document-body {
   font-size: 12px;
 }
 
 @media screen and (min-width: 32rem) and (max-width: 48rem) {
-  .markdown-body {
+  .document-body {
     font-size: 15px;
   }
 }
 
 @media screen and (min-width: 48rem) {
-  .markdown-body {
+  .document-body {
     font-size: 16px;
   }
 }
 
-.markdown-body {
+.document-body {
   line-height: 1.85;
 }
 
-.markdown-body p {
+.document-body p {
   font-size: 1rem;
   margin-bottom: 1.3rem;
 }
 
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
-.markdown-body h4 {
+.document-body h1,
+.document-body h2,
+.document-body h3,
+.document-body h4 {
   margin: 1.414rem 0 .5rem;
   font-weight: inherit;
   line-height: 1.42;
 }
 
-.markdown-body h1 {
+.document-body h1 {
   margin-top: 0;
   font-size: 3.998rem;
 }
 
-.markdown-body h2 {
+.document-body h2 {
   font-size: 2.827rem;
 }
 
-.markdown-body h3 {
+.document-body h3 {
   font-size: 1.999rem;
 }
 
-.markdown-body h4 {
+.document-body h4 {
   font-size: 1.414rem;
 }
 
-.markdown-body h5 {
+.document-body h5 {
   font-size: 1.121rem;
 }
 
-.markdown-body h6 {
+.document-body h6 {
   font-size: .88rem;
 }
 
-.markdown-body small {
+.document-body small {
   font-size: .707em;
 }
 
 /* https://github.com/mrmrs/fluidity */
 
-.markdown-body img,
-.markdown-body canvas,
-.markdown-body iframe,
-.markdown-body video,
-.markdown-body svg,
-.markdown-body select,
-.markdown-body textarea {
+.document-body img,
+.document-body canvas,
+.document-body iframe,
+.document-body video,
+.document-body svg,
+.document-body select,
+.document-body textarea {
   max-width: 100%;
 }
 
@@ -135,11 +135,11 @@ html:root, body {
 
 @import url(http://fonts.googleapis.com/css?family=Arimo:700,700italic);
 
-.markdown-body {
+.document-body {
   font-size: 18px;
 }
 
-.markdown-body {
+.document-body {
   color: #444;
   font-family: 'Open Sans Condensed', sans-serif;
   font-weight: 300;
@@ -147,31 +147,31 @@ html:root, body {
   line-height: 1.45;
 }
 
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
-.markdown-body h4,
-.markdown-body h5,
-.markdown-body h6 {
+.document-body h1,
+.document-body h2,
+.document-body h3,
+.document-body h4,
+.document-body h5,
+.document-body h6 {
   font-family: Arimo, Helvetica, sans-serif;
 }
 
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3 {
+.document-body h1,
+.document-body h2,
+.document-body h3 {
   border-bottom: 2px solid #fafafa;
   margin-bottom: 1.15rem;
   padding-bottom: .5rem;
   text-align: center;
 }
 
-.markdown-body blockquote {
+.document-body blockquote {
   border-left: 8px solid #fafafa;
   padding: 1rem;
 }
 
-.markdown-body pre,
-.markdown-body code {
+.document-body pre,
+.document-body code {
   background-color: #fafafa;
 }
 

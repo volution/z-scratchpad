@@ -5,17 +5,17 @@ html:root, body {
 	background : rgb(34, 39, 46);
 }
 
-.markdown-body, .markdown-header {
+.document-body, .document-header {
 	box-sizing : border-box;
 	min-width : 200px;
 	max-width : 1400px;
 	margin : 0px auto;
 }
-.markdown-body {
+.document-body {
 	padding : 45px;
 	background : hsl(0, 0%, 100%);
 }
-.markdown-header {
+.document-header {
 	padding : 4px;
 	color : hsl(0, 0%, 75%);
 	background : hsl(210, 100%, 10%);
@@ -25,7 +25,7 @@ html:root, body {
 	text-align : center;
 }
 @media screen and (max-width : 767px) {
-	.markdown-body {
+	.document-body {
 		padding : 15px;
 	}
 }

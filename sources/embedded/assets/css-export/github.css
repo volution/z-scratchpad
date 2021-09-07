@@ -7,17 +7,17 @@ html:root, body {
 	background : rgb(34, 39, 46);
 }
 
-.markdown-body, .markdown-header {
+.document-body, .document-header {
 	box-sizing : border-box;
 	min-width : 200px;
 	max-width : 980px;
 	margin : 0px auto;
 }
-.markdown-body {
+.document-body {
 	padding : 45px;
 	background : hsl(0, 0%, 100%);
 }
-.markdown-header {
+.document-header {
 	padding : 4px;
 	color : hsl(0, 0%, 75%);
 	background : hsl(210, 100%, 10%);
@@ -27,71 +27,73 @@ html:root, body {
 	text-align : center;
 }
 @media screen and (max-width : 767px) {
-	.markdown-body {
+	.document-body {
 		padding : 15px;
 	}
 }
 
 /* NOTE:  https://github.com/sindresorhus/github-markdown-css */
 
-.markdown-body .octicon {
+.document-body .octicon {
   display: inline-block;
   fill: currentColor;
   vertical-align: text-bottom;
 }
 
-.markdown-body .anchor {
+.document-body .anchor {
   float: left;
   line-height: 1;
   margin-left: -20px;
   padding-right: 4px;
 }
 
-.markdown-body .anchor:focus {
+.document-body .anchor:focus {
   outline: none;
 }
 
-.markdown-body h1 .octicon-link,
-.markdown-body h2 .octicon-link,
-.markdown-body h3 .octicon-link,
-.markdown-body h4 .octicon-link,
-.markdown-body h5 .octicon-link,
-.markdown-body h6 .octicon-link {
+.document-body h1 .octicon-link,
+.document-body h2 .octicon-link,
+.document-body h3 .octicon-link,
+.document-body h4 .octicon-link,
+.document-body h5 .octicon-link,
+.document-body h6 .octicon-link {
   color: #1b1f23;
   vertical-align: middle;
   visibility: hidden;
 }
 
-.markdown-body h1:hover .anchor,
-.markdown-body h2:hover .anchor,
-.markdown-body h3:hover .anchor,
-.markdown-body h4:hover .anchor,
-.markdown-body h5:hover .anchor,
-.markdown-body h6:hover .anchor {
+.document-body h1:hover .anchor,
+.document-body h2:hover .anchor,
+.document-body h3:hover .anchor,
+.document-body h4:hover .anchor,
+.document-body h5:hover .anchor,
+.document-body h6:hover .anchor {
   text-decoration: none;
 }
 
-.markdown-body h1:hover .anchor .octicon-link,
-.markdown-body h2:hover .anchor .octicon-link,
-.markdown-body h3:hover .anchor .octicon-link,
-.markdown-body h4:hover .anchor .octicon-link,
-.markdown-body h5:hover .anchor .octicon-link,
-.markdown-body h6:hover .anchor .octicon-link {
+.document-body h1:hover .anchor .octicon-link,
+.document-body h2:hover .anchor .octicon-link,
+.document-body h3:hover .anchor .octicon-link,
+.document-body h4:hover .anchor .octicon-link,
+.document-body h5:hover .anchor .octicon-link,
+.document-body h6:hover .anchor .octicon-link {
   visibility: visible;
 }
 
-.markdown-body h1:hover .anchor .octicon-link:before,
-.markdown-body h2:hover .anchor .octicon-link:before,
-.markdown-body h3:hover .anchor .octicon-link:before,
-.markdown-body h4:hover .anchor .octicon-link:before,
-.markdown-body h5:hover .anchor .octicon-link:before,
-.markdown-body h6:hover .anchor .octicon-link:before {
+.document-body h1:hover .anchor .octicon-link:before,
+.document-body h2:hover .anchor .octicon-link:before,
+.document-body h3:hover .anchor .octicon-link:before,
+.document-body h4:hover .anchor .octicon-link:before,
+.document-body h5:hover .anchor .octicon-link:before,
+.document-body h6:hover .anchor .octicon-link:before {
   width: 16px;
   height: 16px;
   content: ' ';
   display: inline-block;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' version='1.1' width='16' height='16' aria-hidden='true'%3E%3Cpath fill-rule='evenodd' d='M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z'%3E%3C/path%3E%3C/svg%3E");
-}.markdown-body {
+}
+
+.document-body {
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   line-height: 1.5;
@@ -102,88 +104,88 @@ html:root, body {
   word-wrap: break-word;
 }
 
-.markdown-body details {
+.document-body details {
   display: block;
 }
 
-.markdown-body summary {
+.document-body summary {
   display: list-item;
 }
 
-.markdown-body a {
+.document-body a {
   background-color: initial;
 }
 
-.markdown-body a:active,
-.markdown-body a:hover {
+.document-body a:active,
+.document-body a:hover {
   outline-width: 0;
 }
 
-.markdown-body strong {
+.document-body strong {
   font-weight: inherit;
   font-weight: bolder;
 }
 
-.markdown-body h1 {
+.document-body h1 {
   font-size: 2em;
   margin: .67em 0;
 }
 
-.markdown-body img {
+.document-body img {
   border-style: none;
 }
 
-.markdown-body code,
-.markdown-body kbd,
-.markdown-body pre {
+.document-body code,
+.document-body kbd,
+.document-body pre {
   font-family: monospace,monospace;
   font-size: 1em;
 }
 
-.markdown-body hr {
+.document-body hr {
   box-sizing: initial;
   height: 0;
   overflow: visible;
 }
 
-.markdown-body input {
+.document-body input {
   font: inherit;
   margin: 0;
 }
 
-.markdown-body input {
+.document-body input {
   overflow: visible;
 }
 
-.markdown-body [type=checkbox] {
+.document-body [type=checkbox] {
   box-sizing: border-box;
   padding: 0;
 }
 
-.markdown-body * {
+.document-body * {
   box-sizing: border-box;
 }
 
-.markdown-body input {
+.document-body input {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
 }
 
-.markdown-body a {
+.document-body a {
   color: #0366d6;
   text-decoration: none;
 }
 
-.markdown-body a:hover {
+.document-body a:hover {
   text-decoration: underline;
 }
 
-.markdown-body strong {
+.document-body strong {
   font-weight: 600;
 }
 
-.markdown-body hr {
+.document-body hr {
   height: 0;
   margin: 15px 0;
   overflow: hidden;
@@ -192,31 +194,31 @@ html:root, body {
   border-bottom: 1px solid #dfe2e5;
 }
 
-.markdown-body hr:after,
-.markdown-body hr:before {
+.document-body hr:after,
+.document-body hr:before {
   display: table;
   content: "";
 }
 
-.markdown-body hr:after {
+.document-body hr:after {
   clear: both;
 }
 
-.markdown-body table {
+.document-body table {
   border-spacing: 0;
   border-collapse: collapse;
 }
 
-.markdown-body td,
-.markdown-body th {
+.document-body td,
+.document-body th {
   padding: 0;
 }
 
-.markdown-body details summary {
+.document-body details summary {
   cursor: pointer;
 }
 
-.markdown-body kbd {
+.document-body kbd {
   display: inline-block;
   padding: 3px 5px;
   font: 11px SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
@@ -229,406 +231,406 @@ html:root, body {
   box-shadow: inset 0 -1px 0 #d1d5da;
 }
 
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
-.markdown-body h4,
-.markdown-body h5,
-.markdown-body h6 {
+.document-body h1,
+.document-body h2,
+.document-body h3,
+.document-body h4,
+.document-body h5,
+.document-body h6 {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.markdown-body h1 {
+.document-body h1 {
   font-size: 32px;
 }
 
-.markdown-body h1,
-.markdown-body h2 {
+.document-body h1,
+.document-body h2 {
   font-weight: 600;
 }
 
-.markdown-body h2 {
+.document-body h2 {
   font-size: 24px;
 }
 
-.markdown-body h3 {
+.document-body h3 {
   font-size: 20px;
 }
 
-.markdown-body h3,
-.markdown-body h4 {
+.document-body h3,
+.document-body h4 {
   font-weight: 600;
 }
 
-.markdown-body h4 {
+.document-body h4 {
   font-size: 16px;
 }
 
-.markdown-body h5 {
+.document-body h5 {
   font-size: 14px;
 }
 
-.markdown-body h5,
-.markdown-body h6 {
+.document-body h5,
+.document-body h6 {
   font-weight: 600;
 }
 
-.markdown-body h6 {
+.document-body h6 {
   font-size: 12px;
 }
 
-.markdown-body p {
+.document-body p {
   margin-top: 0;
   margin-bottom: 10px;
 }
 
-.markdown-body blockquote {
+.document-body blockquote {
   margin: 0;
 }
 
-.markdown-body ol,
-.markdown-body ul {
+.document-body ol,
+.document-body ul {
   padding-left: 0;
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.markdown-body ol ol,
-.markdown-body ul ol {
+.document-body ol ol,
+.document-body ul ol {
   list-style-type: lower-roman;
 }
 
-.markdown-body ol ol ol,
-.markdown-body ol ul ol,
-.markdown-body ul ol ol,
-.markdown-body ul ul ol {
+.document-body ol ol ol,
+.document-body ol ul ol,
+.document-body ul ol ol,
+.document-body ul ul ol {
   list-style-type: lower-alpha;
 }
 
-.markdown-body dd {
+.document-body dd {
   margin-left: 0;
 }
 
-.markdown-body code,
-.markdown-body pre {
+.document-body code,
+.document-body pre {
   font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
   font-size: 12px;
 }
 
-.markdown-body pre {
+.document-body pre {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.markdown-body input::-webkit-inner-spin-button,
-.markdown-body input::-webkit-outer-spin-button {
+.document-body input::-webkit-inner-spin-button,
+.document-body input::-webkit-outer-spin-button {
   margin: 0;
   -webkit-appearance: none;
   appearance: none;
 }
 
-.markdown-body :checked+.radio-label {
+.document-body :checked+.radio-label {
   position: relative;
   z-index: 1;
   border-color: #0366d6;
 }
 
-.markdown-body .border {
+.document-body .border {
   border: 1px solid #e1e4e8!important;
 }
 
-.markdown-body .border-0 {
+.document-body .border-0 {
   border: 0!important;
 }
 
-.markdown-body .border-bottom {
+.document-body .border-bottom {
   border-bottom: 1px solid #e1e4e8!important;
 }
 
-.markdown-body .rounded-1 {
+.document-body .rounded-1 {
   border-radius: 3px!important;
 }
 
-.markdown-body .bg-white {
+.document-body .bg-white {
   background-color: #fff!important;
 }
 
-.markdown-body .bg-gray-light {
+.document-body .bg-gray-light {
   background-color: #fafbfc!important;
 }
 
-.markdown-body .text-gray-light {
+.document-body .text-gray-light {
   color: #6a737d!important;
 }
 
-.markdown-body .mb-0 {
+.document-body .mb-0 {
   margin-bottom: 0!important;
 }
 
-.markdown-body .my-2 {
+.document-body .my-2 {
   margin-top: 8px!important;
   margin-bottom: 8px!important;
 }
 
-.markdown-body .pl-0 {
+.document-body .pl-0 {
   padding-left: 0!important;
 }
 
-.markdown-body .py-0 {
+.document-body .py-0 {
   padding-top: 0!important;
   padding-bottom: 0!important;
 }
 
-.markdown-body .pl-1 {
+.document-body .pl-1 {
   padding-left: 4px!important;
 }
 
-.markdown-body .pl-2 {
+.document-body .pl-2 {
   padding-left: 8px!important;
 }
 
-.markdown-body .py-2 {
+.document-body .py-2 {
   padding-top: 8px!important;
   padding-bottom: 8px!important;
 }
 
-.markdown-body .pl-3,
-.markdown-body .px-3 {
+.document-body .pl-3,
+.document-body .px-3 {
   padding-left: 16px!important;
 }
 
-.markdown-body .px-3 {
+.document-body .px-3 {
   padding-right: 16px!important;
 }
 
-.markdown-body .pl-4 {
+.document-body .pl-4 {
   padding-left: 24px!important;
 }
 
-.markdown-body .pl-5 {
+.document-body .pl-5 {
   padding-left: 32px!important;
 }
 
-.markdown-body .pl-6 {
+.document-body .pl-6 {
   padding-left: 40px!important;
 }
 
-.markdown-body .f6 {
+.document-body .f6 {
   font-size: 12px!important;
 }
 
-.markdown-body .lh-condensed {
+.document-body .lh-condensed {
   line-height: 1.25!important;
 }
 
-.markdown-body .text-bold {
+.document-body .text-bold {
   font-weight: 600!important;
 }
 
-.markdown-body .pl-c {
+.document-body .pl-c {
   color: #6a737d;
 }
 
-.markdown-body .pl-c1,
-.markdown-body .pl-s .pl-v {
+.document-body .pl-c1,
+.document-body .pl-s .pl-v {
   color: #005cc5;
 }
 
-.markdown-body .pl-e,
-.markdown-body .pl-en {
+.document-body .pl-e,
+.document-body .pl-en {
   color: #6f42c1;
 }
 
-.markdown-body .pl-s .pl-s1,
-.markdown-body .pl-smi {
+.document-body .pl-s .pl-s1,
+.document-body .pl-smi {
   color: #24292e;
 }
 
-.markdown-body .pl-ent {
+.document-body .pl-ent {
   color: #22863a;
 }
 
-.markdown-body .pl-k {
+.document-body .pl-k {
   color: #d73a49;
 }
 
-.markdown-body .pl-pds,
-.markdown-body .pl-s,
-.markdown-body .pl-s .pl-pse .pl-s1,
-.markdown-body .pl-sr,
-.markdown-body .pl-sr .pl-cce,
-.markdown-body .pl-sr .pl-sra,
-.markdown-body .pl-sr .pl-sre {
+.document-body .pl-pds,
+.document-body .pl-s,
+.document-body .pl-s .pl-pse .pl-s1,
+.document-body .pl-sr,
+.document-body .pl-sr .pl-cce,
+.document-body .pl-sr .pl-sra,
+.document-body .pl-sr .pl-sre {
   color: #032f62;
 }
 
-.markdown-body .pl-smw,
-.markdown-body .pl-v {
+.document-body .pl-smw,
+.document-body .pl-v {
   color: #e36209;
 }
 
-.markdown-body .pl-bu {
+.document-body .pl-bu {
   color: #b31d28;
 }
 
-.markdown-body .pl-ii {
+.document-body .pl-ii {
   color: #fafbfc;
   background-color: #b31d28;
 }
 
-.markdown-body .pl-c2 {
+.document-body .pl-c2 {
   color: #fafbfc;
   background-color: #d73a49;
 }
 
-.markdown-body .pl-c2:before {
+.document-body .pl-c2:before {
   content: "^M";
 }
 
-.markdown-body .pl-sr .pl-cce {
+.document-body .pl-sr .pl-cce {
   font-weight: 700;
   color: #22863a;
 }
 
-.markdown-body .pl-ml {
+.document-body .pl-ml {
   color: #735c0f;
 }
 
-.markdown-body .pl-mh,
-.markdown-body .pl-mh .pl-en,
-.markdown-body .pl-ms {
+.document-body .pl-mh,
+.document-body .pl-mh .pl-en,
+.document-body .pl-ms {
   font-weight: 700;
   color: #005cc5;
 }
 
-.markdown-body .pl-mi {
+.document-body .pl-mi {
   font-style: italic;
   color: #24292e;
 }
 
-.markdown-body .pl-mb {
+.document-body .pl-mb {
   font-weight: 700;
   color: #24292e;
 }
 
-.markdown-body .pl-md {
+.document-body .pl-md {
   color: #b31d28;
   background-color: #ffeef0;
 }
 
-.markdown-body .pl-mi1 {
+.document-body .pl-mi1 {
   color: #22863a;
   background-color: #f0fff4;
 }
 
-.markdown-body .pl-mc {
+.document-body .pl-mc {
   color: #e36209;
   background-color: #ffebda;
 }
 
-.markdown-body .pl-mi2 {
+.document-body .pl-mi2 {
   color: #f6f8fa;
   background-color: #005cc5;
 }
 
-.markdown-body .pl-mdr {
+.document-body .pl-mdr {
   font-weight: 700;
   color: #6f42c1;
 }
 
-.markdown-body .pl-ba {
+.document-body .pl-ba {
   color: #586069;
 }
 
-.markdown-body .pl-sg {
+.document-body .pl-sg {
   color: #959da5;
 }
 
-.markdown-body .pl-corl {
+.document-body .pl-corl {
   text-decoration: underline;
   color: #032f62;
 }
 
-.markdown-body .mb-0 {
+.document-body .mb-0 {
   margin-bottom: 0!important;
 }
 
-.markdown-body .my-2 {
+.document-body .my-2 {
   margin-bottom: 8px!important;
 }
 
-.markdown-body .my-2 {
+.document-body .my-2 {
   margin-top: 8px!important;
 }
 
-.markdown-body .pl-0 {
+.document-body .pl-0 {
   padding-left: 0!important;
 }
 
-.markdown-body .py-0 {
+.document-body .py-0 {
   padding-top: 0!important;
   padding-bottom: 0!important;
 }
 
-.markdown-body .pl-1 {
+.document-body .pl-1 {
   padding-left: 4px!important;
 }
 
-.markdown-body .pl-2 {
+.document-body .pl-2 {
   padding-left: 8px!important;
 }
 
-.markdown-body .py-2 {
+.document-body .py-2 {
   padding-top: 8px!important;
   padding-bottom: 8px!important;
 }
 
-.markdown-body .pl-3 {
+.document-body .pl-3 {
   padding-left: 16px!important;
 }
 
-.markdown-body .pl-4 {
+.document-body .pl-4 {
   padding-left: 24px!important;
 }
 
-.markdown-body .pl-5 {
+.document-body .pl-5 {
   padding-left: 32px!important;
 }
 
-.markdown-body .pl-6 {
+.document-body .pl-6 {
   padding-left: 40px!important;
 }
 
-.markdown-body .pl-7 {
+.document-body .pl-7 {
   padding-left: 48px!important;
 }
 
-.markdown-body .pl-8 {
+.document-body .pl-8 {
   padding-left: 64px!important;
 }
 
-.markdown-body .pl-9 {
+.document-body .pl-9 {
   padding-left: 80px!important;
 }
 
-.markdown-body .pl-10 {
+.document-body .pl-10 {
   padding-left: 96px!important;
 }
 
-.markdown-body .pl-11 {
+.document-body .pl-11 {
   padding-left: 112px!important;
 }
 
-.markdown-body .pl-12 {
+.document-body .pl-12 {
   padding-left: 128px!important;
 }
 
-.markdown-body hr {
+.document-body hr {
   border-bottom-color: #eee;
 }
 
-.markdown-body kbd {
+.document-body kbd {
   display: inline-block;
   padding: 3px 5px;
   font: 11px SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
@@ -641,42 +643,42 @@ html:root, body {
   box-shadow: inset 0 -1px 0 #d1d5da;
 }
 
-.markdown-body:after,
-.markdown-body:before {
+.document-body:after,
+.document-body:before {
   display: table;
   content: "";
 }
 
-.markdown-body:after {
+.document-body:after {
   clear: both;
 }
 
-.markdown-body>:first-child {
+.document-body>:first-child {
   margin-top: 0!important;
 }
 
-.markdown-body>:last-child {
+.document-body>:last-child {
   margin-bottom: 0!important;
 }
 
-.markdown-body a:not([href]) {
+.document-body a:not([href]) {
   color: inherit;
   text-decoration: none;
 }
 
-.markdown-body blockquote,
-.markdown-body details,
-.markdown-body dl,
-.markdown-body ol,
-.markdown-body p,
-.markdown-body pre,
-.markdown-body table,
-.markdown-body ul {
+.document-body blockquote,
+.document-body details,
+.document-body dl,
+.document-body ol,
+.document-body p,
+.document-body pre,
+.document-body table,
+.document-body ul {
   margin-top: 0;
   margin-bottom: 16px;
 }
 
-.markdown-body hr {
+.document-body hr {
   height: .25em;
   padding: 0;
   margin: 24px 0;
@@ -684,93 +686,93 @@ html:root, body {
   border: 0;
 }
 
-.markdown-body blockquote {
+.document-body blockquote {
   padding: 0 1em;
   color: #6a737d;
   border-left: .25em solid #dfe2e5;
 }
 
-.markdown-body blockquote>:first-child {
+.document-body blockquote>:first-child {
   margin-top: 0;
 }
 
-.markdown-body blockquote>:last-child {
+.document-body blockquote>:last-child {
   margin-bottom: 0;
 }
 
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
-.markdown-body h4,
-.markdown-body h5,
-.markdown-body h6 {
+.document-body h1,
+.document-body h2,
+.document-body h3,
+.document-body h4,
+.document-body h5,
+.document-body h6 {
   margin-top: 24px;
   margin-bottom: 16px;
   font-weight: 600;
   line-height: 1.25;
 }
 
-.markdown-body h1 {
+.document-body h1 {
   font-size: 2em;
 }
 
-.markdown-body h1,
-.markdown-body h2 {
+.document-body h1,
+.document-body h2 {
   padding-bottom: .3em;
   border-bottom: 1px solid #eaecef;
 }
 
-.markdown-body h2 {
+.document-body h2 {
   font-size: 1.5em;
 }
 
-.markdown-body h3 {
+.document-body h3 {
   font-size: 1.25em;
 }
 
-.markdown-body h4 {
+.document-body h4 {
   font-size: 1em;
 }
 
-.markdown-body h5 {
+.document-body h5 {
   font-size: .875em;
 }
 
-.markdown-body h6 {
+.document-body h6 {
   font-size: .85em;
   color: #6a737d;
 }
 
-.markdown-body ol,
-.markdown-body ul {
+.document-body ol,
+.document-body ul {
   padding-left: 2em;
 }
 
-.markdown-body ol ol,
-.markdown-body ol ul,
-.markdown-body ul ol,
-.markdown-body ul ul {
+.document-body ol ol,
+.document-body ol ul,
+.document-body ul ol,
+.document-body ul ul {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.markdown-body li {
+.document-body li {
   word-wrap: break-all;
 }
 
-.markdown-body li>p {
+.document-body li>p {
   margin-top: 16px;
 }
 
-.markdown-body li+li {
+.document-body li+li {
   margin-top: .25em;
 }
 
-.markdown-body dl {
+.document-body dl {
   padding: 0;
 }
 
-.markdown-body dl dt {
+.document-body dl dt {
   padding: 0;
   margin-top: 16px;
   font-size: 1em;
@@ -778,51 +780,51 @@ html:root, body {
   font-weight: 600;
 }
 
-.markdown-body dl dd {
+.document-body dl dd {
   padding: 0 16px;
   margin-bottom: 16px;
 }
 
-.markdown-body table {
+.document-body table {
   display: block;
   width: 100%;
   overflow: auto;
 }
 
-.markdown-body table th {
+.document-body table th {
   font-weight: 600;
 }
 
-.markdown-body table td,
-.markdown-body table th {
+.document-body table td,
+.document-body table th {
   padding: 6px 13px;
   border: 1px solid #dfe2e5;
 }
 
-.markdown-body table tr {
+.document-body table tr {
   background-color: #fff;
   border-top: 1px solid #c6cbd1;
 }
 
-.markdown-body table tr:nth-child(2n) {
+.document-body table tr:nth-child(2n) {
   background-color: #f6f8fa;
 }
 
-.markdown-body img {
+.document-body img {
   max-width: 100%;
   box-sizing: initial;
   background-color: #fff;
 }
 
-.markdown-body img[align=right] {
+.document-body img[align=right] {
   padding-left: 20px;
 }
 
-.markdown-body img[align=left] {
+.document-body img[align=left] {
   padding-right: 20px;
 }
 
-.markdown-body code {
+.document-body code {
   padding: .2em .4em;
   margin: 0;
   font-size: 85%;
@@ -830,11 +832,11 @@ html:root, body {
   border-radius: 3px;
 }
 
-.markdown-body pre {
+.document-body pre {
   word-wrap: normal;
 }
 
-.markdown-body pre>code {
+.document-body pre>code {
   padding: 0;
   margin: 0;
   font-size: 100%;
@@ -844,17 +846,17 @@ html:root, body {
   border: 0;
 }
 
-.markdown-body .highlight {
+.document-body .highlight {
   margin-bottom: 16px;
 }
 
-.markdown-body .highlight pre {
+.document-body .highlight pre {
   margin-bottom: 0;
   word-break: normal;
 }
 
-.markdown-body .highlight pre,
-.markdown-body pre {
+.document-body .highlight pre,
+.document-body pre {
   padding: 16px;
   overflow: auto;
   font-size: 85%;
@@ -863,7 +865,7 @@ html:root, body {
   border-radius: 3px;
 }
 
-.markdown-body pre code {
+.document-body pre code {
   display: inline;
   max-width: auto;
   padding: 0;
@@ -875,29 +877,29 @@ html:root, body {
   border: 0;
 }
 
-.markdown-body .commit-tease-sha {
+.document-body .commit-tease-sha {
   display: inline-block;
   font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
   font-size: 90%;
   color: #444d56;
 }
 
-.markdown-body .full-commit .btn-outline:not(:disabled):hover {
+.document-body .full-commit .btn-outline:not(:disabled):hover {
   color: #005cc5;
   border-color: #005cc5;
 }
 
-.markdown-body .blob-wrapper {
+.document-body .blob-wrapper {
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-.markdown-body .blob-wrapper-embedded {
+.document-body .blob-wrapper-embedded {
   max-height: 240px;
   overflow-y: auto;
 }
 
-.markdown-body .blob-num {
+.document-body .blob-num {
   width: 1%;
   min-width: 50px;
   padding-right: 10px;
@@ -916,15 +918,15 @@ html:root, body {
   user-select: none;
 }
 
-.markdown-body .blob-num:hover {
+.document-body .blob-num:hover {
   color: rgba(27,31,35,.6);
 }
 
-.markdown-body .blob-num:before {
+.document-body .blob-num:before {
   content: attr(data-line-number);
 }
 
-.markdown-body .blob-code {
+.document-body .blob-code {
   position: relative;
   padding-right: 10px;
   padding-left: 10px;
@@ -932,7 +934,7 @@ html:root, body {
   vertical-align: top;
 }
 
-.markdown-body .blob-code-inner {
+.document-body .blob-code-inner {
   overflow: visible;
   font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
   font-size: 12px;
@@ -941,81 +943,81 @@ html:root, body {
   white-space: pre;
 }
 
-.markdown-body .pl-token.active,
-.markdown-body .pl-token:hover {
+.document-body .pl-token.active,
+.document-body .pl-token:hover {
   cursor: pointer;
   background: #ffea7f;
 }
 
-.markdown-body .tab-size[data-tab-size="1"] {
+.document-body .tab-size[data-tab-size="1"] {
   -moz-tab-size: 1;
   tab-size: 1;
 }
 
-.markdown-body .tab-size[data-tab-size="2"] {
+.document-body .tab-size[data-tab-size="2"] {
   -moz-tab-size: 2;
   tab-size: 2;
 }
 
-.markdown-body .tab-size[data-tab-size="3"] {
+.document-body .tab-size[data-tab-size="3"] {
   -moz-tab-size: 3;
   tab-size: 3;
 }
 
-.markdown-body .tab-size[data-tab-size="4"] {
+.document-body .tab-size[data-tab-size="4"] {
   -moz-tab-size: 4;
   tab-size: 4;
 }
 
-.markdown-body .tab-size[data-tab-size="5"] {
+.document-body .tab-size[data-tab-size="5"] {
   -moz-tab-size: 5;
   tab-size: 5;
 }
 
-.markdown-body .tab-size[data-tab-size="6"] {
+.document-body .tab-size[data-tab-size="6"] {
   -moz-tab-size: 6;
   tab-size: 6;
 }
 
-.markdown-body .tab-size[data-tab-size="7"] {
+.document-body .tab-size[data-tab-size="7"] {
   -moz-tab-size: 7;
   tab-size: 7;
 }
 
-.markdown-body .tab-size[data-tab-size="8"] {
+.document-body .tab-size[data-tab-size="8"] {
   -moz-tab-size: 8;
   tab-size: 8;
 }
 
-.markdown-body .tab-size[data-tab-size="9"] {
+.document-body .tab-size[data-tab-size="9"] {
   -moz-tab-size: 9;
   tab-size: 9;
 }
 
-.markdown-body .tab-size[data-tab-size="10"] {
+.document-body .tab-size[data-tab-size="10"] {
   -moz-tab-size: 10;
   tab-size: 10;
 }
 
-.markdown-body .tab-size[data-tab-size="11"] {
+.document-body .tab-size[data-tab-size="11"] {
   -moz-tab-size: 11;
   tab-size: 11;
 }
 
-.markdown-body .tab-size[data-tab-size="12"] {
+.document-body .tab-size[data-tab-size="12"] {
   -moz-tab-size: 12;
   tab-size: 12;
 }
 
-.markdown-body .task-list-item {
+.document-body .task-list-item {
   list-style-type: none;
 }
 
-.markdown-body .task-list-item+.task-list-item {
+.document-body .task-list-item+.task-list-item {
   margin-top: 3px;
 }
 
-.markdown-body .task-list-item input {
+.document-body .task-list-item input {
   margin: 0 .2em .25em -1.6em;
   vertical-align: middle;
 }
