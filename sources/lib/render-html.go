@@ -43,7 +43,7 @@ func DocumentRenderToHtmlDocument (_document *Document, _export bool, _theme str
 			ThemeCss html_template.CSS
 		} {
 			_document,
-			html_template.HTML (_documentHtml),
+			html_template.HTML (stringTrimSpaces (_documentHtml)),
 			html_template.CSS (_themeCssData),
 		}
 	if _error := _templates.documentExportHtmlDocument.Execute (_buffer, _context); _error != nil {
