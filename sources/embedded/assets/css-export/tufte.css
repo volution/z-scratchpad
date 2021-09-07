@@ -27,7 +27,7 @@ html:root, body {
 	font-family : monospace;
 	text-align : center;
 }
-@media screen and (max-width : 767px) {
+@media screen and (max-width : 800px) {
 	.document-body {
 		padding : 15px;
 	}
@@ -191,7 +191,7 @@ html:root, body {
     display: block;
 }
 
-@media screen and (max-width: 760px) {
+@media screen and (max-width: 800px) {
 
     .document-body hr {
         width: 100%;
