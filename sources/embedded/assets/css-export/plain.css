@@ -3,6 +3,7 @@ html:root, body {
 	margin : 0px;
 	padding : 0px;
 	background : rgb(34, 39, 46);
+	-webkit-text-size-adjust : 100%;
 }
 
 .document-body, .document-header {

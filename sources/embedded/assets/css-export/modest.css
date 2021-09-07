@@ -5,6 +5,7 @@ html:root, body {
 	margin : 0px;
 	padding : 0px;
 	background : rgb(34, 39, 46);
+	-webkit-text-size-adjust : 100%;
 }
 
 .document-body, .document-header {
@@ -119,8 +120,6 @@ html:root, body {
   font-size: .707em;
 }
 
-/* https://github.com/mrmrs/fluidity */
-
 .document-body img,
 .document-body canvas,
 .document-body iframe,
@@ -130,10 +129,6 @@ html:root, body {
 .document-body textarea {
   max-width: 100%;
 }
-
-@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700);
-
-@import url(http://fonts.googleapis.com/css?family=Arimo:700,700italic);
 
 .document-body {
   font-size: 18px;
