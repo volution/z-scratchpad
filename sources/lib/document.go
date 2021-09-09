@@ -233,10 +233,14 @@ func DocumentInitializeTitle (_document *Document, _library *Library) (*Error) {
 		return nil
 	}
 	if _document.Title != "" {
-		_document.Title = _library.UseTitlePrefix + _document.Title
+		if ! strings.HasPrefix (_document.Title, _library.UseTitlePrefix) {
+			_document.Title = _library.UseTitlePrefix + _document.Title
+		}
 	}
 	for _index := range _document.TitleAlternatives {
-		_document.TitleAlternatives[_index] = _library.UseTitlePrefix + _document.TitleAlternatives[_index]
+		if ! strings.HasPrefix (_document.TitleAlternatives[_index], _library.UseTitlePrefix) {
+			_document.TitleAlternatives[_index] = _library.UseTitlePrefix + _document.TitleAlternatives[_index]
+		}
 	}
 	return nil
 }
