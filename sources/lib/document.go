@@ -38,14 +38,16 @@ type Document struct {
 	BodyEmpty bool
 	BodyFingerprint string
 	
+	EditEnabled bool
+	Timestamp time.Time
+	
+	// NOTE:  These are not stored in database!
+	
 	RenderHtml string
 	RenderHtmlExport string
 	RenderText string
 	
 	HtmlLinks map[string][]string
-	
-	EditEnabled bool
-	Timestamp time.Time
 }
 
 

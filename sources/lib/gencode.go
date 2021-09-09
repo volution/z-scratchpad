@@ -1,5 +1,6 @@
-
 package zscratchpad
+
+// ~/go/bin/gencode go -schema ./sources/lib/gencode.schema -out ./sources/lib/gencode.go -package zscratchpad -unsafe
 
 import (
 	"io"
@@ -12,6 +13,24 @@ var (
 	_ = io.ReadFull
 	_ = time.Now()
 )
+
+/*
+type Document struct {
+	Identifier        string
+	Library           string
+	Path              string
+	PathInLibrary     string
+	Title             string
+	TitleAlternatives []string
+	SourceFingerprint string
+	Format            string
+	BodyLines         []string
+	BodyEmpty         bool
+	BodyFingerprint   string
+	EditEnabled       bool
+	Timestamp         time.Time
+}
+*/
 
 func (d *Document) Size() (s uint64) {
 
@@ -744,6 +763,33 @@ func (d *Document) Unmarshal(buf []byte) (uint64, error) {
 	return i + 17, nil
 }
 
+/*
+type Library struct {
+	Identifier                     string
+	Name                           string
+	Paths                          []string
+	Disabled                       bool
+	EditEnabled                    bool
+	CreateEnabled                  bool
+	CreatePath                     string
+	CreateNameTimestampLength      uint8
+	CreateNameRandomLength         uint8
+	CreateExtension                string
+	SnapshotEnabled                bool
+	SnapshotExtension              string
+	IncludeGlobPatterns            []string
+	ExcludeGlobPatterns            []string
+	IncludeRegexPatterns           []string
+	ExcludeRegexPatterns           []string
+	UseTitlePrefix                 string
+	UseLibraryAsIdentifierPrefix   bool
+	UsePathInLibraryAsIdentifier   bool
+	UseFileNameAsIdentifier        bool
+	UsePathFingerprintAsIdentifier bool
+	UseFileExtensionAsFormat       bool
+}
+*/
+
 func (d *Library) Size() (s uint64) {
 
 	{
@@ -996,7 +1042,22 @@ func (d *Library) Size() (s uint64) {
 		}
 
 	}
-	s += 10
+	{
+		l := uint64(len(d.UseTitlePrefix))
+
+		{
+
+			t := l
+			for t >= 0x80 {
+				t >>= 7
+				s++
+			}
+			s++
+
+		}
+		s += l
+	}
+	s += 11
 	return
 }
 func (d *Library) Marshal(buf []byte) ([]byte, error) {
@@ -1089,17 +1150,24 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 		}
 	}
 	{
-		if d.EditEnabled {
+		if d.Disabled {
 			buf[i+0] = 1
 		} else {
 			buf[i+0] = 0
 		}
 	}
 	{
-		if d.CreateEnabled {
+		if d.EditEnabled {
 			buf[i+1] = 1
 		} else {
 			buf[i+1] = 0
+		}
+	}
+	{
+		if d.CreateEnabled {
+			buf[i+2] = 1
+		} else {
+			buf[i+2] = 0
 		}
 	}
 	{
@@ -1110,25 +1178,25 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 			t := uint64(l)
 
 			for t >= 0x80 {
-				buf[i+2] = byte(t) | 0x80
+				buf[i+3] = byte(t) | 0x80
 				t >>= 7
 				i++
 			}
-			buf[i+2] = byte(t)
+			buf[i+3] = byte(t)
 			i++
 
 		}
-		copy(buf[i+2:], d.CreatePath)
+		copy(buf[i+3:], d.CreatePath)
 		i += l
 	}
 	{
 
-		*(*uint8)(unsafe.Pointer(&buf[i+2])) = d.CreateNameTimestampLength
+		*(*uint8)(unsafe.Pointer(&buf[i+3])) = d.CreateNameTimestampLength
 
 	}
 	{
 
-		*(*uint8)(unsafe.Pointer(&buf[i+3])) = d.CreateNameRandomLength
+		*(*uint8)(unsafe.Pointer(&buf[i+4])) = d.CreateNameRandomLength
 
 	}
 	{
@@ -1139,22 +1207,22 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 			t := uint64(l)
 
 			for t >= 0x80 {
-				buf[i+4] = byte(t) | 0x80
+				buf[i+5] = byte(t) | 0x80
 				t >>= 7
 				i++
 			}
-			buf[i+4] = byte(t)
+			buf[i+5] = byte(t)
 			i++
 
 		}
-		copy(buf[i+4:], d.CreateExtension)
+		copy(buf[i+5:], d.CreateExtension)
 		i += l
 	}
 	{
 		if d.SnapshotEnabled {
-			buf[i+4] = 1
+			buf[i+5] = 1
 		} else {
-			buf[i+4] = 0
+			buf[i+5] = 0
 		}
 	}
 	{
@@ -1165,15 +1233,15 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 			t := uint64(l)
 
 			for t >= 0x80 {
-				buf[i+5] = byte(t) | 0x80
+				buf[i+6] = byte(t) | 0x80
 				t >>= 7
 				i++
 			}
-			buf[i+5] = byte(t)
+			buf[i+6] = byte(t)
 			i++
 
 		}
-		copy(buf[i+5:], d.SnapshotExtension)
+		copy(buf[i+6:], d.SnapshotExtension)
 		i += l
 	}
 	{
@@ -1184,11 +1252,11 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 			t := uint64(l)
 
 			for t >= 0x80 {
-				buf[i+5] = byte(t) | 0x80
+				buf[i+6] = byte(t) | 0x80
 				t >>= 7
 				i++
 			}
-			buf[i+5] = byte(t)
+			buf[i+6] = byte(t)
 			i++
 
 		}
@@ -1202,15 +1270,15 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 					t := uint64(l)
 
 					for t >= 0x80 {
-						buf[i+5] = byte(t) | 0x80
+						buf[i+6] = byte(t) | 0x80
 						t >>= 7
 						i++
 					}
-					buf[i+5] = byte(t)
+					buf[i+6] = byte(t)
 					i++
 
 				}
-				copy(buf[i+5:], d.IncludeGlobPatterns[k0])
+				copy(buf[i+6:], d.IncludeGlobPatterns[k0])
 				i += l
 			}
 
@@ -1224,11 +1292,11 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 			t := uint64(l)
 
 			for t >= 0x80 {
-				buf[i+5] = byte(t) | 0x80
+				buf[i+6] = byte(t) | 0x80
 				t >>= 7
 				i++
 			}
-			buf[i+5] = byte(t)
+			buf[i+6] = byte(t)
 			i++
 
 		}
@@ -1242,15 +1310,15 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 					t := uint64(l)
 
 					for t >= 0x80 {
-						buf[i+5] = byte(t) | 0x80
+						buf[i+6] = byte(t) | 0x80
 						t >>= 7
 						i++
 					}
-					buf[i+5] = byte(t)
+					buf[i+6] = byte(t)
 					i++
 
 				}
-				copy(buf[i+5:], d.ExcludeGlobPatterns[k0])
+				copy(buf[i+6:], d.ExcludeGlobPatterns[k0])
 				i += l
 			}
 
@@ -1264,11 +1332,11 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 			t := uint64(l)
 
 			for t >= 0x80 {
-				buf[i+5] = byte(t) | 0x80
+				buf[i+6] = byte(t) | 0x80
 				t >>= 7
 				i++
 			}
-			buf[i+5] = byte(t)
+			buf[i+6] = byte(t)
 			i++
 
 		}
@@ -1282,15 +1350,15 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 					t := uint64(l)
 
 					for t >= 0x80 {
-						buf[i+5] = byte(t) | 0x80
+						buf[i+6] = byte(t) | 0x80
 						t >>= 7
 						i++
 					}
-					buf[i+5] = byte(t)
+					buf[i+6] = byte(t)
 					i++
 
 				}
-				copy(buf[i+5:], d.IncludeRegexPatterns[k0])
+				copy(buf[i+6:], d.IncludeRegexPatterns[k0])
 				i += l
 			}
 
@@ -1304,11 +1372,11 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 			t := uint64(l)
 
 			for t >= 0x80 {
-				buf[i+5] = byte(t) | 0x80
+				buf[i+6] = byte(t) | 0x80
 				t >>= 7
 				i++
 			}
-			buf[i+5] = byte(t)
+			buf[i+6] = byte(t)
 			i++
 
 		}
@@ -1322,56 +1390,75 @@ func (d *Library) Marshal(buf []byte) ([]byte, error) {
 					t := uint64(l)
 
 					for t >= 0x80 {
-						buf[i+5] = byte(t) | 0x80
+						buf[i+6] = byte(t) | 0x80
 						t >>= 7
 						i++
 					}
-					buf[i+5] = byte(t)
+					buf[i+6] = byte(t)
 					i++
 
 				}
-				copy(buf[i+5:], d.ExcludeRegexPatterns[k0])
+				copy(buf[i+6:], d.ExcludeRegexPatterns[k0])
 				i += l
 			}
 
 		}
 	}
 	{
-		if d.UseLibraryAsIdentifierPrefix {
-			buf[i+5] = 1
-		} else {
-			buf[i+5] = 0
+		l := uint64(len(d.UseTitlePrefix))
+
+		{
+
+			t := uint64(l)
+
+			for t >= 0x80 {
+				buf[i+6] = byte(t) | 0x80
+				t >>= 7
+				i++
+			}
+			buf[i+6] = byte(t)
+			i++
+
 		}
+		copy(buf[i+6:], d.UseTitlePrefix)
+		i += l
 	}
 	{
-		if d.UsePathInLibraryAsIdentifier {
+		if d.UseLibraryAsIdentifierPrefix {
 			buf[i+6] = 1
 		} else {
 			buf[i+6] = 0
 		}
 	}
 	{
-		if d.UseFileNameAsIdentifier {
+		if d.UsePathInLibraryAsIdentifier {
 			buf[i+7] = 1
 		} else {
 			buf[i+7] = 0
 		}
 	}
 	{
-		if d.UsePathFingerprintAsIdentifier {
+		if d.UseFileNameAsIdentifier {
 			buf[i+8] = 1
 		} else {
 			buf[i+8] = 0
 		}
 	}
 	{
-		if d.UseFileExtensionAsFormat {
+		if d.UsePathFingerprintAsIdentifier {
 			buf[i+9] = 1
 		} else {
 			buf[i+9] = 0
 		}
 	}
-	return buf[:i+10], nil
+	{
+		if d.UseFileExtensionAsFormat {
+			buf[i+10] = 1
+		} else {
+			buf[i+10] = 0
+		}
+	}
+	return buf[:i+11], nil
 }
 
 func (d *Library) Unmarshal(buf []byte) (uint64, error) {
@@ -1465,40 +1552,13 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 		}
 	}
 	{
-		d.EditEnabled = buf[i+0] == 1
+		d.Disabled = buf[i+0] == 1
 	}
 	{
-		d.CreateEnabled = buf[i+1] == 1
+		d.EditEnabled = buf[i+1] == 1
 	}
 	{
-		l := uint64(0)
-
-		{
-
-			bs := uint8(7)
-			t := uint64(buf[i+2] & 0x7F)
-			for buf[i+2]&0x80 == 0x80 {
-				i++
-				t |= uint64(buf[i+2]&0x7F) << bs
-				bs += 7
-			}
-			i++
-
-			l = t
-
-		}
-		d.CreatePath = string(buf[i+2 : i+2+l])
-		i += l
-	}
-	{
-
-		d.CreateNameTimestampLength = *(*uint8)(unsafe.Pointer(&buf[i+2]))
-
-	}
-	{
-
-		d.CreateNameRandomLength = *(*uint8)(unsafe.Pointer(&buf[i+3]))
-
+		d.CreateEnabled = buf[i+2] == 1
 	}
 	{
 		l := uint64(0)
@@ -1506,10 +1566,10 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 		{
 
 			bs := uint8(7)
-			t := uint64(buf[i+4] & 0x7F)
-			for buf[i+4]&0x80 == 0x80 {
+			t := uint64(buf[i+3] & 0x7F)
+			for buf[i+3]&0x80 == 0x80 {
 				i++
-				t |= uint64(buf[i+4]&0x7F) << bs
+				t |= uint64(buf[i+3]&0x7F) << bs
 				bs += 7
 			}
 			i++
@@ -1517,11 +1577,18 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 			l = t
 
 		}
-		d.CreateExtension = string(buf[i+4 : i+4+l])
+		d.CreatePath = string(buf[i+3 : i+3+l])
 		i += l
 	}
 	{
-		d.SnapshotEnabled = buf[i+4] == 1
+
+		d.CreateNameTimestampLength = *(*uint8)(unsafe.Pointer(&buf[i+3]))
+
+	}
+	{
+
+		d.CreateNameRandomLength = *(*uint8)(unsafe.Pointer(&buf[i+4]))
+
 	}
 	{
 		l := uint64(0)
@@ -1540,7 +1607,30 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 			l = t
 
 		}
-		d.SnapshotExtension = string(buf[i+5 : i+5+l])
+		d.CreateExtension = string(buf[i+5 : i+5+l])
+		i += l
+	}
+	{
+		d.SnapshotEnabled = buf[i+5] == 1
+	}
+	{
+		l := uint64(0)
+
+		{
+
+			bs := uint8(7)
+			t := uint64(buf[i+6] & 0x7F)
+			for buf[i+6]&0x80 == 0x80 {
+				i++
+				t |= uint64(buf[i+6]&0x7F) << bs
+				bs += 7
+			}
+			i++
+
+			l = t
+
+		}
+		d.SnapshotExtension = string(buf[i+6 : i+6+l])
 		i += l
 	}
 	{
@@ -1549,10 +1639,10 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 		{
 
 			bs := uint8(7)
-			t := uint64(buf[i+5] & 0x7F)
-			for buf[i+5]&0x80 == 0x80 {
+			t := uint64(buf[i+6] & 0x7F)
+			for buf[i+6]&0x80 == 0x80 {
 				i++
-				t |= uint64(buf[i+5]&0x7F) << bs
+				t |= uint64(buf[i+6]&0x7F) << bs
 				bs += 7
 			}
 			i++
@@ -1573,10 +1663,10 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 				{
 
 					bs := uint8(7)
-					t := uint64(buf[i+5] & 0x7F)
-					for buf[i+5]&0x80 == 0x80 {
+					t := uint64(buf[i+6] & 0x7F)
+					for buf[i+6]&0x80 == 0x80 {
 						i++
-						t |= uint64(buf[i+5]&0x7F) << bs
+						t |= uint64(buf[i+6]&0x7F) << bs
 						bs += 7
 					}
 					i++
@@ -1584,7 +1674,7 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 					l = t
 
 				}
-				d.IncludeGlobPatterns[k0] = string(buf[i+5 : i+5+l])
+				d.IncludeGlobPatterns[k0] = string(buf[i+6 : i+6+l])
 				i += l
 			}
 
@@ -1596,10 +1686,10 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 		{
 
 			bs := uint8(7)
-			t := uint64(buf[i+5] & 0x7F)
-			for buf[i+5]&0x80 == 0x80 {
+			t := uint64(buf[i+6] & 0x7F)
+			for buf[i+6]&0x80 == 0x80 {
 				i++
-				t |= uint64(buf[i+5]&0x7F) << bs
+				t |= uint64(buf[i+6]&0x7F) << bs
 				bs += 7
 			}
 			i++
@@ -1620,10 +1710,10 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 				{
 
 					bs := uint8(7)
-					t := uint64(buf[i+5] & 0x7F)
-					for buf[i+5]&0x80 == 0x80 {
+					t := uint64(buf[i+6] & 0x7F)
+					for buf[i+6]&0x80 == 0x80 {
 						i++
-						t |= uint64(buf[i+5]&0x7F) << bs
+						t |= uint64(buf[i+6]&0x7F) << bs
 						bs += 7
 					}
 					i++
@@ -1631,7 +1721,7 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 					l = t
 
 				}
-				d.ExcludeGlobPatterns[k0] = string(buf[i+5 : i+5+l])
+				d.ExcludeGlobPatterns[k0] = string(buf[i+6 : i+6+l])
 				i += l
 			}
 
@@ -1643,10 +1733,10 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 		{
 
 			bs := uint8(7)
-			t := uint64(buf[i+5] & 0x7F)
-			for buf[i+5]&0x80 == 0x80 {
+			t := uint64(buf[i+6] & 0x7F)
+			for buf[i+6]&0x80 == 0x80 {
 				i++
-				t |= uint64(buf[i+5]&0x7F) << bs
+				t |= uint64(buf[i+6]&0x7F) << bs
 				bs += 7
 			}
 			i++
@@ -1667,10 +1757,10 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 				{
 
 					bs := uint8(7)
-					t := uint64(buf[i+5] & 0x7F)
-					for buf[i+5]&0x80 == 0x80 {
+					t := uint64(buf[i+6] & 0x7F)
+					for buf[i+6]&0x80 == 0x80 {
 						i++
-						t |= uint64(buf[i+5]&0x7F) << bs
+						t |= uint64(buf[i+6]&0x7F) << bs
 						bs += 7
 					}
 					i++
@@ -1678,7 +1768,7 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 					l = t
 
 				}
-				d.IncludeRegexPatterns[k0] = string(buf[i+5 : i+5+l])
+				d.IncludeRegexPatterns[k0] = string(buf[i+6 : i+6+l])
 				i += l
 			}
 
@@ -1690,10 +1780,10 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 		{
 
 			bs := uint8(7)
-			t := uint64(buf[i+5] & 0x7F)
-			for buf[i+5]&0x80 == 0x80 {
+			t := uint64(buf[i+6] & 0x7F)
+			for buf[i+6]&0x80 == 0x80 {
 				i++
-				t |= uint64(buf[i+5]&0x7F) << bs
+				t |= uint64(buf[i+6]&0x7F) << bs
 				bs += 7
 			}
 			i++
@@ -1714,10 +1804,10 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 				{
 
 					bs := uint8(7)
-					t := uint64(buf[i+5] & 0x7F)
-					for buf[i+5]&0x80 == 0x80 {
+					t := uint64(buf[i+6] & 0x7F)
+					for buf[i+6]&0x80 == 0x80 {
 						i++
-						t |= uint64(buf[i+5]&0x7F) << bs
+						t |= uint64(buf[i+6]&0x7F) << bs
 						bs += 7
 					}
 					i++
@@ -1725,29 +1815,57 @@ func (d *Library) Unmarshal(buf []byte) (uint64, error) {
 					l = t
 
 				}
-				d.ExcludeRegexPatterns[k0] = string(buf[i+5 : i+5+l])
+				d.ExcludeRegexPatterns[k0] = string(buf[i+6 : i+6+l])
 				i += l
 			}
 
 		}
 	}
 	{
-		d.UseLibraryAsIdentifierPrefix = buf[i+5] == 1
+		l := uint64(0)
+
+		{
+
+			bs := uint8(7)
+			t := uint64(buf[i+6] & 0x7F)
+			for buf[i+6]&0x80 == 0x80 {
+				i++
+				t |= uint64(buf[i+6]&0x7F) << bs
+				bs += 7
+			}
+			i++
+
+			l = t
+
+		}
+		d.UseTitlePrefix = string(buf[i+6 : i+6+l])
+		i += l
 	}
 	{
-		d.UsePathInLibraryAsIdentifier = buf[i+6] == 1
+		d.UseLibraryAsIdentifierPrefix = buf[i+6] == 1
 	}
 	{
-		d.UseFileNameAsIdentifier = buf[i+7] == 1
+		d.UsePathInLibraryAsIdentifier = buf[i+7] == 1
 	}
 	{
-		d.UsePathFingerprintAsIdentifier = buf[i+8] == 1
+		d.UseFileNameAsIdentifier = buf[i+8] == 1
 	}
 	{
-		d.UseFileExtensionAsFormat = buf[i+9] == 1
+		d.UsePathFingerprintAsIdentifier = buf[i+9] == 1
 	}
-	return i + 10, nil
+	{
+		d.UseFileExtensionAsFormat = buf[i+10] == 1
+	}
+	return i + 11, nil
 }
+
+/*
+type IndexGob struct {
+	Documents        []*Document
+	Libraries        []*Library
+	LibraryDocuments []IndexLibraryDocumentsGob
+}
+*/
 
 func (d *IndexGob) Size() (s uint64) {
 
@@ -2091,6 +2209,13 @@ func (d *IndexGob) Unmarshal(buf []byte) (uint64, error) {
 	}
 	return i + 0, nil
 }
+
+/*
+type IndexLibraryDocumentsGob struct {
+	Library   string
+	Documents []string
+}
+*/
 
 func (d *IndexLibraryDocumentsGob) Size() (s uint64) {
 

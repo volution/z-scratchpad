@@ -30,6 +30,7 @@ struct Library {
 	
 	Paths []string
 	
+	Disabled bool
 	EditEnabled bool
 	
 	CreateEnabled bool
@@ -47,6 +48,7 @@ struct Library {
 	IncludeRegexPatterns []string
 	ExcludeRegexPatterns []string
 	
+	UseTitlePrefix string
 	UseLibraryAsIdentifierPrefix bool
 	UsePathInLibraryAsIdentifier bool
 	UseFileNameAsIdentifier bool
