@@ -1,0 +1,7 @@
+###
+-- title:       with front-matter 03
+-- identifier:  with-front-matter-03
+-- format:      snippets
+###
+
+...

@@ -1,0 +1,7 @@
++++
+title = "with front-matter 04"
+identifier = "with-front-matter-04"
+format = "snippets"
++++
+
+...

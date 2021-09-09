@@ -1,0 +1,5 @@
+## -- title: with front-matter 02
+## -- identifier: with-front-matter-02
+## -- format: snippets
+
+...

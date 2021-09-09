@@ -1,0 +1,7 @@
+---
+title : with front-matter 05
+identifier : with-front-matter-05
+format : snippets
+---
+
+...
