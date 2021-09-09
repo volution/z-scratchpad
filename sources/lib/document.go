@@ -14,6 +14,8 @@ import "unicode/utf8"
 
 
 import "github.com/akutz/sortfold"
+import "github.com/pelletier/go-toml"
+import "gopkg.in/yaml.v2"
 
 
 
@@ -293,82 +295,232 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 	
 	var _identifier string
 	var _library string
+	var _slug string
 	var _format string
 	var _title string
 	var _titles []string
 	
 	_body := _source
+	_headerSyntax := ""
 	_headerPrefix := ""
+	_headerMarker := ""
 	_headerEmpty := true
+	_headerLines := make ([]string, 0, 16)
 	for {
 		
 		if _body == "" {
+			if _headerMarker != "" {
+				return nil, errorw (0x811970f0, nil)
+			}
 			break
 		}
+		
 		_header, _rest, _ok := stringSplitLine (_body)
 		if !_ok {
 			break
 		}
 		
 		if _header == "" {
+			if _headerMarker != "" {
+				return nil, errorw (0xac5961cb, nil)
+			}
 			_body = _rest
 			break
+		}
+		
+		if _headerMarker != "" {
+			if _header == _headerMarker {
+				_body = _rest
+				break
+			}
+		} else if _headerPrefix == "" {
+			if _header == "###" {
+				_headerSyntax = "zzz"
+				_headerMarker = _header
+			} else if _header == "---" {
+				_headerSyntax = "yaml"
+				_headerMarker = _header
+			} else if _header == "+++" {
+				_headerSyntax = "toml"
+				_headerMarker = _header
+			}
+			if _headerMarker != "" {
+				_body = _rest
+				continue
+			}
 		}
 		
 		if _headerPrefix != "" {
 			if ! strings.HasPrefix (_header, _headerPrefix) {
 				break
 			}
-		} else {
+		} else if _headerMarker == "" {
 			if strings.HasPrefix (_header, "## ") {
+				_headerSyntax = "zzz"
 				_headerPrefix = "## "
 			} else if strings.HasPrefix (_header, "# ") {
+				_headerSyntax = "zzz"
 				_headerPrefix = "# "
+			}
+		}
+		
+		if _headerEmpty {
+			if (_headerMarker != "") || (_headerPrefix != "") {
+				_headerEmpty = false
 			} else {
 				break
 			}
 		}
 		
-		_body = _rest
-		_headerEmpty = false
+		if _headerPrefix != "" {
+			_header = _header[len (_headerPrefix):]
+			_header = stringTrimSpaces (_header)
+		}
 		
-		_header = _header[len (_headerPrefix):]
-		_header = stringTrimSpaces (_header)
-		
-		if _header == "" {
+		if stringTrimSpaces (_header) == "" {
 			return nil, errorf (0x8d4a068d, "header empty")
 		}
 		
-		if strings.HasPrefix (_header, "-- ") {
-			
-			_header = _header[3:]
-			_header = stringTrimSpaces (_header)
-			
-			if strings.HasPrefix (_header, "identifier:") {
-				_identifier_0 := _header[11:]
-				_identifier_0 = stringTrimSpaces (_identifier_0)
-				_identifier = _identifier_0
-			} else if strings.HasPrefix (_header, "library:") {
-				_library_0 := _header[8:]
-				_library_0 = stringTrimSpaces (_library_0)
-				_library = _library_0
-			} else if strings.HasPrefix (_header, "format:") {
-				_format_0 := _header[7:]
-				_format_0 = stringTrimSpaces (_format_0)
-				_format = _format_0
-			} else if strings.HasPrefix (_header, "timestamp:") {
-				// NOTE:  Ignore timestamps from file.
+		_headerLines = append (_headerLines, _header)
+		_body = _rest
+	}
+	
+	if _headerSyntax == "zzz" {
+		
+		for _, _header := range _headerLines {
+			if strings.HasPrefix (_header, "-- ") {
+				
+				_header = _header[3:]
+				_header = stringTrimSpaces (_header)
+				
+				if strings.HasPrefix (_header, "identifier:") {
+					_identifier_0 := _header[11:]
+					_identifier_0 = stringTrimSpaces (_identifier_0)
+					if _identifier_0 != "" {
+						if _identifier != "" {
+							return nil, errorw (0x2a6e422e, nil)
+						}
+						_identifier = _identifier_0
+					}
+				} else if strings.HasPrefix (_header, "library:") {
+					_library_0 := _header[8:]
+					_library_0 = stringTrimSpaces (_library_0)
+					if _library_0 != "" {
+						if _library != "" {
+							return nil, errorw (0x389182e2, nil)
+						}
+						_library = _library_0
+					}
+				} else if strings.HasPrefix (_header, "slug:") {
+					_slug_0 := _header[5:]
+					_slug_0 = stringTrimSpaces (_slug_0)
+					if _slug_0 != "" {
+						if _slug != "" {
+							return nil, errorw (0xa6abdc7d, nil)
+						}
+						_slug = _slug_0
+					}
+				} else if strings.HasPrefix (_header, "format:") {
+					_format_0 := _header[7:]
+					_format_0 = stringTrimSpaces (_format_0)
+					if _format_0 != "" {
+						if _format != "" {
+							return nil, errorw (0x6bcc74f2, nil)
+						}
+						_format = _format_0
+					}
+				} else if strings.HasPrefix (_header, "title:") {
+					_title_0 := _header[6:]
+					_title_0 = stringTrimSpaces (_title_0)
+					_titles = append (_titles, _title_0)
+					if _title == "" {
+						_title = _title_0
+					}
+				} else if strings.HasPrefix (_header, "timestamp:") {
+					// NOTE:  Ignore timestamps from file.
+				} else {
+					return nil, errorf (0xc5ccdc9e, "metadata invalid `%s`", _header)
+				}
+				
 			} else {
-				return nil, errorf (0xc5ccdc9e, "metadata invalid `%s`", _header)
-			}
-			
-		} else {
-			
-			_titles = append (_titles, _header)
-			if _title == "" {
-				_title = _header
+				
+				_titles = append (_titles, _header)
+				if _title == "" {
+					_title = _header
+				}
 			}
 		}
+		
+	} else if (_headerSyntax == "toml") || (_headerSyntax == "yaml") {
+		
+		type header struct {
+			Identifier string
+			Library string
+			Slug string
+			Title string
+			Titles []string
+			Format string
+			Timestamp string
+		}
+		
+		_header := header {}
+		_headerBuffer := BytesBufferNewSize (4 * 1024)
+		defer BytesBufferRelease (_headerBuffer)
+		for _, _header := range _headerLines {
+			_headerBuffer.WriteString (_header)
+			_headerBuffer.WriteString ("\n")
+		}
+		
+		switch _headerSyntax {
+			case "toml" :
+				if _error := toml.Unmarshal (_headerBuffer.Bytes (), &_header); _error != nil {
+					return nil, errorw (0x9dde97ab, _error)
+				}
+			case "yaml" :
+				if _error := yaml.Unmarshal (_headerBuffer.Bytes (), &_header); _error != nil {
+					return nil, errorw (0x3c886fe6, _error)
+				}
+			default :
+				panic (0x93b101bf)
+		}
+		
+		_header.Identifier = stringTrimSpaces (_header.Identifier)
+		if _header.Identifier != "" {
+			_identifier = _header.Identifier
+		}
+		_header.Library = stringTrimSpaces (_header.Library)
+		if _header.Library != "" {
+			_library = _header.Library
+		}
+		_header.Slug = stringTrimSpaces (_header.Slug)
+		if _header.Slug != "" {
+			_slug = _header.Slug
+		}
+		_header.Format = stringTrimSpaces (_header.Format)
+		if _header.Format != "" {
+			_format = _header.Format
+		}
+		_header.Title = stringTrimSpaces (_header.Title)
+		if _header.Title != "" {
+			_title = _header.Title
+			_titles = append (_titles, _title)
+		}
+		for _, _headerTitle := range _header.Titles {
+			_headerTitle = stringTrimSpaces (_headerTitle)
+			if _headerTitle == "" {
+				continue
+			}
+			if _title == _headerTitle {
+				continue
+			}
+			if _title == "" {
+				_title = _headerTitle
+			}
+			_titles = append (_titles, _title)
+		}
+		
+	} else if _headerSyntax != "" {
+		panic (0x514cd03a)
 	}
 	
 	_bodyLines_0, _ := stringSplitLines (_body)
@@ -407,6 +559,11 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 			return nil, _error
 		}
 	}
+	if _slug != "" {
+		if ! DocumentIdentifierWithoutLibraryRegex.MatchString (_slug) {
+			return nil, errorw (0x2a5add05, nil)
+		}
+	}
 	if _format != "" {
 		switch _format {
 			case "commonmark", "gemini", "snippets", "text" :
@@ -422,6 +579,10 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 	
 	_sourceFingerprint := fingerprintString (_source)
 	_bodyFingerprint := fingerprintStringLines (_bodyLines)
+	
+	if (_identifier == "") && (_slug != "") {
+		_identifier = _slug
+	}
 	
 	_document := & Document {
 			Title : _title,
