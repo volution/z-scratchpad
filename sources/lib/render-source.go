@@ -13,11 +13,11 @@ func DocumentRenderToSource (_document *Document) (string, *Error) {
 	_buffer := BytesBufferNewSize (128 * 1024)
 	defer BytesBufferRelease (_buffer)
 	
-	if _document.Title != "" {
-		fmt.Fprintf (_buffer, "## -- title:       %s\n", _document.Title)
+	if _document.TitleOriginal != "" {
+		fmt.Fprintf (_buffer, "## -- title:       %s\n", _document.TitleOriginal)
 	}
-	for _, _title := range _document.TitleAlternatives {
-		if _title == _document.Title {
+	for _, _title := range _document.TitleOriginalAlternatives {
+		if _title == _document.TitleOriginal {
 			continue
 		}
 		fmt.Fprintf (_buffer, "## -- title:       %s\n", _title)

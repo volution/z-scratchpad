@@ -16,19 +16,21 @@ var (
 
 /*
 type Document struct {
-	Identifier        string
-	Library           string
-	Path              string
-	PathInLibrary     string
-	Title             string
-	TitleAlternatives []string
-	SourceFingerprint string
-	Format            string
-	BodyLines         []string
-	BodyEmpty         bool
-	BodyFingerprint   string
-	EditEnabled       bool
-	Timestamp         time.Time
+	Identifier                string
+	Library                   string
+	Path                      string
+	PathInLibrary             string
+	Title                     string
+	TitleAlternatives         []string
+	TitleOriginal             string
+	TitleOriginalAlternatives []string
+	SourceFingerprint         string
+	Format                    string
+	BodyLines                 []string
+	BodyEmpty                 bool
+	BodyFingerprint           string
+	EditEnabled               bool
+	Timestamp                 time.Time
 }
 */
 
@@ -127,6 +129,56 @@ func (d *Document) Size() (s uint64) {
 
 			{
 				l := uint64(len(d.TitleAlternatives[k0]))
+
+				{
+
+					t := l
+					for t >= 0x80 {
+						t >>= 7
+						s++
+					}
+					s++
+
+				}
+				s += l
+			}
+
+		}
+
+	}
+	{
+		l := uint64(len(d.TitleOriginal))
+
+		{
+
+			t := l
+			for t >= 0x80 {
+				t >>= 7
+				s++
+			}
+			s++
+
+		}
+		s += l
+	}
+	{
+		l := uint64(len(d.TitleOriginalAlternatives))
+
+		{
+
+			t := l
+			for t >= 0x80 {
+				t >>= 7
+				s++
+			}
+			s++
+
+		}
+
+		for k0 := range d.TitleOriginalAlternatives {
+
+			{
+				l := uint64(len(d.TitleOriginalAlternatives[k0]))
 
 				{
 
@@ -368,6 +420,65 @@ func (d *Document) Marshal(buf []byte) ([]byte, error) {
 
 				}
 				copy(buf[i+0:], d.TitleAlternatives[k0])
+				i += l
+			}
+
+		}
+	}
+	{
+		l := uint64(len(d.TitleOriginal))
+
+		{
+
+			t := uint64(l)
+
+			for t >= 0x80 {
+				buf[i+0] = byte(t) | 0x80
+				t >>= 7
+				i++
+			}
+			buf[i+0] = byte(t)
+			i++
+
+		}
+		copy(buf[i+0:], d.TitleOriginal)
+		i += l
+	}
+	{
+		l := uint64(len(d.TitleOriginalAlternatives))
+
+		{
+
+			t := uint64(l)
+
+			for t >= 0x80 {
+				buf[i+0] = byte(t) | 0x80
+				t >>= 7
+				i++
+			}
+			buf[i+0] = byte(t)
+			i++
+
+		}
+		for k0 := range d.TitleOriginalAlternatives {
+
+			{
+				l := uint64(len(d.TitleOriginalAlternatives[k0]))
+
+				{
+
+					t := uint64(l)
+
+					for t >= 0x80 {
+						buf[i+0] = byte(t) | 0x80
+						t >>= 7
+						i++
+					}
+					buf[i+0] = byte(t)
+					i++
+
+				}
+				copy(buf[i+0:], d.TitleOriginalAlternatives[k0])
 				i += l
 			}
 
@@ -639,6 +750,73 @@ func (d *Document) Unmarshal(buf []byte) (uint64, error) {
 
 				}
 				d.TitleAlternatives[k0] = string(buf[i+0 : i+0+l])
+				i += l
+			}
+
+		}
+	}
+	{
+		l := uint64(0)
+
+		{
+
+			bs := uint8(7)
+			t := uint64(buf[i+0] & 0x7F)
+			for buf[i+0]&0x80 == 0x80 {
+				i++
+				t |= uint64(buf[i+0]&0x7F) << bs
+				bs += 7
+			}
+			i++
+
+			l = t
+
+		}
+		d.TitleOriginal = string(buf[i+0 : i+0+l])
+		i += l
+	}
+	{
+		l := uint64(0)
+
+		{
+
+			bs := uint8(7)
+			t := uint64(buf[i+0] & 0x7F)
+			for buf[i+0]&0x80 == 0x80 {
+				i++
+				t |= uint64(buf[i+0]&0x7F) << bs
+				bs += 7
+			}
+			i++
+
+			l = t
+
+		}
+		if uint64(cap(d.TitleOriginalAlternatives)) >= l {
+			d.TitleOriginalAlternatives = d.TitleOriginalAlternatives[:l]
+		} else {
+			d.TitleOriginalAlternatives = make([]string, l)
+		}
+		for k0 := range d.TitleOriginalAlternatives {
+
+			{
+				l := uint64(0)
+
+				{
+
+					bs := uint8(7)
+					t := uint64(buf[i+0] & 0x7F)
+					for buf[i+0]&0x80 == 0x80 {
+						i++
+						t |= uint64(buf[i+0]&0x7F) << bs
+						bs += 7
+					}
+					i++
+
+					l = t
+
+				}
+				d.TitleOriginalAlternatives[k0] = string(buf[i+0 : i+0+l])
 				i += l
 			}
 

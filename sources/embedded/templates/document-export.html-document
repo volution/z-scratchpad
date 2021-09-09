@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<title>
-			{{- if .Document.Title -}}
-				{{ .Document.Title }}
+			{{- if .Document.TitleOriginal -}}
+				{{ .Document.TitleOriginal }}
 			{{- else -}}
 				[{{ .Document.Identifier }}]
 			{{- end -}}
@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		<header class="document-header">
-			{{- if .Document.Title }}<span>{{ .Document.Title }}</span> {{ end -}}
+			{{- if .Document.TitleOriginal }}<span>{{ .Document.TitleOriginal }}</span> {{ end -}}
 			{{- if true }}<span>[{{ .Document.Identifier }}]</span> {{ end -}}
 			{{- if .Document.Timestamp.IsZero | not }}<span>(<time datetime="{{ .Document.Timestamp.Format "2006-01-02" }}">{{ .Document.Timestamp.Format "2006-01-02 15:04:05" }}</time>)</span> {{ end -}}
 		</header>

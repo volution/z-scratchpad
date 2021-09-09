@@ -34,7 +34,7 @@
 				{{ if .Documents }}
 					<ul>
 						{{ range $_, $document := .Documents }}
-							<li class="search-candidate">{{ template "document-html-a-link" $document }}</li>
+							<li class="search-candidate">{{ template "document-html-a-link-prefixed" $document }}</li>
 						{{ end }}
 					</ul>
 				{{ else }}

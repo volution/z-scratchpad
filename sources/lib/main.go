@@ -1332,7 +1332,7 @@ func mainListOptions (_libraryIdentifier string, _type string, _labelSource stri
 					case "path" :
 						_value = _document.Path
 					case "commonmark-link" :
-						_valueEscaped := _document.Title
+						_valueEscaped := _document.TitleOriginal
 						_valueEscaped = strings.ReplaceAll (_valueEscaped, "\\", "\\\\")
 						_valueEscaped = strings.ReplaceAll (_valueEscaped, "[", "\\[")
 						_valueEscaped = strings.ReplaceAll (_valueEscaped, "]", "\\]")

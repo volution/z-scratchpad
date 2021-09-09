@@ -1,6 +1,6 @@
 
-{{ if .Document.Title -}}
-	{{ .Document.Title }}
+{{ if .Document.TitleOriginal -}}
+	{{ .Document.TitleOriginal }}
 {{- else -}}
 	[{{ .Document.Identifier }}]
 {{- end }}

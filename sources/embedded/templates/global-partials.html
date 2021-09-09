@@ -160,7 +160,15 @@
 {{- end }}
 
 
-{{ define "document-html-a-link" -}}
+{{ define "document-html-a-link-original" -}}
+	{{- if .TitleOriginal -}}
+		<a href="/d/{{ .Identifier }}">{{ .TitleOriginal }}</a>
+	{{- else -}}
+		<a href="/d/{{ .Identifier }}">[{{ .Identifier }}]</a>
+	{{- end -}}
+{{- end }}
+
+{{ define "document-html-a-link-prefixed" -}}
 	{{- if .Title -}}
 		<a href="/d/{{ .Identifier }}">{{ .Title }}</a>
 	{{- else -}}

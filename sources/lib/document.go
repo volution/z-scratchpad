@@ -30,6 +30,9 @@ type Document struct {
 	Title string
 	TitleAlternatives []string
 	
+	TitleOriginal string
+	TitleOriginalAlternatives []string
+	
 	SourceFingerprint string
 	
 	Format string
@@ -237,6 +240,7 @@ func DocumentInitializeTitle (_document *Document, _library *Library) (*Error) {
 			_document.Title = _library.UseTitlePrefix + _document.Title
 		}
 	}
+	_document.TitleOriginalAlternatives = append ([]string (nil), _document.TitleAlternatives ...)
 	for _index := range _document.TitleAlternatives {
 		if ! strings.HasPrefix (_document.TitleAlternatives[_index], _library.UseTitlePrefix) {
 			_document.TitleAlternatives[_index] = _library.UseTitlePrefix + _document.TitleAlternatives[_index]
@@ -593,6 +597,8 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 	_document := & Document {
 			Title : _title,
 			TitleAlternatives : _titles,
+			TitleOriginal : _title,
+			TitleOriginalAlternatives : _titles,
 			Identifier : _identifier,
 			Library : _library,
 			Format : _format,
@@ -613,11 +619,11 @@ func DocumentDump (_stream io.Writer, _document *Document, _includeIdentifiers b
 	_buffer := BytesBufferNewSize (128 * 1024)
 	defer BytesBufferRelease (_buffer)
 	
-	if _document.Title != "" {
-		fmt.Fprintf (_buffer, "-- title (primary): `%s`\n", _document.Title)
+	if _document.TitleOriginal != "" {
+		fmt.Fprintf (_buffer, "-- title (primary): `%s`\n", _document.TitleOriginal)
 	}
-	for _, _title := range _document.TitleAlternatives {
-		if _title == _document.Title {
+	for _, _title := range _document.TitleOriginalAlternatives {
+		if _title == _document.TitleOriginal {
 			continue
 		}
 		fmt.Fprintf (_buffer, "-- title (alternative): `%s`\n", _title)

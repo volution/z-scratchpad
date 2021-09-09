@@ -10,6 +10,9 @@ struct Document {
 	Title string
 	TitleAlternatives []string
 	
+	TitleOriginal string
+	TitleOriginalAlternatives []string
+	
 	SourceFingerprint string
 	
 	Format string

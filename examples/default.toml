@@ -2,6 +2,7 @@
 [[library]]
 identifier = "tests"
 name = "Tests"
+use_title_prefix = "Tests / "
 paths = ["./tests"]
 edit_enabled = true
 create_enabled = false
@@ -13,6 +14,7 @@ use_file_extension_as_format = true
 [[library]]
 identifier = "inbox"
 name = "Inbox"
+use_title_prefix = "Inbox / "
 paths = ["./inbox"]
 edit_enabled = true
 create_enabled = true
@@ -26,6 +28,7 @@ use_file_extension_as_format = true
 [[library]]
 identifier = "imports"
 name = "Imports"
+use_title_prefix = "Imports / "
 paths = ["./imports"]
 edit_enabled = false
 create_enabled = false
