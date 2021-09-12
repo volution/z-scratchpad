@@ -261,6 +261,11 @@ main.document dl {
 	margin-bottom : 1.50rem;
 }
 
+main.document ul,
+main.document ol {
+	padding-left : 2ch;
+}
+
 main.document-format-commonmark p + ul,
 main.document-format-commonmark p + ol,
 main.document-format-commonmark p + dl {
@@ -277,7 +282,6 @@ main.document ul > li::marker {
 }
 
 main.document-format-gemini ul.links > li::marker {
-	font-size : 1.25em;
 	content : "\21d2\00a0";
 }
 
@@ -297,17 +301,19 @@ main.document dl > dd:not(:last-child) {
 
 main.document li > ul,
 main.document li > ol,
-main.document li > dl {
+main.document li > dl,
+main.document li > p,
+main.document li > blockquote,
+main.document li > pre,
+main.document li > h1,
+main.document li > h2,
+main.document li > h3,
+main.document li > h4,
+main.document li > h5,
+main.document li > h6 {
 	display : block;
 	margin-top : 0.50rem;
 	margin-bottom : 0.50rem;
-}
-
-main.document li > ul > li,
-main.document li > ol > li,
-main.document li > dl > dd,
-main.document li > dl > dt {
-	margin-left : 2ch;
 }
 
 
@@ -365,15 +371,6 @@ main.document-format-text pre {
 	padding-right : 2ch;
 }
 
-main.document blockquote > pre,
-main.document li > pre {
-	display : block;
-	padding-top : 0.5ch;
-	padding-bottom : 0.5ch;
-	padding-left : 0.5ch;
-	padding-right : 0.5ch;
-}
-
 main.document-format-commonmark pre,
 main.document-format-gemini pre,
 main.document-format-snippets pre {
@@ -398,6 +395,20 @@ main.document pre > code,
 main.document pre:hover > code {
 	padding : 0px;
 	background : transparent;
+}
+
+
+
+
+main.document blockquote > blockquote,
+main.document blockquote > pre,
+main.document li > blockquote,
+main.document li > pre {
+	display : block;
+	padding-top : 0.5ch;
+	padding-bottom : 0.5ch;
+	padding-left : 0.5ch;
+	padding-right : 0.5ch;
 }
 
 

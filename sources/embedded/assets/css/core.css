@@ -66,11 +66,11 @@ ul > li, ol > li {
 }
 ul > li {
 	list-style-type : square;
-	list-style-position : inside;
+	list-style-position : outside;
 }
 ol > li {
 	list-style-type : decimal;
-	list-style-position : inside;
+	list-style-position : outside;
 }
 
 
