@@ -162,6 +162,11 @@ main.dialogue > * {
 	margin-bottom : 1.50rem;
 }
 
+main.index ul,
+main.dialogue > ul {
+	padding-left : 2ch;
+}
+
 
 
 
@@ -261,9 +266,15 @@ main.document dl {
 	margin-bottom : 1.50rem;
 }
 
-main.document ul,
-main.document ol {
+main.document ul {
 	padding-left : 2ch;
+}
+main.document ol {
+	padding-left : 3ch;
+	counter-reset : list;
+}
+main.document ol > li {
+	counter-increment : list;
 }
 
 main.document-format-commonmark p + ul,
@@ -272,13 +283,13 @@ main.document-format-commonmark p + dl {
 	margin-top : -1.25rem;
 }
 
-main.document ul > li::marker,
-main.document ol > li::marker {
-	font-size : 1em;
-}
-
 main.document ul > li::marker {
 	content : "\25aa\00a0";
+}
+
+main.document ol > li::marker {
+	content : "\2039" counter(list) "\203a\00a0";
+	font-size : 0.9em;
 }
 
 main.document-format-gemini ul.links > li::marker {
