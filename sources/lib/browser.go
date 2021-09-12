@@ -3,6 +3,7 @@
 package zscratchpad
 
 
+import "os"
 import "os/exec"
 import "strings"
 
@@ -23,6 +24,7 @@ type Browser struct {
 	TerminalOpenExternalCommand []string
 	XorgOpenExternalCommand []string
 	
+	UrlDisplay bool
 	QrcodeDisplay bool
 }
 
@@ -115,12 +117,21 @@ func browserUrlOpen (_browser *Browser, _url string, _internal bool, _synchronou
 	
 	_globals := _browser.globals
 	
+	if _browser.UrlDisplay {
+		if _, _error := os.Stdout.WriteString (_url + "\n"); _error != nil {
+			return errorw (0xecc17b46, _error)
+		}
+	}
 	if _browser.QrcodeDisplay {
 		if !_globals.TerminalEnabled {
 			return errorw (0x80c57c45, nil)
 		}
-//		logf ('i', 0x31846dd1, "%s", _url)
-		return QrcodeTerminalDisplay (_url, _globals.Stdout)
+		if _error := QrcodeTerminalDisplay (_url, _globals.Stdout); _error != nil {
+			return _error
+		}
+	}
+	if _browser.UrlDisplay || _browser.QrcodeDisplay {
+		return nil
 	}
 	
 	_command, _terminal, _error := BrowserResolveOpenCommand (_browser, _internal)

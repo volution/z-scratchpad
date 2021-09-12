@@ -125,7 +125,7 @@ type DumpFlags struct {}
 
 
 type ServerFlags struct {
-	UrlBase *string `long:"server-url"`
+	UrlBase *string `long:"server-url" value-name:"{url}"`
 	EndpointIp *string `long:"server-ip" value-name:"{ip}"`
 	EndpointPort *uint16 `long:"server-port" value-name:"{port}"`
 	EditEnabled *bool `long:"server-edit-enabled"`
@@ -151,12 +151,13 @@ type ServerConfiguration struct {
 
 
 type BrowseFlags struct {
-	UrlBase *string `long:"server-url"`
+	UrlBase *string `long:"server-url" value-name:"{url}"`
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Document *string `long:"document" short:"d" value-name:"{identifier}"`
 	SelectLibrary *bool `long:"select-library" short:"S"`
 	SelectDocument *bool `long:"select" short:"s"`
 	Authenticate *bool `long:"authenticate" short:"a"`
+	UrlDisplay *bool `long:"print"`
 	QrcodeDisplay *bool `long:"qrcode"`
 }
 
@@ -1588,6 +1589,9 @@ func MainBrowse (_flags *BrowseFlags, _globals *Globals, _index *Index, _editor 
 	} else {
 		_browser.ServerAuthenticationSecret = ""
 	}
+	
+	_urlDisplay := flagBoolOrDefault (_flags.UrlDisplay, false)
+	_browser.UrlDisplay = _urlDisplay
 	
 	_qrcodeDisplay := flagBoolOrDefault (_flags.QrcodeDisplay, false)
 	_browser.QrcodeDisplay = _qrcodeDisplay
