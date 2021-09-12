@@ -50,6 +50,12 @@ html:root {
 	background : hsl(210, 100%, 5%);
 }
 
+html:root > body > main,
+html:root > body > header,
+html:root > body > footer {
+	text-shadow : 0px 0px 2px hsl(0, 0%, 0%);
+}
+
 
 
 
@@ -399,7 +405,7 @@ main.document-format-snippets pre:hover,
 main.document-format-commonmark code:hover,
 main.document-format-gemini code:hover,
 main.document-format-snippets code:hover {
-	background : hsl(30, 50%, 15%);
+	background : hsl(30, 50%, 10%);
 }
 
 main.document pre > code,
@@ -509,6 +515,19 @@ main.document video[data-zs-url-type="error"] {
 }
 
 .search-result-highlight {
-	background-color : hsl(30, 100%, 15%);
+	background-color : hsl(30, 50%, 15%);
+}
+
+
+.clipboard-active {
+	background-color : hsl(30, 50%, 15%) !important;
+}
+.clipboard-copied {
+	color : hsl(0, 0%, 100%) !important;
+	background-color : hsl(30, 100%, 25%) !important;
+}
+.clipboard-active *,
+.clipboard-copied * {
+	background : transparent !important;
 }
 
