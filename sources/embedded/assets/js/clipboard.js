@@ -49,6 +49,12 @@
 	
 	function _handle (_target, _event, _expectedClicks) {
 		
+		if (_event.target.tagName == "A") {
+			return;
+		}
+		
+		let _propagate = true;
+		
 		if (_target !== _currentTarget) {
 			if (_currentTarget !== null) {
 				_currentTarget.classList.remove ("clipboard-active");
@@ -70,6 +76,7 @@
 			
 			if (_currentClicks == (_expectedClicks - 1)) {
 				_currentTarget.classList.add ("clipboard-active");
+				_propagate = false;
 			}
 			
 			if (_currentTimeout !== null) {
@@ -88,6 +95,8 @@
 			
 			_currentTarget.classList.remove ("clipboard-active");
 			_currentTarget.classList.add ("clipboard-copied");
+			_propagate = false;
+			
 			if (_currentTimeout !== null) {
 				window.clearTimeout (_currentTimeout);
 			}
@@ -97,10 +106,15 @@
 					_currentClicks = 0;
 					_currentTimeout = null;
 				}, 6000);
+			
+		} else {
+			_propagate = false;
 		}
 		
-		_event.stopPropagation ();
-		_event.preventDefault ();
+		if (!_propagate) {
+			_event.stopPropagation ();
+			_event.preventDefault ();
+		}
 	}
 	
 	function _register (_target, _expectedClicks) {
