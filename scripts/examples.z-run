@@ -47,6 +47,8 @@
 	test "${#}" -eq 0
 	_documents=(
 			'readme tests:readme'
+			'commonmark tests:commonmark'
+			'gemini tests:gemini-1'
 		)
 	_themes=( github modest tufte plain )
 	for _document_and_identifier in "${_documents[@]}" ; do

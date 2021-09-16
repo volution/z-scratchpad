@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+	<head>
+		<title>gemini (with extension)</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg data-name='Layer 2'%3E%3Cg data-name='file-text'%3E%3Crect width='24' height='24' opacity='0'/%3E%3Cpath d='M15 16H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2z'/%3E%3Cpath d='M9 14h3a1 1 0 0 0 0-2H9a1 1 0 0 0 0 2z'/%3E%3Cpath d='M19.74 8.33l-5.44-6a1 1 0 0 0-.74-.33h-7A2.53 2.53 0 0 0 4 4.5v15A2.53 2.53 0 0 0 6.56 22h10.88A2.53 2.53 0 0 0 20 19.5V9a1 1 0 0 0-.26-.67zM14 5l2.74 3h-2a.79.79 0 0 1-.74-.85zm3.44 15H6.56a.53.53 0 0 1-.56-.5v-15a.53.53 0 0 1 .56-.5H12v3.15A2.79 2.79 0 0 0 14.71 10H18v9.5a.53.53 0 0 1-.56.5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E" />
+		<style>html:root,body{margin:0;padding:0;background:#22272e;-webkit-text-size-adjust:100%}.document-body,.document-header{box-sizing:border-box;min-width:200px;max-width:1400px;margin:0 auto}.document-body{padding:45px;background:#fff}.document-header{padding:4px;color:#bfbfbf;background:#001933;font-size:16px;line-height:24px;font-family:monospace;text-align:center}@media screen and (max-width:800px){.document-body{padding:15px}}.document-body pre,.document-body code{font-family:Menlo,Monaco,courier new,monospace}.document-body pre{padding:.5rem;line-height:1.25;overflow-x:scroll}.document-body a,.document-body a:visited{color:#3498db}.document-body a:hover,.document-body a:focus,.document-body a:active{color:#2980b9}.document-body{font-size:12px}@media screen and (min-width:32rem) and (max-width:48rem){.document-body{font-size:15px}}@media screen and (min-width:48rem){.document-body{font-size:16px}}.document-body{line-height:1.85}.document-body p{font-size:1rem;margin-bottom:1.3rem}.document-body h1,.document-body h2,.document-body h3,.document-body h4{margin:1.414rem 0 .5rem;font-weight:inherit;line-height:1.42}.document-body h1{margin-top:0;font-size:3.998rem}.document-body h2{font-size:2.827rem}.document-body h3{font-size:1.999rem}.document-body h4{font-size:1.414rem}.document-body h5{font-size:1.121rem}.document-body h6{font-size:.88rem}.document-body small{font-size:.707em}.document-body img,.document-body canvas,.document-body iframe,.document-body video,.document-body svg,.document-body select,.document-body textarea{max-width:100%}.document-body{font-size:18px}.document-body{color:#444;font-family:open sans condensed,sans-serif;margin:0 auto;line-height:1.45}.document-body h1,.document-body h2,.document-body h3,.document-body h4,.document-body h5,.document-body h6{font-family:Arimo,Helvetica,sans-serif}.document-body h1,.document-body h2,.document-body h3{border-bottom:2px solid #fafafa;margin-bottom:1.15rem;padding-bottom:.5rem;text-align:center}.document-body blockquote{border-left:8px solid #fafafa;padding:1rem}.document-body pre,.document-body code{background-color:#fafafa}</style>
+	</head>
+	<body>
+		<header class="document-header"><span>gemini (with extension)</span> <span>[tests:gemini-1]</span> <span>(<time datetime="2021-08-22">2021-08-22 20:58:15</time>)</span> </header>
+		<main class="document-body">
+
+
+<h1>How to create text/gemini documents</h1>
+<h2>Headings</h2>
+<p>Headings are supported at three different levels denoted by starting a line of text with 1-3 &#39;#&#39; characters followed by a space and some text:</p>
+<pre><code># I am the biggest heading
+## I am the mid-size heading
+### I am the smallest heading
+</code></pre>
+<p>Some clients/browsers will create tables of contents for documents based on these headings, others will show them in different font sizes, while other will just display the text as is. When displayed as is a viewer can still see that they are hedings and what their neting level is by the number of &#39;#&#39; characters they see preceding the text.</p>
+<h2>Links</h2>
+<p>Links are created by starting a line with `=&gt;` followed by the url, a space, and the text you would like the user to see:</p>
+<ul class="links">
+<li><a href="https://gemlog.blue" rel="nofollow noreferrer" data-zs-url-original-href="https://gemlog.blue" data-zs-url-type="external">Start creating your own gemlog!</a></li>
+<li><a href="https://gemlog.blue" rel="nofollow noreferrer" data-zs-url-original-href="https://gemlog.blue" data-zs-url-type="external">Visit us over gemini</a></li>
+</ul>
+<p>You may have noticed that gemini supports links to other protocols (the above example includes a web link, beginning with `https`, and a gemini link, beginning with `gemini`). This crosslinking support is one of the great strengths of the gemini protocol.</p>
+<h2>Lists</h2>
+<ul>
+<li>Lines that start wint `*` are treated as &#34;list items&#34;.</li>
+<li>Second line.</li>
+<li>Third line.</li>
+</ul>
+<h2>Block Quotes</h2>
+<blockquote>
+<p>Lines that start with `&gt;` are treated as &#34;block quotes&#34;.</p>
+</blockquote>
+<h2>Pre-formatted text</h2>
+<p>Preformatted text lines are the most complicated type of line in text/gemini. They function as a sort of toggle. You toggle on preformatted mode with three back tick characters (``` at the beginning of the line) and toggle off with three more. The starting line of ``` can also include &#34;alt&#34; text after the back ticks. This will usually not be shown to the user, but is useful for search engines, screen readers, or users using clients that allow it to be shown.</p>
+<p>Using pre-formatted text mode you can display ascii art, poetry with irregular spacing, code, etc. without the client reworking the spaces in your lines.</p>
+<pre><code>0  0
+ L
+\__/
+</code></pre>
+
+
+		</main>
+	</body>
+</html>
