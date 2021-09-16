@@ -37,6 +37,9 @@ func DocumentSanitizeHtml (_document *Document, _unsafe string, _mangle bool) (s
 	// FIXME:  Make this configurable!
 	_parser.AllowURLSchemes ("mailto", "http", "https", "ftp", "file", "gopher", "gemini", "s", "sd", "sl", "w")
 	
+	// NOTE:  Required for "task-lists".
+	_parser.AllowAttrs ("type", "disabled", "checked") .OnElements ("input")
+	
 	_unsafeBuffer := bytes.NewBufferString (_unsafe)
 	
 	_sanitizedBuffer := _parser.SanitizeReader (_unsafeBuffer)

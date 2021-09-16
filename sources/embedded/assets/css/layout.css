@@ -498,6 +498,26 @@ main.document video[data-zs-url-type="error"] {
 
 
 
+main.document input[type="checkbox"] {
+	border : none;
+}
+main.document input[type="checkbox"]::before {
+	display : inline-block;
+	width : 4ch;
+	text-align : center;
+}
+main.document input[type="checkbox"]::before {
+	content : "\23a3\25cf\23a4";
+	color : hsl(0, 75%, 50%);
+}
+main.document input[type="checkbox"][checked]::before {
+	content : "\23a3\2715\23a4";
+	color : hsl(120, 75%, 50%);
+}
+
+
+
+
 .search-container {
 	font-size : 0.75rem !important;
 	line-height : 1.0rem !important;
