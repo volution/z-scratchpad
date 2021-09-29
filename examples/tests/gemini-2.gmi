@@ -1,0 +1,8 @@
+## gemini links
+
+
+=> sd:tests:readme
+=> sd:tests:commonmark
+=> sd:tests:markdown-links
+=> sd:tests:gemini-2
+
