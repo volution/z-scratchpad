@@ -15,12 +15,35 @@
 
 
 << go / execute / main / debug
+	
 	"${ZRUN[@]}" ':: go / build / main / debug'
+	
+	export -n -- \
+			ZRUN_LIBRARY_SOURCE= \
+			ZRUN_LIBRARY_URL= \
+			ZRUN_LIBRARY_FINGERPRINT= \
+			ZRUN_EXECUTABLE= \
+			ZRUN_WORKSPACE= \
+			ZRUN_CACHE= \
+	#
+	
 	exec -- ./.outputs/main--debug "${@}"
 !!
 
+
 << go / execute / main / release
+	
 	"${ZRUN[@]}" ':: go / build / main / release'
+	
+	export -n -- \
+			ZRUN_LIBRARY_SOURCE= \
+			ZRUN_LIBRARY_URL= \
+			ZRUN_LIBRARY_FINGERPRINT= \
+			ZRUN_EXECUTABLE= \
+			ZRUN_WORKSPACE= \
+			ZRUN_CACHE= \
+	#
+	
 	exec -- ./.outputs/main--release "${@}"
 !!
 
@@ -30,7 +53,9 @@
 << go / build / main / debug
 	
 	test "${#}" -eq 0
+	
 	"${ZRUN[@]}" ':: sources / embedded / prepare'
+	
 	_outputs="$( exec -- readlink -e -- ./.outputs )"
 	
 	_build_target=development
@@ -71,8 +96,10 @@
 << go / build / main / release
 	
 	test "${#}" -eq 0
+	
 	"${ZRUN[@]}" ':: sources / embedded / prepare'
 	"${ZRUN[@]}" ':: sources / embedded / bundle'
+	
 	_outputs="$( exec -- readlink -e -- ./.outputs )"
 	
 	_build_target=release
@@ -127,6 +154,7 @@
 		rm -- "${_outputs}/main--release${_suffix}.new"
 	fi
 !!
+
 
 
 
@@ -204,11 +232,46 @@
 !!
 
 
+
+
 << go / dependencies / vendor
 	test "${#}" -eq 0
-	exec -- "${ZRUN[@]}" ':: go / tool' \
+	
+	if test -e ./vendors ; then
+		rm -- ./sources/vendor
+		mv -T -- ./vendors ./sources/vendor
+	fi
+	
+	"${ZRUN[@]}" ':: go / tool' \
 			mod vendor \
-			-v \
+	#
+	
+	mv -T -- ./sources/vendor ./vendors
+	ln -s -T -- ../vendors ./sources/vendor
+!!
+
+
+<< go / dependencies / vendor / cleanup
+	test "${#}" -eq 0
+	
+	find ./vendor/ \
+			-xdev \
+			-not -type d \
+			-not -path './sources/vendor/modules.txt' \
+			-not -name 'go.mod' \
+			-not -name 'go.sum' \
+			-not -name '*.go' \
+			-not -name '*.c' \
+			-not -name '*.h' \
+			-not -name '*.s' \
+			-delete \
+	#
+	
+	find ./vendor/ \
+			-xdev \
+			-type d \
+			-empty \
+			-delete \
 	#
 !!
 
@@ -216,7 +279,9 @@
 
 
 << go / tool
+	
 	test "${#}" -ge 1
+	
 	_outputs="$( exec -- readlink -e -- ./.outputs )"
 	_sources="$( exec -- readlink -e -- ./sources )"
 	
@@ -232,6 +297,15 @@
 	fi
 	
 	cd -- "${_sources}"
+	
+	export -n -- \
+			ZRUN_LIBRARY_SOURCE= \
+			ZRUN_LIBRARY_URL= \
+			ZRUN_LIBRARY_FINGERPRINT= \
+			ZRUN_EXECUTABLE= \
+			ZRUN_WORKSPACE= \
+			ZRUN_CACHE= \
+	#
 	
 	exec -- "${_go}" "${@}"
 !!

@@ -8,6 +8,17 @@
 
 
 
+<< workspace / initialize
+	
+	test "${#}" -eq 0
+	
+	"${ZRUN[@]}" ':: workspace / initialize / outputs'
+	"${ZRUN[@]}" ':: workspace / initialize / go'
+!!
+
+
+
+
 << workspace / initialize / go
 	
 	test "${#}" -eq 0

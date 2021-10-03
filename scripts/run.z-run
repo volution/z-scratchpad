@@ -4,14 +4,11 @@
 
 
 ::// run / ...
-::// use / ...
 ::// watch / run / ...
+::// use / run / ...
 
 
 
-
-:: watch / run / server :: exec -- "${ZRUN[@]}" ':: watch / run / exec' server "${@}"
-:: watch / run / menu :: exec -- "${ZRUN[@]}" ':: watch / run / exec' menu "${@}"
 
 :: watch / run / exec :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / exec' "${@}"
 
@@ -19,30 +16,13 @@
 
 
 :: run / version :: exec -- "${ZRUN[@]}" ':: run / exec' --version "${@}"
-:: run / sources :: exec -- "${ZRUN[@]}" ':: run / exec' --sources "${@}"
+:: run / sources / md5 :: exec -- "${ZRUN[@]}" ':: run / exec' --sources-md5 "${@}"
+:: run / sources / cpio :: exec -- "${ZRUN[@]}" ':: run / exec' --sources-cpio "${@}"
+:: run / manual :: exec -- "${ZRUN[@]}" ':: run / exec' --manual "${@}"
+:: run / manual / text :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-text "${@}"
+:: run / manual / html :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-html "${@}"
+:: run / manual / man :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-man "${@}"
 :: run / help :: exec -- "${ZRUN[@]}" ':: run / exec' --help "${@}"
-
-
-:: run / menu :: exec -- "${ZRUN[@]}" ':: run / exec' menu "${@}"
-:: run / server :: exec -- "${ZRUN[@]}" ':: run / exec' server "${@}"
-:: run / browse :: exec -- "${ZRUN[@]}" ':: run / exec' browse "${@}"
-:: run / browse / authenticate :: exec -- "${ZRUN[@]}" ':: run / exec' browse -a "${@}"
-:: run / browse / select / library :: exec -- "${ZRUN[@]}" ':: run / exec' browse -S "${@}"
-:: run / browse / select / document :: exec -- "${ZRUN[@]}" ':: run / exec' browse -s "${@}"
-:: run / list :: exec -- "${ZRUN[@]}" ':: run / exec' list "${@}"
-:: run / list / libraries :: exec -- "${ZRUN[@]}" ':: run / exec' list -t library "${@}"
-:: run / list / documents :: exec -- "${ZRUN[@]}" ':: run / exec' list -t document "${@}"
-:: run / search :: exec -- "${ZRUN[@]}" ':: run / exec' search "${@}"
-:: run / search / body :: exec -- "${ZRUN[@]}" ':: run / exec' search -W body "${@}"
-:: run / grep :: exec -- "${ZRUN[@]}" ':: run / exec' grep "${@}"
-:: run / grep / body :: exec -- "${ZRUN[@]}" ':: run / exec' grep -W body "${@}"
-:: run / edit :: exec -- "${ZRUN[@]}" ':: run / exec' edit "${@}"
-:: run / edit / select :: exec -- "${ZRUN[@]}" ':: run / exec' edit -s "${@}"
-:: run / create :: exec -- "${ZRUN[@]}" ':: run / exec' create "${@}"
-:: run / create / select :: exec -- "${ZRUN[@]}" ':: run / exec' create -s "${@}"
-:: run / export :: exec -- "${ZRUN[@]}" ':: run / exec' export "${@}"
-:: run / export / select :: exec -- "${ZRUN[@]}" ':: run / exec' export -s "${@}"
-:: run / dump :: exec -- "${ZRUN[@]}" ':: run / exec' dump "${@}"
 
 
 
@@ -107,6 +87,27 @@
 		rm -- ./.outputs/profile--memory.pprof
 	fi
 	
+	if test -n "${__RUN_TERM:-}" ; then
+		export -- TERM="${__RUN_TERM}"
+	fi
+	export -n -- __RUN_TERM=
+	
+	if test "${__RUN_DISPLAY:-}" == none ; then
+		export -n -- DISPLAY=
+	elif test -n "${__RUN_DISPLAY:-}" ; then
+		export -- DISPLAY="${__RUN_DISPLAY}"
+	fi
+	export -n -- __RUN_DISPLAY=
+	
+	export -n -- \
+			ZRUN_LIBRARY_SOURCE= \
+			ZRUN_LIBRARY_URL= \
+			ZRUN_LIBRARY_FINGERPRINT= \
+			ZRUN_EXECUTABLE= \
+			ZRUN_WORKSPACE= \
+			ZRUN_CACHE= \
+	#
+	
 	case "${_profile}" in
 		( hyperfine )
 			_wrapper=(
@@ -135,20 +136,28 @@
 !!
 
 
-:: use / reset :: export -- __RUN_TARGET= __RUN_PROFILE=
 
-:: use / target / debug + build :: export -- __RUN_TARGET=debug-build
-:: use / target / release + build :: export -- __RUN_TARGET=release-build
-:: use / target / debug :: export -- __RUN_TARGET=debug
-:: use / target / release :: export -- __RUN_TARGET=release
-:: use / target / installed :: export -- __RUN_TARGET=installed
 
-:: use / profile / none :: export -- __RUN_PROFILE=none
-:: use / profile / all :: export -- __RUN_PROFILE=all
-:: use / profile / cpu :: export -- __RUN_PROFILE=cpu
-:: use / profile / memory :: export -- __RUN_PROFILE=memory
-:: use / profile / time :: export -- __RUN_PROFILE=time
-:: use / profile / hyperfine :: export -- __RUN_PROFILE=hyperfine
+:: use / run / reset :: export -- __RUN_TARGET= __RUN_PROFILE= __RUN_TERM= __RUN_DISPLAY=
+
+:: use / run / target / debug + build :: export -- __RUN_TARGET=debug-build
+:: use / run / target / release + build :: export -- __RUN_TARGET=release-build
+:: use / run / target / debug :: export -- __RUN_TARGET=debug
+:: use / run / target / release :: export -- __RUN_TARGET=release
+:: use / run / target / installed :: export -- __RUN_TARGET=installed
+
+:: use / run / profile / none :: export -- __RUN_PROFILE=none
+:: use / run / profile / all :: export -- __RUN_PROFILE=all
+:: use / run / profile / cpu :: export -- __RUN_PROFILE=cpu
+:: use / run / profile / memory :: export -- __RUN_PROFILE=memory
+:: use / run / profile / time :: export -- __RUN_PROFILE=time
+:: use / run / profile / hyperfine :: export -- __RUN_PROFILE=hyperfine
+
+:: use / run / term / enable :: export -- __RUN_TERM="${TERM}"
+:: use / run / term / disable :: export -- __RUN_TERM=dumb
+
+:: use / run / xorg / enable :: export -- __RUN_DISPLAY="${DISPLAY}"
+:: use / run / xorg / disable :: export -- __RUN_DISPLAY=none
 
 
 

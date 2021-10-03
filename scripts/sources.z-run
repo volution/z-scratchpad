@@ -41,7 +41,28 @@
 	
 	test "${#}" -eq 0
 	
+	"${ZRUN[@]}" ':: sources / embedded / manual'
 	"${ZRUN[@]}" ':: sources / embedded / hash'
+!!
+
+
+
+
+<< sources / embedded / manual
+	
+	test "${#}" -eq 0
+	
+	if ! cmp -s -- ./documentation/manual/z-scratchpad.1.txt ./sources/embedded/manual/z-scratchpad.txt ; then
+		cp -T -- ./documentation/manual/z-scratchpad.1.txt ./sources/embedded/manual/z-scratchpad.txt
+	fi
+	
+	if ! cmp -s -- ./documentation/manual/z-scratchpad.1.html ./sources/embedded/manual/z-scratchpad.html ; then
+		cp -T -- ./documentation/manual/z-scratchpad.1.html ./sources/embedded/manual/z-scratchpad.html
+	fi
+	
+	if ! cmp -s -- ./documentation/manual/z-scratchpad.1.man ./sources/embedded/manual/z-scratchpad.man ; then
+		cp -T -- ./documentation/manual/z-scratchpad.1.man ./sources/embedded/manual/z-scratchpad.man
+	fi
 !!
 
 
@@ -214,6 +235,8 @@
 	printf -- '\n[--]  --------[ %s ]------------------------------------------------------\n\n' "${_timestamp}" >&2
 	exec -- "${@}"
 !!
+
+
 
 
 << sources / css-export / minify
