@@ -46,6 +46,8 @@ func PreMain () () {
 	}
 	
 	
+	
+	
 	if len (_arguments) == 1 {
 		_argument := _arguments[0]
 		
@@ -70,20 +72,42 @@ func PreMain () () {
 		}
 		
 		if _argument == "--sources-md5" {
-			if _, _error := os.Stdout.WriteString (BUILD_SOURCES_MD5); _error != nil {
+			if _, _error := os.Stdout.WriteString (embeddedSourcesMd5); _error != nil {
 				panic (abortErrorw (0x6c4a7eb3, _error))
 			}
 			os.Exit (0)
 			panic (abortErrorw (0xbe9f73ad, nil))
 		}
+		
 		if _argument == "--sources-cpio" {
-			if _, _error := os.Stdout.Write (BUILD_SOURCES_CPIO_GZ); _error != nil {
+			if _, _error := os.Stdout.Write (embeddedSourcesCpioGz); _error != nil {
 				panic (abortErrorw (0xf5b73ab8, _error))
 			}
 			os.Exit (0)
 			panic (abortErrorw (0x97f9faf1, nil))
 		}
+		
+		if (_argument == "--manual") || (_argument == "--manual-text") || (_argument == "--manual-html") || (_argument == "--manual-man") {
+			_manual := ""
+			switch _argument {
+				case "--manual", "--manual-text" :
+					_manual = embeddedManualTxt
+				case "--manual-html" :
+					_manual = embeddedManualHtml
+				case "--manual-man" :
+					_manual = embeddedManualMan
+				default :
+					panic (abortErrorw (0x43f9aab3, nil))
+			}
+			if _, _error := os.Stdout.WriteString (_manual); _error != nil {
+				panic (abortErrorw (0xe391f2f3, _error))
+			}
+			os.Exit (0)
+			panic (abortErrorw (0xf962a0b9, nil))
+		}
 	}
+	
+	
 	
 	
 	if _error := Main (_executable, _arguments, _environment); _error == nil {

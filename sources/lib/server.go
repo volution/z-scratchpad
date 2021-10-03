@@ -306,6 +306,12 @@ func ServerHandle (_server *Server, _request *http.Request, _response http.Respo
 	if _path == "/__/sources.cpio" {
 		return ServerHandleSourcesCpio (_server, _response)
 	}
+	if _path == "/__/manual.txt" {
+		return ServerHandleManualText (_server, _response)
+	}
+	if _path == "/__/manual.html" {
+		return ServerHandleManualHtml (_server, _response)
+	}
 	
 	switch _path {
 		case "/favicon.ico", "/favicon.png" :
@@ -707,14 +713,26 @@ func ServerHandleVersion (_server *Server, _response http.ResponseWriter) (*Erro
 }
 
 
+
+
 func ServerHandleSourcesMd5 (_server *Server, _response http.ResponseWriter) (*Error) {
-	return respondWithTextString (_response, BUILD_SOURCES_MD5)
+	return respondWithTextString (_response, embeddedSourcesMd5)
 }
 
 func ServerHandleSourcesCpio (_server *Server, _response http.ResponseWriter) (*Error) {
 	_response.Header () .Add ("Content-Encoding", "gzip")
-	return respondWithBuffer (_response, "application/x-cpio", bytes.NewBuffer (BUILD_SOURCES_CPIO_GZ))
+	return respondWithBuffer (_response, "application/x-cpio", bytes.NewBuffer (embeddedSourcesCpioGz))
 }
+
+
+func ServerHandleManualText (_server *Server, _response http.ResponseWriter) (*Error) {
+	return respondWithTextString (_response, embeddedManualTxt)
+}
+
+func ServerHandleManualHtml (_server *Server, _response http.ResponseWriter) (*Error) {
+	return respondWithHtmlString (_response, embeddedManualHtml)
+}
+
 
 
 
