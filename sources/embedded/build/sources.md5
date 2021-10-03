@@ -1,4 +1,4 @@
-88604e0d16461ce4a0599c7c4ea2743d *cmd/main.go
+ff57b2328d39bee505ffd78a2f9f7207 *cmd/main.go
 db5c27d0d62f810245f16b3c09ed73e3 *embedded/assets.go
 f3743ce2ce721ee058377aa8422673be *embedded/assets/css-export/github-min.css
 059d99967d58e794068ca8fe3f645a34 *embedded/assets/css-export/github.css
@@ -17,6 +17,10 @@ ff8686194bf69afde56a149ee27c1a52 *embedded/assets/js/clipboard.js
 7b3a9f27be53e4befa33d2f9409f03ca *embedded/assets/js/reload.js
 c81b38423216ca83a2944be7e9132ef1 *embedded/assets/js/search.js
 89248210749e679489e208b4f67b33ed *embedded/build.go
+173b1258f8cc44b6708c479c451ea51d *embedded/manual.go
+3ca584bcb14475b6d072d78a1cafa6e0 *embedded/manual/z-scratchpad.html
+e61d4ad1d14aa342b8953fb802d1f2e8 *embedded/manual/z-scratchpad.man
+39e9e89e60f0919e773db8fc18df830f *embedded/manual/z-scratchpad.txt
 5508bd3c9263344a491e7208c23c0725 *embedded/templates.go
 d983e87522ae4308fba9d50ea5d1ce8f *embedded/templates/document-export.html
 667e0fe31715796a49d2de488d7ca4f1 *embedded/templates/document-export.html-document
@@ -27,7 +31,7 @@ d41d8cd98f00b204e9800998ecf8427e *embedded/templates/document-view.txt
 ada65dd4ecea47e5dad375d660455c81 *embedded/templates/documents-index.html
 d41d8cd98f00b204e9800998ecf8427e *embedded/templates/documents-index.txt
 efe7638c0405e6bd110583e47307bbe7 *embedded/templates/global-partials.html
-55a79fc2c37e6233880de41f4208636e *embedded/templates/home.html
+b2a343e65019f5286aa244073b9bf163 *embedded/templates/home.html
 d41d8cd98f00b204e9800998ecf8427e *embedded/templates/home.txt
 190487e2da45c67f991156eb22861699 *embedded/templates/index.html
 d41d8cd98f00b204e9800998ecf8427e *embedded/templates/index.txt
@@ -43,10 +47,11 @@ c7c130a0c5eb1d4a6dd872ab216cc90f *embedded/templates/version.html
 a94b168bd6bcf1a9ebc59900e87f66e7 *go.mod
 380253882d39fbc3fb626fe6ce41d3a1 *go.sum
 2e244b8d92262285b7f84e18e5d51a00 *lib/browser.go
-9a74c19f2ccc6cff0baf38bc9befa7b5 *lib/constants.go
+62695bd1770016186b5d6b894ed8af73 *lib/constants.go
 17b9a25ec9e6a52bd57d6131b05fe6d6 *lib/crypto.go
 f49cabb6571d44477db925bcd91538d4 *lib/document.go
 564c2a94cfdf7c1f1b56dca80f63c711 *lib/editor.go
+30c874295737dd0d1e10ebb3b90f614f *lib/embedded.go
 5430777c64386706f5836debcea97847 *lib/gencode.go
 a8dc15a6fd8163462d97ddf56353fc01 *lib/gencode.schema
 f7f009af8264fc099cd41bc2fec5c9c0 *lib/globals.go
@@ -56,14 +61,14 @@ b799f8cb8a9d9b367f2ba6d8b7be9efd *lib/library.go
 3b75dbc3e472c175443eb00ed51eeae8 *lib/parser-commonmark.go
 ef24c8895edffeef00b691e0f2b64b80 *lib/parser-gemini.go
 836841c0f0e89e90aebd1b6ccdf930c8 *lib/parser-snippets.go
-02ced92b09e218965d673634284b7979 *lib/premain.go
+ebe98cb875b808e46131c748d13ee4e8 *lib/premain.go
 83ea6327909884ec01f467d407951cb2 *lib/qrcode.go
 a67c7c69133b9df856a6c399f6dfa1c5 *lib/render-html.go
 cf73c443c637ae181c12facf40a19402 *lib/render-source.go
 4c9fdf5f48d72f00617a199e17f83e86 *lib/render-text.go
 81163989f2fa340fd5392caf26ca07a2 *lib/runtime.go
 52b3679c06ad8983602d4e6a200c7457 *lib/sanitizer-html.go
-d64a25811a6ebdf135858ad53e8051dd *lib/server.go
+66abf775ebd418b9ca3e65cd53899d04 *lib/server.go
 a27c50ec9ac895a53874035d764f85f3 *lib/templates.go
 716d90ef359073b920195c4b8d2f905e *lib/transcript.go
 9b082d19b96cd17ce721c95f66620d55 *lib/utils.go
