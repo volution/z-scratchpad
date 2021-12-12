@@ -44,8 +44,8 @@ d41d8cd98f00b204e9800998ecf8427e *embedded/templates/library-view.txt
 c7c130a0c5eb1d4a6dd872ab216cc90f *embedded/templates/version.html
 41c90349029a7725d19a8af8a89047c3 *extensions/gemini/html.go
 393bd1cb203347316b5e9611a14d4fc8 *extensions/gemini/text.go
-a94b168bd6bcf1a9ebc59900e87f66e7 *go.mod
-380253882d39fbc3fb626fe6ce41d3a1 *go.sum
+13a051b70d2b915dfdb6c634927e32f4 *go.mod
+8042aa07371013752878b7a854bbe66d *go.sum
 2e244b8d92262285b7f84e18e5d51a00 *lib/browser.go
 62695bd1770016186b5d6b894ed8af73 *lib/constants.go
 17b9a25ec9e6a52bd57d6131b05fe6d6 *lib/crypto.go
