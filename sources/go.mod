@@ -8,13 +8,13 @@ require (
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/mattn/go-isatty v0.0.14
 	github.com/mdp/qrterminal v1.0.1
-	github.com/microcosm-cc/bluemonday v1.0.15
+	github.com/microcosm-cc/bluemonday v1.0.16
 	github.com/pelletier/go-toml v1.9.4
 	github.com/subchen/go-trylock/v2 v2.0.0
-	github.com/yuin/goldmark v1.4.1
+	github.com/yuin/goldmark v1.4.4
 	github.com/zeebo/blake3 v0.2.1
-	golang.org/x/net v0.0.0-20210928044308-7d9f5e0b762b
-	golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6
+	golang.org/x/net v0.0.0-20211209124913-491a49abca63
+	golang.org/x/sys v0.0.0-20211210111614-af8b64212486
 	gopkg.in/yaml.v2 v2.4.0
 )
 
