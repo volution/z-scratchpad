@@ -1,4 +1,17 @@
 
+
+
+
+![logo](./documentation/logo.png)
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
 # `z-scratchpad` -- lightweight Go-based notes tool
 
 
