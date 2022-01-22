@@ -10,7 +10,7 @@ import html_template "html/template"
 import text_template "text/template"
 
 
-import embedded "github.com/cipriancraciun/z-scratchpad/embedded"
+import embedded "github.com/volution/z-scratchpad/embedded"
 
 
 

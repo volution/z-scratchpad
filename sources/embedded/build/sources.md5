@@ -1,4 +1,4 @@
-ff57b2328d39bee505ffd78a2f9f7207 *cmd/main.go
+ba23159084b5619c473ed6d241b2eee7 *cmd/main.go
 db5c27d0d62f810245f16b3c09ed73e3 *embedded/assets.go
 f3743ce2ce721ee058377aa8422673be *embedded/assets/css-export/github-min.css
 059d99967d58e794068ca8fe3f645a34 *embedded/assets/css-export/github.css
@@ -44,14 +44,14 @@ d41d8cd98f00b204e9800998ecf8427e *embedded/templates/library-view.txt
 c7c130a0c5eb1d4a6dd872ab216cc90f *embedded/templates/version.html
 41c90349029a7725d19a8af8a89047c3 *extensions/gemini/html.go
 393bd1cb203347316b5e9611a14d4fc8 *extensions/gemini/text.go
-13a051b70d2b915dfdb6c634927e32f4 *go.mod
+cfce80a5ac1b89959084ee1cf096bfce *go.mod
 8042aa07371013752878b7a854bbe66d *go.sum
 2e244b8d92262285b7f84e18e5d51a00 *lib/browser.go
-62695bd1770016186b5d6b894ed8af73 *lib/constants.go
+3b2b687502299565b1cab38a075d49f4 *lib/constants.go
 17b9a25ec9e6a52bd57d6131b05fe6d6 *lib/crypto.go
 f49cabb6571d44477db925bcd91538d4 *lib/document.go
 564c2a94cfdf7c1f1b56dca80f63c711 *lib/editor.go
-30c874295737dd0d1e10ebb3b90f614f *lib/embedded.go
+e32e8669ea9625e969e086a9a946771b *lib/embedded.go
 5430777c64386706f5836debcea97847 *lib/gencode.go
 a8dc15a6fd8163462d97ddf56353fc01 *lib/gencode.schema
 f7f009af8264fc099cd41bc2fec5c9c0 *lib/globals.go
@@ -59,7 +59,7 @@ d1aa784449c0a541cba10aa99f73131a *lib/index.go
 b799f8cb8a9d9b367f2ba6d8b7be9efd *lib/library.go
 368ce23b2941daef347149563a177e20 *lib/main.go
 3b75dbc3e472c175443eb00ed51eeae8 *lib/parser-commonmark.go
-ef24c8895edffeef00b691e0f2b64b80 *lib/parser-gemini.go
+b72a2c9e0eba916d7fb97f64fc364545 *lib/parser-gemini.go
 836841c0f0e89e90aebd1b6ccdf930c8 *lib/parser-snippets.go
 ebe98cb875b808e46131c748d13ee4e8 *lib/premain.go
 83ea6327909884ec01f467d407951cb2 *lib/qrcode.go
@@ -69,7 +69,7 @@ cf73c443c637ae181c12facf40a19402 *lib/render-source.go
 81163989f2fa340fd5392caf26ca07a2 *lib/runtime.go
 52b3679c06ad8983602d4e6a200c7457 *lib/sanitizer-html.go
 66abf775ebd418b9ca3e65cd53899d04 *lib/server.go
-a27c50ec9ac895a53874035d764f85f3 *lib/templates.go
+2a707619c8d49788adbf7f35f2caf793 *lib/templates.go
 716d90ef359073b920195c4b8d2f905e *lib/transcript.go
 9b082d19b96cd17ce721c95f66620d55 *lib/utils.go
 3bf2f2bb1e18e0a55ba4429ddecdc819 *lib/workflows.go

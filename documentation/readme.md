@@ -266,12 +266,12 @@ Alternatively, one can place it in one's `$HOME/bin` folder and add that to `$PA
 
 ### Releases
 
-The self-contained executable is available from the `z-scratchpad` GitHub repository [releases](https://github.com/cipriancraciun/z-scratchpad/releases):
-* [v0.0.1](https://github.com/cipriancraciun/z-scratchpad/releases/tag/v0.0.1) -- the first preliminary preview release:
-  * [v0.0.1 for Linux](https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1) -- tested on OpenSUSE, and used by me in my everyday work;
-  * [v0.0.1 for OSX](https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--darwin--v0.0.1) -- untested;
-  * [v0.0.1 for FreeBSD](https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--freebsd--v0.0.1) -- untested;
-  * [v0.0.1 for OpenBSD](https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--openbsd--v0.0.1) -- untested;
+The self-contained executable is available from the `z-scratchpad` GitHub repository [releases](https://github.com/volution/z-scratchpad/releases):
+* [v0.0.1](https://github.com/volution/z-scratchpad/releases/tag/v0.0.1) -- the first preliminary preview release:
+  * [v0.0.1 for Linux](https://github.com/volution/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1) -- tested on OpenSUSE, and used by me in my everyday work;
+  * [v0.0.1 for OSX](https://github.com/volution/z-scratchpad/releases/download/v0.0.1/z-scratchpad--darwin--v0.0.1) -- untested;
+  * [v0.0.1 for FreeBSD](https://github.com/volution/z-scratchpad/releases/download/v0.0.1/z-scratchpad--freebsd--v0.0.1) -- untested;
+  * [v0.0.1 for OpenBSD](https://github.com/volution/z-scratchpad/releases/download/v0.0.1/z-scratchpad--openbsd--v0.0.1) -- untested;
 
 Also, each of these files are signed with my PGP key `5A974037A6FD8839`, thus do check the signature.
 
@@ -292,10 +292,10 @@ gpg:               imported: 1
 * download the executable and signature (replace the `linux` token with `darwin` (for OSX), `freebsd` or `openbsd`):
 ~~~~
 curl -s -L -S -f -o ./z-scratchpad \
-    https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1
+    https://github.com/volution/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1
 
 curl -s -L -S -f -o ./z-scratchpad.asc \
-    https://github.com/cipriancraciun/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1.asc
+    https://github.com/volution/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1.asc
 ~~~~
 
 * verify the executable:
@@ -334,7 +334,7 @@ z-scratchpad --version
 * executable    : z-scratchpad
 * build target  : release, linux-amd64, go1.16.7, gc
 * build number  : 2025, 2021-08-13-11-56-08
-* code & issues : https://github.com/cipriancraciun/z-scratchpad
+* code & issues : https://github.com/volution/z-scratchpad
 * sources git   : 1abeee1c76fc4a40e1465e4810be0258992d1815
 * sources hash  : 51382d0da05c3e129fc73eac59754fad
 * uname node    : some-workstation
@@ -347,7 +347,7 @@ Alternatively, one can just build the executable themselves (for example to get 
 
 * clone the repository:
 ~~~~
-git clone https://github.com/cipriancraciun/z-scratchpad ./z-scratchpad
+git clone https://github.com/volution/z-scratchpad ./z-scratchpad
 ~~~~
 
 * switch to the sources folder:
@@ -374,7 +374,7 @@ z-scratchpad --version
 * executable    : z-scratchpad
 * build target  : release, linux-amd64, go1.16.7, gc
 * build number  : 2025, 2021-08-13-11-56-08
-* code & issues : https://github.com/cipriancraciun/z-scratchpad
+* code & issues : https://github.com/volution/z-scratchpad
 * sources git   : 1abeee1c76fc4a40e1465e4810be0258992d1815
 * sources hash  : 51382d0da05c3e129fc73eac59754fad
 * uname node    : some-workstation

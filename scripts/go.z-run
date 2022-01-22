@@ -69,8 +69,8 @@
 			-l
 		)
 	_ldflags=(
-			-X "github.com/cipriancraciun/z-scratchpad/lib.BUILD_TARGET=${_build_target}"
-			-X "github.com/cipriancraciun/z-scratchpad/lib.BUILD_GIT_HASH=${_build_git_hash}"
+			-X "github.com/volution/z-scratchpad/lib.BUILD_TARGET=${_build_target}"
+			-X "github.com/volution/z-scratchpad/lib.BUILD_GIT_HASH=${_build_git_hash}"
 		)
 	
 	_tags="$( printf -- '%s,' "${_tags[@]}" )"
@@ -111,8 +111,8 @@
 	_gcflags=()
 	_ldflags=(
 			all=-s
-			-X "github.com/cipriancraciun/z-scratchpad/lib.BUILD_TARGET=${_build_target}"
-			-X "github.com/cipriancraciun/z-scratchpad/lib.BUILD_GIT_HASH=${_build_git_hash}"
+			-X "github.com/volution/z-scratchpad/lib.BUILD_TARGET=${_build_target}"
+			-X "github.com/volution/z-scratchpad/lib.BUILD_GIT_HASH=${_build_git_hash}"
 		)
 	
 	_tags="$( printf -- '%s,' "${_tags[@]}" )"

@@ -3,7 +3,7 @@
 package zscratchpad
 
 
-import embedded "github.com/cipriancraciun/z-scratchpad/embedded"
+import embedded "github.com/volution/z-scratchpad/embedded"
 
 
 

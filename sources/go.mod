@@ -1,4 +1,4 @@
-module github.com/cipriancraciun/z-scratchpad
+module github.com/volution/z-scratchpad
 
 go 1.17
 

@@ -3,7 +3,7 @@
 package zscratchpad
 
 
-import embedded "github.com/cipriancraciun/z-scratchpad/embedded"
+import embedded "github.com/volution/z-scratchpad/embedded"
 
 import "runtime"
 import "strings"
@@ -13,7 +13,7 @@ import "golang.org/x/sys/unix"
 
 
 
-var PROJECT_URL string = "https://github.com/cipriancraciun/z-scratchpad"
+var PROJECT_URL string = "https://github.com/volution/z-scratchpad"
 
 var BUILD_TARGET string = "{unknown-target}"
 var BUILD_TARGET_ARCH string = runtime.GOARCH

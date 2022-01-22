@@ -5,7 +5,7 @@ package zscratchpad
 
 import "unicode/utf8"
 
-import "github.com/cipriancraciun/z-scratchpad/extensions/gemini"
+import "github.com/volution/z-scratchpad/extensions/gemini"
 
 
 
