@@ -1,0 +1,17 @@
+
+--------------------------------------------------------------------------------
+=== How to TBD? ===
+
+TBD
+
+--------------------------------------------------------------------------------
+=== How to get more information?
+
+>> z-scratchpad --version
+>> z-scratchpad --help | less
+>> z-scratchpad --manual | less
+>> z-scratchpad --readme | less
+>> man <( z-scratchpad --manual-man )
+>> lynx --force-html <( z-scratchpad --manual-html )
+>> lynx --force-html <( z-scratchpad --readme-html )
+
