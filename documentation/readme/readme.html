@@ -89,7 +89,7 @@ Primary key fingerprint: 58FC 2194 FCC2 4783 99CB  220C 5A97 4037 A6FD 8839
 * uname system  : Linux, 5.some-version, x86_64
 </code></pre><h3>Build from source</h3><p>Alternatively, one can just build the executable themselves (for example to get the latest unreleased changes).</p><ul><li>clone the repository:</li></ul><pre><code>git clone https://github.com/volution/z-scratchpad ./z-scratchpad
 </code></pre><ul><li>switch to the sources folder:</li></ul><pre><code>cd ./z-scratchpad/sources
-</code></pre><ul><li>build the executable:</li></ul><pre><code>go build -o ./z-scratchpad ./cmd/main.go
+</code></pre><ul><li>build the executable:</li></ul><pre><code>go build -o ./z-scratchpad ./cmd/z-scratchpad.go
 </code></pre><ul><li>copy the executable on the <code>$PATH</code>:</li></ul><pre><code>sudo cp ./z-scratchpad /usr/local/bin/z-scratchpad
 </code></pre><ul><li>check that it works:</li></ul><pre><code>z-scratchpad --version
 </code></pre><pre><code>* version       : 0.0.1
