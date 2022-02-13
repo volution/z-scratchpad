@@ -4,30 +4,35 @@
 
 
 ::// run / ...
-::// watch / run / ...
-::// use / run / ...
 
 
 
 
-:: watch / run / exec :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / exec' "${@}"
+--:: watch / run / exec :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / exec' "${@}"
+--:: watch / run / exec / * :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / exec / *' "${@}"
 
 
 
 
-:: run / version :: exec -- "${ZRUN[@]}" ':: run / exec' --version "${@}"
-:: run / sources / md5 :: exec -- "${ZRUN[@]}" ':: run / exec' --sources-md5 "${@}"
-:: run / sources / cpio :: exec -- "${ZRUN[@]}" ':: run / exec' --sources-cpio "${@}"
-:: run / manual :: exec -- "${ZRUN[@]}" ':: run / exec' --manual "${@}"
-:: run / manual / text :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-text "${@}"
-:: run / manual / html :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-html "${@}"
-:: run / manual / man :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-man "${@}"
-:: run / help :: exec -- "${ZRUN[@]}" ':: run / exec' --help "${@}"
+--:: run / exec :: exec -- "${ZRUN[@]}" ':: run / exec / *' z-scratchpad "${@}"
+
+:: run / flags / version :: exec -- "${ZRUN[@]}" ':: run / exec' --version "${@}"
+:: run / flags / sources / md5 :: exec -- "${ZRUN[@]}" ':: run / exec' --sources-md5 "${@}"
+:: run / flags / sources / cpio :: exec -- "${ZRUN[@]}" ':: run / exec' --sources-cpio "${@}"
+:: run / flags / manual :: exec -- "${ZRUN[@]}" ':: run / exec' --manual "${@}"
+:: run / flags / manual / text :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-text "${@}"
+:: run / flags / manual / html :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-html "${@}"
+:: run / flags / manual / man :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-man "${@}"
+:: run / flags / help :: exec -- "${ZRUN[@]}" ':: run / exec' --help "${@}"
 
 
 
 
-<< run / exec
+--<< run / exec / *
+	
+	test "${#}" -ge 1
+	_main="${1}"
+	shift -- 1
 	
 	_target="${__RUN_TARGET:-debug-build}"
 	_profile="${__RUN_PROFILE:-none}"
@@ -40,17 +45,17 @@
 		;;
 		( all | cpu )
 			_extra_arguments+=(
-					--profile-cpu-path ./.outputs/profile--cpu.pprof
+					--profile-cpu-path "./.outputs/${_main}--profile--cpu.pprof"
 				)
 		;;&
 		( all | memory )
 			_extra_arguments+=(
-					--profile-memory-path ./.outputs/profile--memory.pprof
+					--profile-memory-path "./.outputs/${_main}--profile--memory.pprof"
 				)
 		;;&
 		( all | cpu | memory )
 		;;
-		( hyperfine | time )
+		( hyperfine | hyperfine-with-output | time )
 		;;
 		( * )
 			printf -- '[ee]  invalid run profile `%s`;  aborting!\n' "${_profile}" >&2
@@ -60,19 +65,19 @@
 	
 	case "${_target}" in
 		( debug-build )
-			"${ZRUN[@]}" ':: go / build / main / debug'
+			"${ZRUN[@]}" ':: go / build / * / debug' "${_main}"
 		;;&
 		( release-build )
-			"${ZRUN[@]}" ':: go / build / main / release'
+			"${ZRUN[@]}" ':: go / build / * / release' "${_main}"
 		;;&
 		( debug | debug-build )
-			_command=( ./.outputs/main--debug "${_extra_arguments[@]}" "${@}" )
+			_command=( "./.outputs/${_main}--debug" "${_extra_arguments[@]}" "${@}" )
 		;;
 		( release | release-build )
-			_command=( ./.outputs/main--release "${_extra_arguments[@]}" "${@}" )
+			_command=( "./.outputs/${_main}--release" "${_extra_arguments[@]}" "${@}" )
 		;;
 		( installed )
-			_command=( "$( type -P -- z-scratchpad )" "${_extra_arguments[@]}" "${@}" )
+			_command=( "$( type -P -- "${_main}" )" "${_extra_arguments[@]}" "${@}" )
 		;;
 		( * )
 			printf -- '[ee]  invalid target `%s`;  aborting!\n' "${_target}" >&2
@@ -80,11 +85,11 @@
 		;;
 	esac
 	
-	if test -e ./.outputs/profile--cpu.pprof ; then
-		rm -- ./.outputs/profile--cpu.pprof
+	if test -e "./.outputs/${_main}--profile--cpu.pprof" ; then
+		rm -- "./.outputs/${_main}--profile--cpu.pprof"
 	fi
-	if test -e ./.outputs/profile--memory.pprof ; then
-		rm -- ./.outputs/profile--memory.pprof
+	if test -e "./.outputs/${_main}--profile--memory.pprof" ; then
+		rm -- "./.outputs/${_main}--profile--memory.pprof"
 	fi
 	
 	if test -n "${__RUN_TERM:-}" ; then
@@ -102,6 +107,7 @@
 	export -n -- \
 			ZRUN_LIBRARY_SOURCE= \
 			ZRUN_LIBRARY_URL= \
+			ZRUN_LIBRARY_IDENTIFIER= \
 			ZRUN_LIBRARY_FINGERPRINT= \
 			ZRUN_EXECUTABLE= \
 			ZRUN_WORKSPACE= \
@@ -109,16 +115,19 @@
 	#
 	
 	case "${_profile}" in
-		( hyperfine )
+		( hyperfine | hyperfine-with-output )
 			_wrapper=(
 					hyperfine
 						--warmup 5
 						--min-runs 10
 						--max-runs 100
 						--shell ''
-						--command-name z-scratchpad
-						--
+						--command-name "${_main}"
 				)
+			if test "${_profile}" == hyperfine-with-output ; then
+				_wrapper+=( --show-output )
+			fi
+			_wrapper+=( -- )
 			exec -- "${_wrapper[@]}" "${_command[*]@Q}"
 		;;
 		( time )
@@ -152,6 +161,7 @@
 :: use / run / profile / memory :: export -- __RUN_PROFILE=memory
 :: use / run / profile / time :: export -- __RUN_PROFILE=time
 :: use / run / profile / hyperfine :: export -- __RUN_PROFILE=hyperfine
+:: use / run / profile / hyperfine / with-output :: export -- __RUN_PROFILE=hyperfine-with-output
 
 :: use / run / term / enable :: export -- __RUN_TERM="${TERM}"
 :: use / run / term / disable :: export -- __RUN_TERM=dumb
@@ -162,15 +172,21 @@
 
 
 
-<< go / pprof / cpu / server
+<< go / pprof / cpu / * / server
+	test "${#}" -ge 1
+	_main="${1}"
+	shift -- 1
 	test "${#}" -eq 0
-	test -f ./.outputs/profile--cpu.pprof
-	exec -- go tool pprof -http 127.70.72.170:8080 -no_browser -functions -- ./.outputs/profile--cpu.pprof
+	test -f "./.outputs/${_main}--profile--cpu.pprof"
+	exec -- go tool pprof -http 127.70.72.170:8080 -no_browser -functions -- "./.outputs/${_main}--profile--cpu.pprof"
 !!
 
-<< go / pprof / memory / server
+<< go / pprof / memory / * / server
+	test "${#}" -ge 1
+	_main="${1}"
+	shift -- 1
 	test "${#}" -eq 0
-	test -f ./.outputs/profile--memory.pprof
-	exec -- go tool pprof -http 127.146.243.63:8080 -no_browser -functions -sample_index=alloc_space -- ./.outputs/profile--memory.pprof
+	test -f "./.outputs/${_main}--profile--memory.pprof"
+	exec -- go tool pprof -http 127.146.243.63:8080 -no_browser -functions -sample_index=alloc_space -- "./.outputs/${_main}--profile--memory.pprof"
 !!
 

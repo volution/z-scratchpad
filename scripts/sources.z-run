@@ -41,16 +41,24 @@
 	
 	test "${#}" -eq 0
 	
-	"${ZRUN[@]}" ':: sources / embedded / manual'
+	"${ZRUN[@]}" ':: sources / embedded / documentation'
 	"${ZRUN[@]}" ':: sources / embedded / hash'
 !!
 
 
 
 
-<< sources / embedded / manual
+<< sources / embedded / documentation
 	
 	test "${#}" -eq 0
+	
+	if ! cmp -s -- ./documentation/readme/readme.txt ./sources/embedded/documentation/readme.txt ; then
+		cp -T -- ./documentation/readme/readme.txt ./sources/embedded/documentation/readme.txt
+	fi
+	
+	if ! cmp -s -- ./documentation/readme/readme.html ./sources/embedded/documentation/readme.html ; then
+		cp -T -- ./documentation/readme/readme.html ./sources/embedded/documentation/readme.html
+	fi
 	
 	if ! cmp -s -- ./documentation/manual/z-scratchpad.1.txt ./sources/embedded/manual/z-scratchpad.txt ; then
 		cp -T -- ./documentation/manual/z-scratchpad.1.txt ./sources/embedded/manual/z-scratchpad.txt
@@ -142,6 +150,8 @@
 << sources / embedded / bundle
 	
 	test "${#}" -eq 0
+	
+	"${ZRUN[@]}" ':: sources / embedded / prepare'
 	
 	if test -s ./sources/embedded/build/sources.cpio.gz ; then
 		rm -- ./sources/embedded/build/sources.cpio.gz

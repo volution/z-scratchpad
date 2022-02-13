@@ -1,6 +1,8 @@
 #!/dev/null
 
 
+::// watch / ...
+::// use / ...
 ::// *
 
 
@@ -9,12 +11,15 @@
 
 && _/manual.z-run
 && _/readme.z-run
+&& _/documentation.z-run
 
 && _/workspace.z-run
 && _/sources.z-run
 && _/go.z-run
 
 && _/deploy.z-run
+
+&& _/generate.z-run
 
 &&?? _/.local.z-run
 

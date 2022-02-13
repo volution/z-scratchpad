@@ -1,0 +1,22 @@
+#!/dev/null
+
+
+
+
+::// documentation / ...
+
+
+
+
+<< documentation / all / render
+	test "${#}" -eq 0
+	"${ZRUN[@]}" ':: documentation / readme / render'
+	"${ZRUN[@]}" ':: sources / embedded / documentation'
+!!
+
+<< documentation / all / render / forced
+	test "${#}" -eq 0
+	"${ZRUN[@]}" ':: documentation / readme / render / forced'
+	"${ZRUN[@]}" ':: sources / embedded / documentation'
+!!
+

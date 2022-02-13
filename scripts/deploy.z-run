@@ -8,19 +8,19 @@
 
 
 
-:: deploy / rsync / linux :: exec -- "${ZRUN[@]}" ':: deploy / rsync' linux "${@}"
-:: deploy / rsync / darwin :: exec -- "${ZRUN[@]}" ':: deploy / rsync' darwin "${@}"
-:: deploy / rsync / freebsd :: exec -- "${ZRUN[@]}" ':: deploy / rsync' freebsd "${@}"
-:: deploy / rsync / openbsd :: exec -- "${ZRUN[@]}" ':: deploy / rsync' openbsd "${@}"
+--:: deploy / rsync / * / linux :: exec -- "${ZRUN[@]}" ':: deploy / rsync / *' linux "${@}"
+--:: deploy / rsync / * / darwin :: exec -- "${ZRUN[@]}" ':: deploy / rsync / *' darwin "${@}"
+--:: deploy / rsync / * / freebsd :: exec -- "${ZRUN[@]}" ':: deploy / rsync / *' freebsd "${@}"
+--:: deploy / rsync / * / openbsd :: exec -- "${ZRUN[@]}" ':: deploy / rsync / *' openbsd "${@}"
 
---<< deploy / rsync
-	test "${#}" -eq 2
-	_os="${1}"
-	_target="${2}"
-	shift -- 2
-	"${ZRUN[@]}" ':: deploy / release' "${_os}"
-	_source="./.outputs/main--release--${_os}"
-	printf -- '[ii]  deploying (`%s`) to `%s`...\n' "${_os}" "${_target}" >&2
+
+
+
+--<< deploy / rsync / *
+	test "${#}" -eq 3 ; _os="${1}" ; _main="${2}" ; _target="${3}" ; shift -- 3
+	"${ZRUN[@]}" ':: deploy / release' "${_os}" "${_main}"
+	_source="./.outputs/${_main}--release--${_os}"
+	printf -- '[ii]  deploying `%s` for `%s` to `%s`...\n' "${_main}" "${_os}" "${_target}" >&2
 	exec -- rsync -i -t -p --chmod=0555 -- "${_source}" "${_target}"
 !!
 
@@ -28,30 +28,164 @@
 
 
 << deploy / publish
+	
+	if test "${#}" -eq 0 ; then
+		_main_0=all
+	else
+		_main_0="${1}"
+		shift -- 1
+	fi
+	
 	test "${#}" -eq 0
+	
 	test -d ./.publish/
-	"${ZRUN[@]}" ':: deploy / release'
+	
+	
+	"${ZRUN[@]}" ':: sources / embedded / bundle'
+	"${ZRUN[@]}" ':: documentation / all / render / forced'
+	
+	
 	_build_version="$( exec -- cat -- ./sources/embedded/build/version.txt )"
-	printf -- '[ii]  publishing `%s`...\n' "${_build_version}" >&2
+	case "${_build_version}" in
+		( 0.0.0 | *.0 )
+			_build_release=false
+			_build_suffix='--preview'
+		;;
+		( * )
+			_build_release=true
+			_build_suffix=''
+		;;
+	esac
+	
+	
+	if test "${_build_release}" == true ; then
+		for _main in z-scratchpad ; do
+			if test "${_main_0}" != all -a "${_main_0}" != "${_main}" ; then
+				continue
+			fi
+			for _os in linux darwin freebsd openbsd ; do
+				if test -e "./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}" ; then
+					printf -- '[ee]  release already exists for `%s` for `%s`!\n' "${_main}" "${_os}" >&2
+					exit -- 1
+				fi
+			done
+		done
+	fi
+	
+	
+	if ! git diff --quiet ; then
+		printf -- '[ee]  dirty repository (before build);  aborting!\n' >&2
+		exit -- 1
+	fi
+	if ! git diff --cached --quiet ; then
+		printf -- '[ee]  dirty repository (before build);  aborting!\n' >&2
+		exit -- 1
+	fi
+	
+	
+	printf -- '[ii]  releasing all for `%s`...\n' "${_build_version}${_build_suffix}" >&2
+	
+	"${ZRUN[@]}" ':: deploy / release' all "${_main_0}"
+	
+	
+	if ! git diff --quiet ; then
+		printf -- '[ee]  dirty repository (after build);  aborting!\n' >&2
+		exit -- 1
+	fi
+	if ! git diff --cached --quiet ; then
+		printf -- '[ee]  dirty repository (after build);  aborting!\n' >&2
+		exit -- 1
+	fi
+	
+	
+	printf -- '[ii]  tagging and pushing for `%s`...\n' "${_build_version}${_build_suffix}" >&2
+	printf -- '[--]\n' >&2
+	
+	if test "${_build_release}" == true ; then
+		git tag --sign -m "[release]  Release \`v${_build_version}\`." -- "v${_build_version}" HEAD
+	else
+		git tag --sign -m "[preview]  Preview \`v${_build_version}\`." --force -- preview HEAD
+	fi
+	
+	"${ZRUN[@]}" ':: github / push'
+	
+	printf -- '[--]\n' >&2
+	
+	
+	printf -- '[ii]  publishing all for `%s`...\n' "${_build_version}${_build_suffix}" >&2
+	
 	for _os in linux darwin freebsd openbsd ; do
-		if test -e "./.publish/${_os}/z-scratchpad--${_os}--v${_build_version}" -a "${_build_version}" != 0.0.0 ; then
-			printf -- '[ee]  release already exists for `%s`!\n' "${_os}" >&2
-			continue
-		fi
-		rsync -i -t -p --chmod=0555 -- \
-				"./.outputs/main--release--${_os}" \
-				"./.publish/${_os}/z-scratchpad--${_os}--v${_build_version}" \
-		#
-		gpg2 --sign --detach-sign --armor \
-				--default-key 58FC2194FCC2478399CB220C5A974037A6FD8839 \
-				--output "./.publish/${_os}/z-scratchpad--${_os}--v${_build_version}.asc" \
-				-- "./.publish/${_os}/z-scratchpad--${_os}--v${_build_version}" \
-		#
-		gpg2 --verify \
-				-- "./.publish/${_os}/z-scratchpad--${_os}--v${_build_version}.asc" \
-		#
-		ln -s -T -f -- "./z-scratchpad--${_os}--v${_build_version}" "./.publish/${_os}/z-scratchpad"
-		ln -s -T -f -- "./z-scratchpad--${_os}--v${_build_version}.asc" "./.publish/${_os}/z-scratchpad.asc"
+		for _main in z-scratchpad ; do
+			
+			if test "${_main_0}" != all -a "${_main_0}" != "${_main}" ; then
+				continue
+			fi
+			
+			printf -- '[ii]  publishing `%s` for `%s` for `%s`...\n' "${_main}" "${_os}" "${_build_version}${_build_suffix}" >&2
+			printf -- '[--]\n' >&2
+			
+			rsync -i -t -p --chmod=0555 -- \
+					"./.outputs/${_main}--release--${_os}" \
+					"./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}" \
+			#
+			
+			if test -e "./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}.asc" ; then
+				if ! gpg2 --verify -- \
+						"./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}.asc" \
+						< /dev/null > /dev/null 2> /dev/null \
+				; then
+					rm -- "./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}.asc"
+				fi
+			fi
+			
+			if test ! -e "./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}.asc" ; then
+				for _retry in 1 2 3 4 ; do
+					if gpg2 --sign --detach-sign --armor \
+							--default-key 58FC2194FCC2478399CB220C5A974037A6FD8839 \
+							--output "./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}.asc" \
+							-- "./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}" \
+					; then break ; fi
+				done
+			fi
+			
+			gpg2 --verify \
+					-- "./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}.asc" \
+			#
+			
+			if test "${_build_release}" == true ; then
+				ln -s -T -f -- "./${_main}--${_os}--v${_build_version}${_build_suffix}" "./.publish/${_os}/${_main}${_build_suffix}"
+				ln -s -T -f -- "./${_main}--${_os}--v${_build_version}${_build_suffix}.asc" "./.publish/${_os}/${_main}${_build_suffix}.asc"
+			fi
+			
+			printf -- '[--]\n' >&2
+		done
+	done
+	
+	
+	printf -- '[ii]  publishing all for `%s` (on GitHub)...\n' "${_build_version}${_build_suffix}" >&2
+	
+	for _os in linux darwin freebsd openbsd ; do
+		for _main in z-scratchpad ; do
+			
+			if test "${_main_0}" != all -a "${_main_0}" != "${_main}" ; then
+				continue
+			fi
+			
+			printf -- '[ii]  publishing `%s` for `%s` for `%s` (on GitHub)...\n' "${_main}" "${_os}" "${_build_version}${_build_suffix}" >&2
+			
+			if test "${_build_release}" == true ; then
+				gh release upload --clobber -- "v${_build_version}" \
+						"./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}" \
+						"./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}.asc" \
+				#
+			else
+				gh release upload --clobber -- preview \
+						"./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}" \
+						"./.publish/${_os}/${_main}--${_os}--v${_build_version}${_build_suffix}.asc" \
+				#
+			fi
+			
+		done
 	done
 !!
 
@@ -60,33 +194,44 @@
 
 << deploy / release
 	if test "${#}" -ge 1 ; then
-		_os="${1}"
+		_os_0="${1}"
 		shift -- 1
 	else
-		_os='all'
+		_os_0='all'
+	fi
+	if test "${#}" -ge 1 ; then
+		_main_0="${1}"
+		shift -- 1
+	else
+		_main_0=all
 	fi
 	test "${#}" -eq 0
 	if test "${__DEPLOY_NORELEASE:-}" == true ; then
 		exit -- 0
 	fi
-	case "${_os}" in
-		( all | linux )
-			"${ZRUN[@]}" ':: go / build / main / release / linux'
-		;;&
-		( all | darwin )
-			"${ZRUN[@]}" ':: go / build / main / release / darwin'
-		;;&
-		( all | freebsd )
-			"${ZRUN[@]}" ':: go / build / main / release / freebsd'
-		;;&
-		( all | openbsd )
-			"${ZRUN[@]}" ':: go / build / main / release / openbsd'
-		;;&
-		( all | linux | darwin | freebsd | openbsd )
-		;;
-		( * )
-			printf -- '[ee]  invalid os `%s`;  aborting!\n' "${_os}" >&2
-		;;
-	esac
+	for _main in z-scratchpad ; do
+		if test "${_main_0}" != all -a "${_main_0}" != "${_main}" ; then
+			continue
+		fi
+		for _os in linux darwin freebsd openbsd ; do
+			if test "${_os_0}" != all -a "${_os_0}" != "${_os}" ; then
+				continue
+			fi
+			case "${_os}" in
+				( linux )
+					"${ZRUN[@]}" ':: go / build / * / release / linux' "${_main}"
+				;;
+				( darwin )
+					"${ZRUN[@]}" ':: go / build / * / release / darwin' "${_main}"
+				;;
+				( freebsd )
+					"${ZRUN[@]}" ':: go / build / * / release / freebsd' "${_main}"
+				;;
+				( openbsd )
+					"${ZRUN[@]}" ':: go / build / * / release / openbsd' "${_main}"
+				;;
+			esac
+		done
+	done
 !!
 
