@@ -5,3 +5,137 @@
 
 ++::// documentation / manual / ...
 
+
+
+
+--<< documentation / manual / open / * / html / firefox
+	test "${#}" -ge 1 ; _manual="${1}" ; shift -- 1
+	test "${#}" -eq 0
+	"${ZRUN[@]}" ':: documentation / manual / render / *' "${_manual}"
+	exec -- x-www firefox-guest:z-scratchpad open file:"$( exec -- readlink -e -- "./documentation/manual/${_manual}.html" )"
+!!
+
+--<< documentation / manual / open / * / html / chromium
+	test "${#}" -ge 1 ; _manual="${1}" ; shift -- 1
+	test "${#}" -eq 0
+	"${ZRUN[@]}" ':: documentation / manual / render / *' "${_manual}"
+	exec -- x-www chromium-guest:z-scratchpad open file:"$( exec -- readlink -e -- "./documentation/manual/${_manual}.html" )"
+!!
+
+--<< documentation / manual / open / * / html / webview
+	test "${#}" -ge 1 ; _manual="${1}" ; shift -- 1
+	test "${#}" -eq 0
+	"${ZRUN[@]}" ':: documentation / manual / render / *' "${_manual}"
+	exec -- x-www webview open file:"$( exec -- readlink -e -- "./documentation/manual/${_manual}.html" )"
+!!
+
+--<< documentation / manual / open / * / html / links
+	test "${#}" -ge 1 ; _manual="${1}" ; shift -- 1
+	test "${#}" -eq 0
+	"${ZRUN[@]}" ':: documentation / manual / render / *' "${_manual}"
+	exec -- links file:"$( exec -- readlink -e -- "./documentation/manual/${_manual}.html" )"
+!!
+
+--<< documentation / manual / open / * / man
+	test "${#}" -ge 1 ; _manual="${1}" ; shift -- 1
+	test "${#}" -eq 0
+	"${ZRUN[@]}" ':: documentation / manual / render / *' "${_manual}"
+	exec -- man -- "./documentation/manual/${_manual}.man"
+!!
+
+--<< documentation / manual / open / * / text
+	test "${#}" -ge 1 ; _manual="${1}" ; shift -- 1
+	test "${#}" -eq 0
+	"${ZRUN[@]}" ':: documentation / manual / render / *' "${_manual}"
+	exec -- less -- "./documentation/manual/${_manual}.txt"
+!!
+
+
+
+
+--<< watch / documentation / manual / render / *
+	test "${#}" -ge 1 ; _manual="${1}" ; shift -- 1
+	exec -- watchexec \
+			--watch="./documentation/manual/${_manual}.ronn" \
+			--no-shell \
+			-- \
+			"${ZRUN[@]}" ':: documentation / manual / render / *' "${_manual}" "${@}" \
+	#
+!!
+
+
+--<< documentation / manual / render / *
+	test "${#}" -ge 1 ; _manual="${1}" ; shift -- 1
+	if test \
+			"./documentation/manual/${_manual}.ronn" -ot "./documentation/manual/${_manual}.man" -a \
+			"./documentation/manual/${_manual}.ronn" -ot "./documentation/manual/${_manual}.html" -a \
+			"./documentation/manual/${_manual}.ronn" -ot "./documentation/manual/${_manual}.txt" \
+	; then
+		printf -- '[ii]  skipping rendering `%s`!\n' "${_manual}" >&2
+		exit -- 0
+	fi
+	printf -- '[ii]  rendering `%s`...\n' "${_manual}" >&2
+	exec -- "${ZRUN[@]}" ':: documentation / manual / render / * / forced' "${_manual}" "${@}"
+!!
+
+
+
+
+--<< documentation / manual / render / * / forced
+	
+	test "${#}" -ge 1 ; _manual="${1}" ; shift -- 1
+	test "${#}" -eq 0
+	
+	_build_timestamp="$( exec -- cat -- ./sources/embedded/build/timestamp.txt )"
+	_build_date="${_build_timestamp:0:10}"
+	
+	_ronn_arguments=(
+			--manual="${_manual%%.*}"
+			--organization=volution.ro
+			--date='1970-12-01'
+			--warnings
+		)
+	
+	ronn \
+			--roff --pipe "${_ronn_arguments[@]}" \
+			-- \
+			"./documentation/manual/${_manual}.ronn" \
+	| sed -r -e "s#December 1970#${_build_date}#g" \
+		>| "./documentation/manual/${_manual}.man.tmp" \
+	#
+	mv -T -- \
+			"./documentation/manual/${_manual}.man.tmp" \
+			"./documentation/manual/${_manual}.man" \
+	#
+	
+	ronn \
+			--html --pipe "${_ronn_arguments[@]}" \
+			--style man,dark,print \
+			-- \
+			"./documentation/manual/${_manual}.ronn" \
+	| sed -r -e "s#December 1970#${_build_date}#g" \
+		>| "./documentation/manual/${_manual}.html.tmp" \
+	#
+	mv -T -- \
+			"./documentation/manual/${_manual}.html.tmp" \
+			"./documentation/manual/${_manual}.html" \
+	#
+	
+	mandoc \
+			-c \
+			-man \
+			-T utf8 \
+			-I os=POSIX \
+			-O indent=2 \
+			-O width=78 \
+			-W all \
+		< "./documentation/manual/${_manual}.man" \
+	| col -b -x \
+		>| "./documentation/manual/${_manual}.txt.tmp" \
+	#
+	mv -T -- \
+			"./documentation/manual/${_manual}.txt.tmp" \
+			"./documentation/manual/${_manual}.txt" \
+	#
+!!
+

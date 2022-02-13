@@ -60,16 +60,20 @@
 		cp -T -- ./documentation/readme/readme.html ./sources/embedded/documentation/readme.html
 	fi
 	
-	if ! cmp -s -- ./documentation/manual/z-scratchpad.1.txt ./sources/embedded/manual/z-scratchpad.txt ; then
-		cp -T -- ./documentation/manual/z-scratchpad.1.txt ./sources/embedded/manual/z-scratchpad.txt
+	if ! cmp -s -- ./documentation/help/z-scratchpad.txt ./sources/embedded/documentation/z-scratchpad--help.txt ; then
+		cp -T -- ./documentation/help/z-scratchpad.txt ./sources/embedded/documentation/z-scratchpad--help.txt
 	fi
 	
-	if ! cmp -s -- ./documentation/manual/z-scratchpad.1.html ./sources/embedded/manual/z-scratchpad.html ; then
-		cp -T -- ./documentation/manual/z-scratchpad.1.html ./sources/embedded/manual/z-scratchpad.html
+	if ! cmp -s -- ./documentation/manual/z-scratchpad.1.txt ./sources/embedded/documentation/z-scratchpad--manual.txt ; then
+		cp -T -- ./documentation/manual/z-scratchpad.1.txt ./sources/embedded/documentation/z-scratchpad--manual.txt
 	fi
 	
-	if ! cmp -s -- ./documentation/manual/z-scratchpad.1.man ./sources/embedded/manual/z-scratchpad.man ; then
-		cp -T -- ./documentation/manual/z-scratchpad.1.man ./sources/embedded/manual/z-scratchpad.man
+	if ! cmp -s -- ./documentation/manual/z-scratchpad.1.html ./sources/embedded/documentation/z-scratchpad--manual.html ; then
+		cp -T -- ./documentation/manual/z-scratchpad.1.html ./sources/embedded/documentation/z-scratchpad--manual.html
+	fi
+	
+	if ! cmp -s -- ./documentation/manual/z-scratchpad.1.man ./sources/embedded/documentation/z-scratchpad--manual.man ; then
+		cp -T -- ./documentation/manual/z-scratchpad.1.man ./sources/embedded/documentation/z-scratchpad--manual.man
 	fi
 !!
 
@@ -221,6 +225,7 @@
 			--filter="${_sources}/embedded/*.go" \
 			--filter="${_sources}/embedded/templates/**" \
 			--filter="${_sources}/embedded/assets/**" \
+			--filter="${_sources}/embedded/documentation/**" \
 			\
 			--restart \
 			\
