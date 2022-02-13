@@ -1,0 +1,6 @@
+
+
+# z-scratchpad -- lightweight notes library tool
+
+**TBD**
+

@@ -1,1 +1,10 @@
-z-scratchpad manual (man)
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "Z\-SCRATCHPAD" "1" "2022-02-13" "volution.ro" "z-scratchpad"
+.
+.SH "NAME"
+\fBz\-scratchpad\fR \- lightweight notes library tool
+.
+.P
+\fBTBD\fR
