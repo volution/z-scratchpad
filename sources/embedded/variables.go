@@ -44,7 +44,7 @@ func init () () {
 	
 	var _uname unix.Utsname
 	if _error := unix.Uname (&_uname); _error != nil {
-		panic (abortErrorw (0xc404e938, _error))
+		panic (_error)
 	}
 	
 	_convert := func (_bytes []byte, _default string) (string) {
