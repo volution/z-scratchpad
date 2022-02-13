@@ -16,6 +16,9 @@ import html_template "html/template"
 import text_template "text/template"
 
 
+import . "github.com/volution/z-scratchpad/embedded"
+
+
 
 
 type Server struct {
@@ -716,21 +719,21 @@ func ServerHandleVersion (_server *Server, _response http.ResponseWriter) (*Erro
 
 
 func ServerHandleSourcesMd5 (_server *Server, _response http.ResponseWriter) (*Error) {
-	return respondWithTextString (_response, embeddedSourcesMd5)
+	return respondWithTextString (_response, BuildSourcesMd5)
 }
 
 func ServerHandleSourcesCpio (_server *Server, _response http.ResponseWriter) (*Error) {
 	_response.Header () .Add ("Content-Encoding", "gzip")
-	return respondWithBuffer (_response, "application/x-cpio", bytes.NewBuffer (embeddedSourcesCpioGz))
+	return respondWithBuffer (_response, "application/x-cpio", bytes.NewBuffer (BuildSourcesCpioGz))
 }
 
 
 func ServerHandleManualText (_server *Server, _response http.ResponseWriter) (*Error) {
-	return respondWithTextString (_response, embeddedManualTxt)
+	return respondWithTextString (_response, ZscratchpadManualTxt)
 }
 
 func ServerHandleManualHtml (_server *Server, _response http.ResponseWriter) (*Error) {
-	return respondWithHtmlString (_response, embeddedManualHtml)
+	return respondWithHtmlString (_response, ZscratchpadManualHtml)
 }
 
 

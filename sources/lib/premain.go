@@ -12,6 +12,9 @@ import "runtime/debug"
 import "strings"
 
 
+import . "github.com/volution/z-scratchpad/embedded"
+
+
 
 
 func PreMain () () {
@@ -72,7 +75,7 @@ func PreMain () () {
 		}
 		
 		if _argument == "--sources-md5" {
-			if _, _error := os.Stdout.WriteString (embeddedSourcesMd5); _error != nil {
+			if _, _error := os.Stdout.WriteString (BuildSourcesMd5); _error != nil {
 				panic (abortErrorw (0x6c4a7eb3, _error))
 			}
 			os.Exit (0)
@@ -80,7 +83,7 @@ func PreMain () () {
 		}
 		
 		if _argument == "--sources-cpio" {
-			if _, _error := os.Stdout.Write (embeddedSourcesCpioGz); _error != nil {
+			if _, _error := os.Stdout.Write (BuildSourcesCpioGz); _error != nil {
 				panic (abortErrorw (0xf5b73ab8, _error))
 			}
 			os.Exit (0)
@@ -91,11 +94,11 @@ func PreMain () () {
 			_manual := ""
 			switch _argument {
 				case "--manual", "--manual-text" :
-					_manual = embeddedManualTxt
+					_manual = ZscratchpadManualTxt
 				case "--manual-html" :
-					_manual = embeddedManualHtml
+					_manual = ZscratchpadManualHtml
 				case "--manual-man" :
-					_manual = embeddedManualMan
+					_manual = ZscratchpadManualMan
 				default :
 					panic (abortErrorw (0x43f9aab3, nil))
 			}

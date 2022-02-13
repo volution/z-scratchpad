@@ -22,6 +22,9 @@ import "github.com/pelletier/go-toml"
 import "github.com/akutz/sortfold"
 
 
+import . "github.com/volution/z-scratchpad/embedded"
+
+
 
 
 type GlobalFlags struct {

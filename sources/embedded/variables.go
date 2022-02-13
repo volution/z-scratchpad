@@ -1,10 +1,11 @@
 
 
-package zscratchpad
+package embedded
 
 
-import embedded "github.com/volution/z-scratchpad/embedded"
-
+import "crypto/sha256"
+import "encoding/hex"
+import "io"
 import "runtime"
 import "strings"
 
@@ -22,18 +23,19 @@ var BUILD_COMPILER_TYPE string = runtime.Compiler
 var BUILD_COMPILER_VERSION string = runtime.Version ()
 var BUILD_DEVELOPMENT bool = (BUILD_TARGET == "development")
 
-var BUILD_VERSION string = strings.Trim (embedded.BuildVersion, "\n")
-var BUILD_NUMBER string = strings.Trim (embedded.BuildNumber, "\n")
-var BUILD_TIMESTAMP string = strings.Trim (embedded.BuildTimestamp, "\n")
+var BUILD_VERSION string = strings.Trim (buildVersion, "\n")
+var BUILD_NUMBER string = strings.Trim (buildNumber, "\n")
+var BUILD_TIMESTAMP string = strings.Trim (buildTimestamp, "\n")
 
 var BUILD_GIT_HASH string = "{unknown-git-hash}"
-var BUILD_SOURCES_HASH string = strings.Trim (embedded.BuildSourcesHash, "\n")
+var BUILD_SOURCES_HASH string = strings.Trim (buildSourcesHash, "\n")
 
 var UNAME_NODE string = "{unknown-node}"
 var UNAME_SYSTEM string = "{unknown-system}"
 var UNAME_RELEASE string = "{unknown-release}"
 var UNAME_VERSION string = "{unknown-version}"
 var UNAME_MACHINE string = "{unknown-machine}"
+var UNAME_FINGERPRINT string = "{unknown-fingerprint}"
 
 
 
@@ -71,6 +73,19 @@ func init () () {
 	}
 	if UNAME_NODE == "" {
 		UNAME_NODE = "{unknown-node}"
+	}
+	
+	{
+		_hasher := sha256.New ()
+		for _, _token := range []string {
+				"98ff673c677ffaeb481ce53a8deef977",
+				UNAME_NODE, UNAME_SYSTEM, UNAME_RELEASE, UNAME_VERSION, UNAME_MACHINE,
+		} {
+			io.WriteString (_hasher, _token)
+			_hasher.Write ([]byte { 0 })
+		}
+		_hash := hex.EncodeToString (_hasher.Sum (nil))
+		UNAME_FINGERPRINT = _hash [0:32]
 	}
 }
 
