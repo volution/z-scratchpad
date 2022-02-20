@@ -19,13 +19,17 @@ func DocumentRenderToHtmlDocument (_document *Document, _export bool, _theme str
 	}
 	_themeCssAsset := ""
 	if _theme == "default" {
-		_theme = "github"
+		_theme = "github-auto"
 	}
 	switch _theme {
 		case "plain" :
 			_themeCssAsset = "assets/css-export/plain-min.css"
-		case "github" :
-			_themeCssAsset = "assets/css-export/github-min.css"
+		case "github-auto", "github" :
+			_themeCssAsset = "assets/css-export/github-auto-min.css"
+		case "github-light" :
+			_themeCssAsset = "assets/css-export/github-light-min.css"
+		case "github-dark" :
+			_themeCssAsset = "assets/css-export/github-dark-min.css"
 		case "modest" :
 			_themeCssAsset = "assets/css-export/modest-min.css"
 		case "tufte" :

@@ -256,11 +256,19 @@
 
 << sources / css-export / minify
 	test "${#}" -eq 0
-	find ./sources/embedded/assets/css-export -type f -name '*.css' -not -name '*-min.css' -print \
+	find ./sources/embedded/assets/css-export \
+			-type f \
+			-name '*.css' \
+			-not -name '*-min.css' \
+			-not -name '*-original.css' \
+			-print \
 	| while read -r -- _path ; do
 		_folder="$( exec -- dirname -- "${_path}" )"
 		_name="$( exec -- basename -- "${_path}" .css )"
-		minify --type css < "${_path}" >| "${_folder}/${_name}-min.css"
+		minify --type css  \
+			< "${_path}" \
+			>| "${_folder}/${_name}-min.css" \
+		#
 	done
 !!
 

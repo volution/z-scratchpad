@@ -51,7 +51,7 @@
 			'commonmark tests:commonmark'
 			'gemini tests:gemini-1'
 		)
-	_themes=( github modest tufte plain )
+	_themes=( github-auto github-light github-dark modest tufte plain )
 	for _document_and_identifier in "${_documents[@]}" ; do
 		_document="${_document_and_identifier% *}"
 		_identifier="${_document_and_identifier#* }"
