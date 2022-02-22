@@ -11,7 +11,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.18
 	github.com/pelletier/go-toml v1.9.4
 	github.com/subchen/go-trylock/v2 v2.0.0
-	github.com/yuin/goldmark v1.4.6
+	github.com/yuin/goldmark v1.4.7
 	github.com/zeebo/blake3 v0.2.2
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158
