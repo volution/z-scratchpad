@@ -272,3 +272,91 @@
 	done
 !!
 
+
+
+
+<< sources / generate / bom
+	test "${#}" -eq 0
+	
+	if test ! -e ./documentation/bom.json ; then
+	execline-cd ./sources \
+	cyclonedx-gomod mod -json -licenses \
+		>| ./documentation/bom.json \
+	#
+	fi
+	
+	jq \
+			'
+				.components[]
+				| .licenses = [
+					(.evidence // {})
+					| (.licenses // [])
+					| .[]
+					| .license.id
+				]
+				| .externalReferences = (
+					(.externalReferences // [])
+					| group_by (.type)
+					| map ({
+						key : .[0].type,
+						value : . | map (del (.type))
+					})
+					| from_entries
+				)
+				| .vcs_url = (
+					.externalReferences.vcs
+					| (if . != null then .[0].url else "" end)
+				)
+			' \
+		< ./documentation/bom.json \
+	| jq \
+			'
+				. as $component
+				| {
+					name : .name,
+					version : .version,
+					purl : .purl,
+					license :
+						.licenses
+						| join (" | ")
+						| (
+							({
+							}[$component.name])
+							// ({
+								"" : "{unknown}",
+							}[.])
+							// .
+						),
+					vcs :
+						.vcs_url
+						| (
+							({
+								"golang.org/x/net" : "https://github.com/golang/net",
+								"golang.org/x/sys" : "https://github.com/golang/sys",
+								"rsc.io/qr" : "https://github.com/rsc/qr",
+							}[$component.name])
+							// ({
+								"" : "{unknown}",
+								"<no value>" : "{unknown}",
+							}[.])
+							// .
+						),
+				}
+			' \
+	| jq --slurp . \
+	| gomplate \
+			-c .=stdin:///.json \
+			--in \
+	'
+	## SBOM (Software Bill of Materials)
+	
+	| Dependency | Version | License (SPDX) | VCS URL |
+	| ---        | ---     | ---            | ---     |
+	{{ range $_, $_component := . -}}
+	| {{ $_component.name }} | {{ $_component.version }} | {{ $_component.license }} | {{ $_component.vcs }} |
+	{{ end }}
+	' \
+		>| ./documentation/bom.md \
+	#
+!!
+
