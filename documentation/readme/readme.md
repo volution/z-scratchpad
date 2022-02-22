@@ -741,6 +741,6 @@ incorporates code from other open-source projects
 (besides other tools used to develop, build and test).
 
 Strictly related to the project's dependencies (direct and transitive),
-please see the [SBOM (Software Bill of Materials)](./documentation/bom.md)
+please see the [SBOM (Software Bill of Materials)](./documentation/sbom/sbom.md)
 for links to these dependencies and their licenses.
 

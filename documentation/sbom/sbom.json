@@ -1,0 +1,114 @@
+[
+  {
+    "name": "github.com/akutz/sortfold",
+    "version": "v0.2.1",
+    "purl": "pkg:golang/github.com/akutz/sortfold@v0.2.1?type=module",
+    "license": "Apache-2.0",
+    "vcs": "https://github.com/akutz/sortfold"
+  },
+  {
+    "name": "github.com/aymerick/douceur",
+    "version": "v0.2.0",
+    "purl": "pkg:golang/github.com/aymerick/douceur@v0.2.0?type=module",
+    "license": "MIT",
+    "vcs": "https://github.com/aymerick/douceur"
+  },
+  {
+    "name": "github.com/gobwas/glob",
+    "version": "v0.2.3",
+    "purl": "pkg:golang/github.com/gobwas/glob@v0.2.3?type=module",
+    "license": "MIT",
+    "vcs": "https://github.com/gobwas/glob"
+  },
+  {
+    "name": "github.com/gorilla/css",
+    "version": "v1.0.0",
+    "purl": "pkg:golang/github.com/gorilla/css@v1.0.0?type=module",
+    "license": "BSD-3-Clause",
+    "vcs": "https://github.com/gorilla/css"
+  },
+  {
+    "name": "github.com/jessevdk/go-flags",
+    "version": "v1.5.0",
+    "purl": "pkg:golang/github.com/jessevdk/go-flags@v1.5.0?type=module",
+    "license": "BSD-3-Clause",
+    "vcs": "https://github.com/jessevdk/go-flags"
+  },
+  {
+    "name": "github.com/mattn/go-isatty",
+    "version": "v0.0.14",
+    "purl": "pkg:golang/github.com/mattn/go-isatty@v0.0.14?type=module",
+    "license": "MIT",
+    "vcs": "https://github.com/mattn/go-isatty"
+  },
+  {
+    "name": "github.com/mdp/qrterminal",
+    "version": "v1.0.1",
+    "purl": "pkg:golang/github.com/mdp/qrterminal@v1.0.1?type=module",
+    "license": "MIT",
+    "vcs": "https://github.com/mdp/qrterminal"
+  },
+  {
+    "name": "github.com/microcosm-cc/bluemonday",
+    "version": "v1.0.18",
+    "purl": "pkg:golang/github.com/microcosm-cc/bluemonday@v1.0.18?type=module",
+    "license": "BSD-3-Clause",
+    "vcs": "https://github.com/microcosm-cc/bluemonday"
+  },
+  {
+    "name": "github.com/pelletier/go-toml",
+    "version": "v1.9.4",
+    "purl": "pkg:golang/github.com/pelletier/go-toml@v1.9.4?type=module",
+    "license": "Apache-2.0",
+    "vcs": "https://github.com/pelletier/go-toml"
+  },
+  {
+    "name": "github.com/subchen/go-trylock/v2",
+    "version": "v2.0.0",
+    "purl": "pkg:golang/github.com/subchen/go-trylock/v2@v2.0.0?type=module",
+    "license": "Apache-2.0",
+    "vcs": "https://github.com/subchen/go-trylock"
+  },
+  {
+    "name": "github.com/yuin/goldmark",
+    "version": "v1.4.7",
+    "purl": "pkg:golang/github.com/yuin/goldmark@v1.4.7?type=module",
+    "license": "MIT",
+    "vcs": "https://github.com/yuin/goldmark"
+  },
+  {
+    "name": "github.com/zeebo/blake3",
+    "version": "v0.2.2",
+    "purl": "pkg:golang/github.com/zeebo/blake3@v0.2.2?type=module",
+    "license": "CC0-1.0",
+    "vcs": "https://github.com/zeebo/blake3"
+  },
+  {
+    "name": "golang.org/x/net",
+    "version": "v0.0.0-20220127200216-cd36cc0744dd",
+    "purl": "pkg:golang/golang.org/x/net@v0.0.0-20220127200216-cd36cc0744dd?type=module",
+    "license": "BSD-3-Clause",
+    "vcs": "https://github.com/golang/net"
+  },
+  {
+    "name": "golang.org/x/sys",
+    "version": "v0.0.0-20220209214540-3681064d5158",
+    "purl": "pkg:golang/golang.org/x/sys@v0.0.0-20220209214540-3681064d5158?type=module",
+    "license": "BSD-3-Clause",
+    "vcs": "https://github.com/golang/sys"
+  },
+  {
+    "name": "gopkg.in/yaml.v2",
+    "version": "v2.4.0",
+    "purl": "pkg:golang/gopkg.in/yaml.v2@v2.4.0?type=module",
+    "license": "Apache-2.0",
+    "vcs": "https://github.com/go-yaml/yaml"
+  },
+  {
+    "name": "rsc.io/qr",
+    "version": "v0.2.0",
+    "purl": "pkg:golang/rsc.io/qr@v0.2.0?type=module",
+    "license": "BSD-3-Clause",
+    "vcs": "https://github.com/rsc/qr"
+  }
+]
