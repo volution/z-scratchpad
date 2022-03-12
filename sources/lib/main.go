@@ -120,7 +120,7 @@ type EditFlags struct {
 type ExportFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Document *string `long:"document" short:"d" value-name:"{identifier}"`
-	Format *string `long:"format" short:"f" choice:"source" choice:"text" choice:"html" choice:"html-plain" choice:"html-github" choice:"html-github-auto" choice:"html-github-light" choice:"html-github-dark" choice:"html-modest" choice:"html-tufte" choice:"html-body"`
+	Format *string `long:"format" short:"f" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"source" choice:"text" choice:"html" choice:"html-plain" choice:"html-github" choice:"html-github-auto" choice:"html-github-light" choice:"html-github-dark" choice:"html-modest" choice:"html-tufte" choice:"html-body"`
 	Select *bool `long:"select" short:"s"`
 }
 
@@ -961,6 +961,15 @@ func mainExportOutput (_identifier string, _format string, _globals *Globals, _i
 	
 	_buffer := (*bytes.Buffer) (nil)
 	switch _format {
+		
+		case "identifier" :
+			_buffer = bytes.NewBufferString (_document.Identifier)
+		
+		case "title", "name" :
+			_buffer = bytes.NewBufferString (_document.Title)
+		
+		case "path" :
+			_buffer = bytes.NewBufferString (_document.Path)
 		
 		case "source" :
 			if _output, _error := DocumentRenderToSource (_document); _error == nil {
