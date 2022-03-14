@@ -747,11 +747,15 @@ func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor 
 					// NOP
 				default :
 					if ! flagBoolOrDefault (_flags.MultipleAllowed, false) {
-						// FIXME:  Use document titles instead of identifiers!
 						_options := make ([][2]string, 0, len (_selection))
 						for _, _selection := range _selection {
 							_identifier := _selection[1]
-							_options = append (_options, [2]string { _identifier, _identifier })
+							_document, _error := WorkflowDocumentResolve (_identifier, _index)
+							if _error != nil {
+								return _error
+							}
+							_label := _document.Title
+							_options = append (_options, [2]string { _label, _identifier })
 						}
 						_selection, _error = mainListSelect (_options, _editor)
 						if _error != nil {
