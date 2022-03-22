@@ -6,7 +6,7 @@
       + features (and anti-features); performance;
       + how? (concepts, and inner workings);
       + why? (history, and reasons);
-      + contributions; licensing;
+      + contributions; licensing; SBOM;
 
 -------------------------------------------------------------------------------
 
@@ -765,4 +765,14 @@ different license, please send an email to the authors, stating the licensing
 requirements, accompanied by the reasons and other details; then, depending on
 the situation, the authors might release the sources and/or documentation under
 a different license.
+
+SBOM (Software Bill of Materials)
+
+This project, like many other open-source projects, incorporates code from
+other open-source projects (besides other tools used to develop, build and
+test).
+
+Strictly related to the project's dependencies (direct and transitive), please
+see the SBOM (Software Bill of Materials) for links to these dependencies and
+their licenses.
 

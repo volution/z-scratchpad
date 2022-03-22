@@ -27,12 +27,12 @@ b7bd2ebef5fe1e6977b63c341c02fda1 *embedded/build.go
 1666dc30a8c7958531a361d57c21b903 *embedded/documentation.go
 a311fb94ed5a728b94cf2877973e7504 *embedded/documentation/help--footer.txt
 c4065e769d5c8c8970243c4c595b396e *embedded/documentation/help--header.txt
-18a2d5773696aeea94a32452f0cb538a *embedded/documentation/readme.html
-eae2766bfa5fdfffd44f9bb929ccfc63 *embedded/documentation/readme.txt
+d21a81d53460a0312fc0d7c49781ea9a *embedded/documentation/readme.html
+d978105c7b3ded2bdc3fb1d9913b2741 *embedded/documentation/readme.txt
 7e2a4392b5598a5ae4043de84890285f *embedded/documentation/z-scratchpad--help.txt
-dc399a13a340ff31253ad84a1e803598 *embedded/documentation/z-scratchpad--manual.html
-8d36a043a7f1c5b3bf6ef319c3034a18 *embedded/documentation/z-scratchpad--manual.man
-916c787ffc4537e21c0a1281138def4d *embedded/documentation/z-scratchpad--manual.txt
+adc40ddf7e48eb6d5bc5c858bce3dafb *embedded/documentation/z-scratchpad--manual.html
+e9c218d98060b177b8b3192553f2803f *embedded/documentation/z-scratchpad--manual.man
+73f63a94744a71ef6d60d93cff551bcf *embedded/documentation/z-scratchpad--manual.txt
 5508bd3c9263344a491e7208c23c0725 *embedded/templates.go
 d983e87522ae4308fba9d50ea5d1ce8f *embedded/templates/document-export.html
 667e0fe31715796a49d2de488d7ca4f1 *embedded/templates/document-export.html-document
@@ -57,8 +57,8 @@ c7c130a0c5eb1d4a6dd872ab216cc90f *embedded/templates/version.html
 20494525658fed218ab905b2c925f276 *embedded/variables.go
 41c90349029a7725d19a8af8a89047c3 *extensions/gemini/html.go
 393bd1cb203347316b5e9611a14d4fc8 *extensions/gemini/text.go
-9b0bfd081d3f2206871e3a238806983b *go.mod
-84bc74e620f569d563246c1f1bba9b87 *go.sum
+127d6226c4af6525ed05b60b834ff7fc *go.mod
+ab3645d6ad69208a91154ecb74c376c3 *go.sum
 2e244b8d92262285b7f84e18e5d51a00 *lib/browser.go
 17b9a25ec9e6a52bd57d6131b05fe6d6 *lib/crypto.go
 f49cabb6571d44477db925bcd91538d4 *lib/document.go
@@ -68,7 +68,7 @@ a8dc15a6fd8163462d97ddf56353fc01 *lib/gencode.schema
 f7f009af8264fc099cd41bc2fec5c9c0 *lib/globals.go
 cb903f25dfacfb9e4d3ebcd21e847da0 *lib/index.go
 b799f8cb8a9d9b367f2ba6d8b7be9efd *lib/library.go
-6510e1f5ea188ab72eefd7c4a5d307f3 *lib/main.go
+cf62c377d6bb2a9a4bca206298912ea5 *lib/main.go
 3b75dbc3e472c175443eb00ed51eeae8 *lib/parser-commonmark.go
 b72a2c9e0eba916d7fb97f64fc364545 *lib/parser-gemini.go
 836841c0f0e89e90aebd1b6ccdf930c8 *lib/parser-snippets.go
