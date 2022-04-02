@@ -1,0 +1,364 @@
+
+
+@namespace svg "http://www.w3.org/2000/svg";
+
+
+
+
+main.document h1,
+main.document h2 {
+	margin-top : 4.50rem;
+	margin-bottom : 1.50rem;
+	border-color : hsl(0, 0%, 25%);
+	border-bottom-style : solid;
+	border-bottom-width : 0.25rem;
+}
+
+main.document h3,
+main.document h4 {
+	margin-top : 3.00rem;
+	margin-bottom : 1.50rem;
+	border-color : hsl(0, 0%, 25%);
+	border-bottom-style : solid;
+	border-bottom-width : 0.15rem;
+}
+
+main.document h5,
+main.document h6 {
+	margin-top : 3.00rem;
+	margin-bottom : 1.50rem;
+}
+
+main.document h1,
+main.document h2,
+main.document h3,
+main.document h4,
+main.document h5,
+main.document h6 {
+	font-weight : bolder;
+}
+
+main.document h1 {
+	font-size : 1.75rem;
+	line-height : 3.00rem;
+}
+main.document h2 {
+	font-size : 1.50rem;
+	line-height : 3.00rem;
+}
+main.document h3 {
+	font-size : 1.20rem;
+}
+main.document h4 {
+	font-size : 1.10rem;
+}
+main.document h5 {
+	font-size : 1.05rem;
+}
+main.document h6 {
+	font-size : 1.00rem;
+}
+
+
+
+
+main.document hr {
+	margin-top : 3.00rem;
+	margin-bottom : 3.00rem;
+	border-color : hsl(0, 0%, 25%);
+	border-bottom-style : dotted;
+	border-bottom-width : 0.50rem;
+}
+
+
+
+
+main.document p {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+}
+
+
+
+
+main.document blockquote {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+	padding-top : 1ch;
+	padding-bottom : 1ch;
+	padding-left : 2ch;
+	padding-right : 2ch;
+	border-color : hsl(0, 0%, 25%);
+	border-left-style : solid;
+	border-left-width : 0.25rem;
+	background : hsla(0, 0%, 50%, 10%);
+}
+
+
+
+
+main.document ul,
+main.document ol,
+main.document dl {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+}
+
+main.document ul {
+	padding-left : 2ch;
+}
+main.document ol {
+	padding-left : 3ch;
+	counter-reset : list;
+}
+main.document ol > li {
+	counter-increment : list;
+}
+
+main.document-format-commonmark p + ul,
+main.document-format-commonmark p + ol,
+main.document-format-commonmark p + dl {
+	margin-top : -1.20rem;
+}
+
+main.document ul > li::marker {
+	content : "\25aa\00a0";
+}
+
+main.document ol > li::marker {
+	content : "\2039" counter(list) "\203a\00a0";
+	font-size : 0.9em;
+}
+
+main.document-format-gemini ul.links > li::marker {
+	content : "\21d2\00a0";
+}
+
+main.document ul > li:not(:first-child),
+main.document ol > li:not(:first-child),
+main.document dl > dt:not(:first-child),
+main.document dl > dd:not(:first-child) {
+	margin-top : 0.25rem;
+}
+
+main.document ul > li:not(:last-child),
+main.document ol > li:not(:last-child),
+main.document dl > dt:not(:last-child),
+main.document dl > dd:not(:last-child) {
+	margin-bottom : 0.25rem;
+}
+
+main.document li > ul,
+main.document li > ol,
+main.document li > dl,
+main.document li > p,
+main.document li > blockquote,
+main.document li > pre,
+main.document li > h1,
+main.document li > h2,
+main.document li > h3,
+main.document li > h4,
+main.document li > h5,
+main.document li > h6 {
+	display : block;
+	margin-top : 0.50rem;
+	margin-bottom : 0.50rem;
+}
+
+
+
+
+main.document blockquote > :not(svg|*) {
+	display : block;
+	margin-left : 0px;
+}
+
+main.document blockquote > h1,
+main.document blockquote > h2,
+main.document blockquote > h3,
+main.document blockquote > h4,
+main.document blockquote > h5,
+main.document blockquote > h6 {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+}
+
+main.document blockquote > :not(svg|*):first-child {
+	margin-top : 0px;
+}
+main.document blockquote > :not(svg|*):last-child {
+	margin-bottom : 0px;
+}
+
+
+
+
+main.document pre {
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+	padding-top : 1ch;
+	padding-bottom : 1ch;
+	padding-left : 1ch;
+	padding-right : 1ch;
+}
+
+main.document-format-snippets pre,
+main.document-format-text pre {
+	padding-left : 2ch;
+	padding-right : 2ch;
+}
+
+main.document-format-commonmark pre,
+main.document-format-gemini pre,
+main.document-format-snippets pre {
+	background : hsl(0, 0%, 12%);
+}
+
+main.document-format-commonmark code,
+main.document-format-gemini code,
+main.document-format-snippets code {
+	background : hsl(0, 0%, 18%);
+}
+
+main.document-format-commonmark pre:hover,
+main.document-format-gemini pre:hover,
+main.document-format-snippets pre:hover,
+main.document-format-commonmark code:hover,
+main.document-format-gemini code:hover,
+main.document-format-snippets code:hover {
+	background : hsl(30, 50%, 10%);
+}
+
+
+
+
+main.document pre > code {
+	display : block;
+	white-space : pre;
+	overflow-x : auto;
+}
+
+main.document pre > code,
+main.document pre:hover > code {
+	padding : 0px;
+	background : transparent;
+}
+
+
+
+
+main.document blockquote > blockquote,
+main.document blockquote > pre,
+main.document li > blockquote,
+main.document li > pre {
+	display : block;
+	padding-top : 0.5ch;
+	padding-bottom : 0.5ch;
+	padding-left : 0.5ch;
+	padding-right : 0.5ch;
+}
+
+
+
+
+main.document h1 :not(svg|*),
+main.document h2 :not(svg|*),
+main.document h3 :not(svg|*),
+main.document h4 :not(svg|*),
+main.document h5 :not(svg|*),
+main.document h6 :not(svg|*),
+main.document pre :not(svg|*),
+main.document code :not(svg|*),
+main.document a :not(svg|*) {
+	padding : 0px;
+	color : inherit;
+	background : transparent;
+}
+
+
+
+
+main.document {
+	word-spacing : -0.33ch;
+}
+
+main.document pre {
+	word-spacing : 0px;
+}
+
+
+
+
+main.document img:not(.inline),
+main.document video {
+	display : block;
+	max-width : -moz-available;
+	max-width : -webkit-fill-available;
+	max-height : 90vh;
+	margin-left : auto;
+	margin-right : auto;
+	margin-top : 1.50rem;
+	margin-bottom : 1.50rem;
+	overflow : auto;
+}
+
+main.document video {
+	object-fit : contain;
+}
+
+main.document img.inline {
+	display : inline-block;
+	vertical-align : middle;
+	height : 1.25em;
+}
+
+
+
+
+
+
+
+
+main.document input[type="checkbox"] {
+	border : none;
+}
+main.document input[type="checkbox"]::before {
+	display : inline-block;
+	width : 4ch;
+	text-align : center;
+}
+main.document input[type="checkbox"]::before {
+	content : "\23a3\25cf\23a4";
+	color : hsl(0, 75%, 50%);
+}
+main.document input[type="checkbox"][checked]::before {
+	content : "\23a3\2715\23a4";
+	color : hsl(120, 75%, 50%);
+}
+
+
+
+
+
+
+
+
+main.document a[data-zs-url-type="error"],
+main.document img[data-zs-url-type="error"],
+main.document video[data-zs-url-type="error"] {
+	color : hsl(60, 50%, 75%);
+	background : hsl(0, 50%, 15%);
+	cursor : not-allowed;
+}
+
+main.document img[data-zs-url-type="error"],
+main.document video[data-zs-url-type="error"] {
+	padding-top : 1ch;
+	padding-bottom : 1ch;
+	padding-left : 2ch;
+	padding-right : 2ch;
+	border-color : hsl(0, 0%, 25%);
+	border-left-style : solid;
+	border-left-width : 0.25rem;
+}
+

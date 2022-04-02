@@ -1,44 +1,53 @@
 
 
+@namespace svg "http://www.w3.org/2000/svg";
+
+
 
 
 html:root {
-	font-family : "JetBrains Mono NL", "JetBrains Mono", "Fira Mono", "Courier New", monospace;
+	font-family : "JetBrains Mono NL", "JetBrains Mono", "Fira Mono", "Andale Mono", "Fira Sans", "Verdana", "Trebuchet MS", sans-serif;
 	font-size : 16px;
 	line-height : 24px;
 }
 
-
-html:root {
-	color : hsl(0, 0%, 75%);
-	background-color : hsl(0, 0%, 15%);
+pre, code {
+	font-family : "JetBrains Mono NL", "JetBrains Mono", "Fira Mono", "Andale Mono", "Courier New", monospace;
 }
 
 
-* {
+
+
+html:root {
+	color : hsl(0, 0%, 75%);
+	background : hsl(0, 0%, 15%);
+}
+
+
+:not(svg|*) {
 	border-color : hsl(0, 0%, 25%);
 	outline-color : hsl(0, 0%, 25%);
 }
 
 
-::selection {
+:not(svg|*)::selection {
 	color : hsl(0, 0%, 100%) !important;
 	background-color : hsl(30, 100%, 25%) !important;
 }
 
 
-* {
+:not(svg|*) {
 	scrollbar-width : thin;
-	scrollbar-color : hsl(0, 0%, 5%) hsl(0, 0%, 25%);
+	scrollbar-color : hsl(0, 0%, 25%) transparent;
 }
 
-::-webkit-scrollbar {
-	width : 6px;
-	height : 6px;
-	background : hsl(0, 0%, 5%);
+:not(svg|*)::-webkit-scrollbar {
+	width : 4px;
+	height : 4px;
+	background : transparent;
 }
 
-::-webkit-scrollbar-thumb {
+:not(svg|*)::-webkit-scrollbar-thumb {
 	background : hsl(0, 0%, 25%);
 }
 
@@ -55,14 +64,18 @@ div, dialog, form, fieldset,
 table, figure, figcaption,
 hr {
 	display : block;
+	/* NOTE:  Breaks in Chrome!
 	display : flow-root;
 	display : block flow-root;
+	*/
 }
 
 
 ul > li, ol > li {
 	display : list-item;
+	/* NOTE:  Breaks in Chrome!
 	display : list-item block flow-root;
+	*/
 }
 ul > li {
 	list-style-type : square;
@@ -71,6 +84,15 @@ ul > li {
 ol > li {
 	list-style-type : decimal;
 	list-style-position : outside;
+}
+
+
+code,
+em, i, u,
+strong, mark, b,
+del, s,
+q {
+	display : inline;
 }
 
 
@@ -108,10 +130,10 @@ details > summary {
 	cursor : pointer;
 }
 
-a *,
-button *, select *,
-input[type="submit"] *, input[type="reset"] *, input[type="button"] *,
-details > summary * {
+a :not(svg|*),
+button :not(svg|*), select :not(svg|*),
+input[type="submit"] :not(svg|*), input[type="reset"] :not(svg|*), input[type="button"] :not(svg|*),
+details > summary :not(svg|*) {
 	color : inherit;
 	cursor : inherit;
 }
@@ -134,9 +156,6 @@ input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hove
 	outline-color : hsl(360, 50%, 75%);
 	outline-offset : -1px;
 }
-
-
-
 
 button, input, select, summary {
 	border-style : solid;
