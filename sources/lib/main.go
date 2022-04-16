@@ -81,7 +81,7 @@ type ListFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	Type *string `long:"type" short:"t" choice:"library" choice:"document"`
 	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"commonmark-link"`
-	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
+	Format *string `long:"format" short:"f" choice:"text" choice:"text-sp" choice:"text-0" choice:"json"`
 }
 
 type SearchFlags struct {
@@ -89,7 +89,7 @@ type SearchFlags struct {
 	Type *string `long:"type" short:"t" choice:"library" choice:"document"`
 	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"commonmark-link"`
 	How *string `long:"how" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
-	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json"`
+	Format *string `long:"format" short:"f" choice:"text" choice:"text-sp" choice:"text-0" choice:"json"`
 	Action *string `long:"action" short:"a" choice:"output" choice:"edit" choice:"export" choice:"browse"`
 	MultipleAllowed *bool `long:"multiple" short:"m"`
 }
@@ -98,7 +98,7 @@ type GrepFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"commonmark-link"`
 	Where *string `long:"where" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
-	Format *string `long:"format" short:"f" choice:"text" choice:"text-0" choice:"json" choice:"context"`
+	Format *string `long:"format" short:"f" choice:"text" choice:"text-sp" choice:"text-0" choice:"json" choice:"context"`
 	Terms []string `long:"term" short:"t" value-name:"{term}"`
 	Action *string `long:"action" short:"a" choice:"output" choice:"edit" choice:"export" choice:"browse"`
 	MultipleAllowed *bool `long:"multiple" short:"m"`
@@ -1473,13 +1473,24 @@ func mainListOutput (_options [][2]string, _format string, _globals *Globals) (*
 	
 	switch _format {
 		
-		case "text", "text-0" :
+		case "text", "text-sp", "text-0" :
 			_separator := byte ('\n')
+			_always := true
 			if _format == "text-0" {
 				_separator = 0
+			} else if _format == "text-sp" {
+				_separator = byte (' ')
+				_always = false
 			}
+			_first := true
 			for _, _value := range _list {
+				if !_first {
+					_buffer.WriteByte (_separator)
+				}
 				_buffer.WriteString (_value)
+				_first = false
+			}
+			if _always {
 				_buffer.WriteByte (_separator)
 			}
 		
