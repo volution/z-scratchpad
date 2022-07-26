@@ -7,6 +7,7 @@
       + how? (concepts, and inner workings);
       + why? (history, and reasons);
       + contributions; licensing; SBOM;
+      + chat on Discord, discuss on GitHub, or email author
 
 -------------------------------------------------------------------------------
 
@@ -71,9 +72,12 @@ contributions and licensing sections.
 
 Status
 
-    WIP (work in progress)
+Currently, z-scratchpad is still in a pre-release state, perhaps somewhere
+between a beta and a release-candidate.
 
-At the moment z-scratchpad is still under heavy development.
+There is no promise of backward or forward compatibility, there is little
+documentation (besides the examples), there is no testing harness, and there is
+no roadmap.
 
 That being said, I'm using it for all my note taking, from personal notes, to
 for-work project specific documents.
@@ -218,12 +222,12 @@ Releases
 The self-contained executable is available from the z-scratchpad GitHub
 repository releases:
 
-  * v0.0.1 -- the first preliminary preview release:
-      + v0.0.1 for Linux -- tested on OpenSUSE, and used by me in my everyday
+  * v0.1.1 -- the first preliminary preview release:
+      + v0.1.1 for Linux -- tested on OpenSUSE, and used by me in my everyday
         work;
-      + v0.0.1 for OSX -- untested;
-      + v0.0.1 for FreeBSD -- untested;
-      + v0.0.1 for OpenBSD -- untested;
+      + v0.1.1 for OSX -- untested;
+      + v0.1.1 for FreeBSD -- untested;
+      + v0.1.1 for OpenBSD -- untested;
 
 Also, each of these files are signed with my PGP key 5A974037A6FD8839, thus do
 check the signature.
@@ -245,10 +249,10 @@ gpg:               imported: 1
     (for OSX), freebsd or openbsd):
 
 curl -s -L -S -f -o ./z-scratchpad \
-    https://github.com/volution/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1
+    https://github.com/volution/z-scratchpad/releases/download/v0.1.1/z-scratchpad--linux--v0.1.1
 
 curl -s -L -S -f -o ./z-scratchpad.asc \
-    https://github.com/volution/z-scratchpad/releases/download/v0.0.1/z-scratchpad--linux--v0.0.1.asc
+    https://github.com/volution/z-scratchpad/releases/download/v0.1.1/z-scratchpad--linux--v0.1.1.asc
 
   * verify the executable:
 
@@ -277,15 +281,17 @@ sudo cp ./z-scratchpad /usr/local/bin/z-scratchpad
 
 z-scratchpad --version
 
-* version       : 0.0.1
-* executable    : z-scratchpad
-* build target  : release, linux-amd64, go1.16.7, gc
-* build number  : 2025, 2021-08-13-11-56-08
+* tool          : z-scratchpad
+* version       : 0.1.1
+* executable    : /usr/local/bin/z-scratchpad
+* build target  : release, linux-amd64, go1.18.3, gc
+* build number  : 4543, 2022-07-26-21-00-31
 * code & issues : https://github.com/volution/z-scratchpad
-* sources git   : 1abeee1c76fc4a40e1465e4810be0258992d1815
-* sources hash  : 51382d0da05c3e129fc73eac59754fad
+* sources git   : 8ac0303de9f139a550bc7634cc59b7575dfcf2b0
+* sources hash  : 958636a84ba8b31f7cebdd2e8d368973
 * uname node    : some-workstation
-* uname system  : Linux, 5.some-version, x86_64
+* uname system  : Linux, 5.18.4-1-default, x86_64
+* uname hash    : 636fe534b72441e2ccb478f9bd56d653
 
 Build from source
 
@@ -312,15 +318,17 @@ sudo cp ./z-scratchpad /usr/local/bin/z-scratchpad
 
 z-scratchpad --version
 
-* version       : 0.0.1
-* executable    : z-scratchpad
-* build target  : release, linux-amd64, go1.16.7, gc
-* build number  : 2025, 2021-08-13-11-56-08
+* tool          : z-scratchpad
+* version       : 0.1.1
+* executable    : /usr/local/bin/z-scratchpad
+* build target  : release, linux-amd64, go1.18.3, gc
+* build number  : 4543, 2022-07-26-21-00-31
 * code & issues : https://github.com/volution/z-scratchpad
-* sources git   : 1abeee1c76fc4a40e1465e4810be0258992d1815
-* sources hash  : 51382d0da05c3e129fc73eac59754fad
+* sources git   : 8ac0303de9f139a550bc7634cc59b7575dfcf2b0
+* sources hash  : 958636a84ba8b31f7cebdd2e8d368973
 * uname node    : some-workstation
-* uname system  : Linux, 5.some-version, x86_64
+* uname system  : Linux, 5.18.4-1-default, x86_64
+* uname hash    : 636fe534b72441e2ccb478f9bd56d653
 
 -------------------------------------------------------------------------------
 

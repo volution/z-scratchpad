@@ -15,8 +15,9 @@ eb5e955863f6feb9fd951d7c3a419f4a *embedded/assets/css-export/modest.css
 3c664cfae144e4a955960f87154cce7f *embedded/assets/css-export/plain.css
 8db22869f1f2e185f1b87cce331fd475 *embedded/assets/css-export/tufte-min.css
 3abba7d179ae12a997c4ac1f65f39d74 *embedded/assets/css-export/tufte.css
-ec55476f63d387f198f6574b02001570 *embedded/assets/css/core.css
-a452a4b3c710c63bc73d11cfb2bcf43d *embedded/assets/css/layout.css
+da2647fa88d8dbb5910197f96192d10a *embedded/assets/css/core.css
+a24250494753f493184f7fd6511a9a6a *embedded/assets/css/document.css
+762e42d091cfb4beb55f485217b016a3 *embedded/assets/css/layout.css
 ff58fccbe0a7fc30456a4bdbe0e57919 *embedded/assets/css/reset.css
 0d3f5fc25aa081d2e1b0cdf0ca0cbb88 *embedded/assets/favicons/favicon.ico
 9e2c606da7ac201ca73d480994ecffc9 *embedded/assets/favicons/favicon.png
@@ -27,12 +28,12 @@ b7bd2ebef5fe1e6977b63c341c02fda1 *embedded/build.go
 1666dc30a8c7958531a361d57c21b903 *embedded/documentation.go
 a311fb94ed5a728b94cf2877973e7504 *embedded/documentation/help--footer.txt
 c4065e769d5c8c8970243c4c595b396e *embedded/documentation/help--header.txt
-d21a81d53460a0312fc0d7c49781ea9a *embedded/documentation/readme.html
-d978105c7b3ded2bdc3fb1d9913b2741 *embedded/documentation/readme.txt
+13b538ffab875c1672ee8b5f07fe9deb *embedded/documentation/readme.html
+fac0a7b6cae7f6f103f881dc2b82e94e *embedded/documentation/readme.txt
 7e2a4392b5598a5ae4043de84890285f *embedded/documentation/z-scratchpad--help.txt
-adc40ddf7e48eb6d5bc5c858bce3dafb *embedded/documentation/z-scratchpad--manual.html
-e9c218d98060b177b8b3192553f2803f *embedded/documentation/z-scratchpad--manual.man
-73f63a94744a71ef6d60d93cff551bcf *embedded/documentation/z-scratchpad--manual.txt
+641724bf56f50c3ceef084e412f37fca *embedded/documentation/z-scratchpad--manual.html
+13b563ccb435254f00d95bb925c58654 *embedded/documentation/z-scratchpad--manual.man
+4b564485a7703f03e76cc4c7a76e03ab *embedded/documentation/z-scratchpad--manual.txt
 5508bd3c9263344a491e7208c23c0725 *embedded/templates.go
 d983e87522ae4308fba9d50ea5d1ce8f *embedded/templates/document-export.html
 667e0fe31715796a49d2de488d7ca4f1 *embedded/templates/document-export.html-document
@@ -42,7 +43,7 @@ efe4fa273af16a0c1520e86fff954a3c *embedded/templates/document-export.txt
 d41d8cd98f00b204e9800998ecf8427e *embedded/templates/document-view.txt
 ada65dd4ecea47e5dad375d660455c81 *embedded/templates/documents-index.html
 d41d8cd98f00b204e9800998ecf8427e *embedded/templates/documents-index.txt
-efe7638c0405e6bd110583e47307bbe7 *embedded/templates/global-partials.html
+9fb5af98bb6bb709e8d16046db6e3cf1 *embedded/templates/global-partials.html
 b2a343e65019f5286aa244073b9bf163 *embedded/templates/home.html
 d41d8cd98f00b204e9800998ecf8427e *embedded/templates/home.txt
 190487e2da45c67f991156eb22861699 *embedded/templates/index.html
@@ -68,7 +69,7 @@ a8dc15a6fd8163462d97ddf56353fc01 *lib/gencode.schema
 f7f009af8264fc099cd41bc2fec5c9c0 *lib/globals.go
 cb903f25dfacfb9e4d3ebcd21e847da0 *lib/index.go
 b799f8cb8a9d9b367f2ba6d8b7be9efd *lib/library.go
-cf62c377d6bb2a9a4bca206298912ea5 *lib/main.go
+b1c6f1cd3b00dd140e5bc874f874138f *lib/main.go
 3b75dbc3e472c175443eb00ed51eeae8 *lib/parser-commonmark.go
 b72a2c9e0eba916d7fb97f64fc364545 *lib/parser-gemini.go
 836841c0f0e89e90aebd1b6ccdf930c8 *lib/parser-snippets.go
