@@ -23,7 +23,7 @@
 > * [how? (concepts, and inner workings)](#how);
 > * [why? (history, and reasons)](#why);
 > * [contributions](#contributions); [licensing](#license); [SBOM](#sbom-software-bill-of-materials);
-> * [chat on Discord](https://discord.gg/fheZqMer), [discuss on GitHub](https://github.com/volution/z-scratchpad/discussions/categories/discussions), or [email author](mailto:ciprian.craciun@gmail.com)
+> * [chat on Discord](https://discord.gg/TaseUnCGax), [discuss on GitHub](https://github.com/volution/z-scratchpad/discussions/categories/discussions), or [email author](mailto:ciprian.craciun@gmail.com)
 
 
 
