@@ -1,6 +1,7 @@
 
 .*
 !.gitignore
+!.github
 
 /examples/inbox/**
 !/examples/inbox/.gitignore
