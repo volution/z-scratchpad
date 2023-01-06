@@ -22,7 +22,7 @@
 > * [features (and anti-features)](#features); [performance](#performance);
 > * [how? (concepts, and inner workings)](#how);
 > * [why? (history, and reasons)](#why);
-> * [contributions](#contributions); [licensing](#license); [SBOM](#sbom-software-bill-of-materials);
+> * [contributions](#contributions); [licensing](#license); [SBOM](#sbom);
 > * [chat on Discord](https://discord.gg/TaseUnCGax), [discuss on GitHub](https://github.com/volution/z-scratchpad/discussions/categories/discussions), or [email author](mailto:ciprian.craciun@gmail.com)
 
 
@@ -743,7 +743,7 @@ and other details; then, depending on the situation, the authors might
 release the sources and/or documentation under a different license.
 
 
-### SBOM (Software Bill of Materials)
+### <span id="sbom">SBOM (Software Bill of Materials)</span>
 
 This project, like many other open-source projects,
 incorporates code from other open-source projects
