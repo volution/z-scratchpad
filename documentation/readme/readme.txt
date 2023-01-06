@@ -1,5 +1,5 @@
 
-    Table of contents
+z-scratchpad -- lightweight Go-based notes tool
 
       + about; status; screenshots;
       + documentation; install;
@@ -7,7 +7,8 @@
       + how? (concepts, and inner workings);
       + why? (history, and reasons);
       + contributions; licensing; SBOM;
-      + chat on Discord, discuss on GitHub, or email author
+      + chat on Discord; discuss on GitHub; email author;
+      + source code at https://github.com/volution/z-scratchpad
 
 -------------------------------------------------------------------------------
 

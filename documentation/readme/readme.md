@@ -2,7 +2,7 @@
 
 
 
-![logo](./documentation/logo.png)
+![banner](./documentation/assets/github-banner.png)
 
 
 
@@ -15,15 +15,21 @@
 # `z-scratchpad` -- lightweight Go-based notes tool
 
 
-> ## Table of contents
->
-> * [about](#about); [status](#status); [screenshots](#screenshots);
-> * [documentation](#documentation);  [install](#install);
-> * [features (and anti-features)](#features); [performance](#performance);
+> * [about](#about);
+>   [status](#status);
+>   [screenshots](#screenshots);
+> * [documentation](#documentation);
+>   [install](#install);
+> * [features (and anti-features)](#features);
+>   [performance](#performance);
 > * [how? (concepts, and inner workings)](#how);
 > * [why? (history, and reasons)](#why);
-> * [contributions](#contributions); [licensing](#license); [SBOM](#sbom);
-> * [chat on Discord](https://discord.gg/TaseUnCGax), [discuss on GitHub](https://github.com/volution/z-scratchpad/discussions/categories/discussions), or [email author](mailto:ciprian.craciun@gmail.com)
+> * [contributions](#contributions);
+>   [licensing](#license); [SBOM](#sbom);
+> * [chat on Discord](https://discord.gg/TaseUnCGax);
+>   [discuss on GitHub](https://github.com/volution/z-scratchpad/discussions/categories/discussions);
+>   [email author](mailto:ciprian.craciun@gmail.com);
+> * source code at <https://github.com/volution/z-scratchpad>
 
 
 
@@ -127,28 +133,28 @@ thus usable with generic file-management tools.
 
 The WUI showing this readme rendered in Firefox browser (under Xorg):
 
-![wui-firefox-document](./documentation/screenshots/wui-firefox-document.png)
+![wui-firefox-document](./documentation/assets/screenshot-wui-firefox-document.png)
 
 
 ### WUI under terminal
 
 The WUI showing this readme rendered in [links](http://links.twibright.com/) (under URxvt terminal) (scrolled 1 page to skip the document header):
 
-![wui-links-document](./documentation/screenshots/wui-links-document.png)
+![wui-links-document](./documentation/assets/screenshot-wui-links-document.png)
 
 
 ### Menus under Xorg
 
 Selecting a document to edit with [`rofi`](https://github.com/davatorium/rofi) (under Xorg):
 
-![select-rofi-document](./documentation/screenshots/select-rofi-document.png)
+![select-rofi-document](./documentation/assets/screenshot-select-rofi-document.png)
 
 
 ### Menus under terminal
 
 Selecting a document to edit with [`fzf`](https://github.com/junegunn/fzf) (under URxvt terminal with [`tmux`](https://github.com/tmux/tmux) support):
 
-![select-fzf-document](./documentation/screenshots/select-fzf-document.png)
+![select-fzf-document](./documentation/assets/screenshot-select-fzf-document.png)
 
 
 
