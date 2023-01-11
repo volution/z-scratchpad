@@ -28,12 +28,12 @@ b7bd2ebef5fe1e6977b63c341c02fda1 *embedded/build.go
 1666dc30a8c7958531a361d57c21b903 *embedded/documentation.go
 a311fb94ed5a728b94cf2877973e7504 *embedded/documentation/help--footer.txt
 c4065e769d5c8c8970243c4c595b396e *embedded/documentation/help--header.txt
-f17afb6723f0ad6e2d2815527c7a54fd *embedded/documentation/readme.html
-fac0a7b6cae7f6f103f881dc2b82e94e *embedded/documentation/readme.txt
+f4c0678b00191dede72deaa8d0fbdfc8 *embedded/documentation/readme.html
+17325ed551343a682730a87d0cb24bce *embedded/documentation/readme.txt
 7e2a4392b5598a5ae4043de84890285f *embedded/documentation/z-scratchpad--help.txt
-641724bf56f50c3ceef084e412f37fca *embedded/documentation/z-scratchpad--manual.html
-13b563ccb435254f00d95bb925c58654 *embedded/documentation/z-scratchpad--manual.man
-4b564485a7703f03e76cc4c7a76e03ab *embedded/documentation/z-scratchpad--manual.txt
+33690a4d52b4f611e79f7f0eabf6f633 *embedded/documentation/z-scratchpad--manual.html
+2f91d1bf8eb86540bd033aef867d8465 *embedded/documentation/z-scratchpad--manual.man
+bf143c5e0a895985b8c22e06a1884287 *embedded/documentation/z-scratchpad--manual.txt
 5508bd3c9263344a491e7208c23c0725 *embedded/templates.go
 d983e87522ae4308fba9d50ea5d1ce8f *embedded/templates/document-export.html
 667e0fe31715796a49d2de488d7ca4f1 *embedded/templates/document-export.html-document
