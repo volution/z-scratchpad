@@ -8,15 +8,16 @@
 | `github.com/gobwas/glob` | `v0.2.3` | `MIT` | <https://github.com/gobwas/glob> |
 | `github.com/gorilla/css` | `v1.0.0` | `BSD-3-Clause` | <https://github.com/gorilla/css> |
 | `github.com/jessevdk/go-flags` | `v1.5.0` | `BSD-3-Clause` | <https://github.com/jessevdk/go-flags> |
-| `github.com/mattn/go-isatty` | `v0.0.14` | `MIT` | <https://github.com/mattn/go-isatty> |
+| `github.com/klauspost/cpuid/v2` | `v2.2.3` | `MIT` | <https://github.com/klauspost/cpuid> |
+| `github.com/mattn/go-isatty` | `v0.0.17` | `MIT` | <https://github.com/mattn/go-isatty> |
 | `github.com/mdp/qrterminal` | `v1.0.1` | `MIT` | <https://github.com/mdp/qrterminal> |
-| `github.com/microcosm-cc/bluemonday` | `v1.0.18` | `BSD-3-Clause` | <https://github.com/microcosm-cc/bluemonday> |
-| `github.com/pelletier/go-toml` | `v1.9.4` | `Apache-2.0` | <https://github.com/pelletier/go-toml> |
+| `github.com/microcosm-cc/bluemonday` | `v1.0.21` | `BSD-3-Clause` | <https://github.com/microcosm-cc/bluemonday> |
+| `github.com/pelletier/go-toml` | `v1.9.5` | `Apache-2.0` | <https://github.com/pelletier/go-toml> |
 | `github.com/subchen/go-trylock/v2` | `v2.0.0` | `Apache-2.0` | <https://github.com/subchen/go-trylock> |
-| `github.com/yuin/goldmark` | `v1.4.7` | `MIT` | <https://github.com/yuin/goldmark> |
-| `github.com/zeebo/blake3` | `v0.2.2` | `CC0-1.0` | <https://github.com/zeebo/blake3> |
-| `golang.org/x/net` | `v0.0.0-20220127200216-cd36cc0744dd` | `BSD-3-Clause` | <https://github.com/golang/net> |
-| `golang.org/x/sys` | `v0.0.0-20220209214540-3681064d5158` | `BSD-3-Clause` | <https://github.com/golang/sys> |
+| `github.com/yuin/goldmark` | `v1.5.3` | `MIT` | <https://github.com/yuin/goldmark> |
+| `github.com/zeebo/blake3` | `v0.2.3` | `CC0-1.0` | <https://github.com/zeebo/blake3> |
+| `golang.org/x/net` | `v0.5.0` | `BSD-3-Clause` | <https://github.com/golang/net> |
+| `golang.org/x/sys` | `v0.4.0` | `BSD-3-Clause` | <https://github.com/golang/sys> |
 | `gopkg.in/yaml.v2` | `v2.4.0` | `Apache-2.0` | <https://github.com/go-yaml/yaml> |
 | `rsc.io/qr` | `v0.2.0` | `BSD-3-Clause` | <https://github.com/rsc/qr> |
 
