@@ -118,7 +118,11 @@ func PreMain () () {
 				(_argument == "--manual-man") ||
 				(_argument == "--readme") ||
 				(_argument == "--readme-text") || (_argument == "--readme-txt") ||
-				(_argument == "--readme-html") {
+				(_argument == "--readme-html") ||
+				(_argument == "--sbom") ||
+				(_argument == "--sbom-text") || (_argument == "--sbom-txt") ||
+				(_argument == "--sbom-html") ||
+				(_argument == "--sbom-json") {
 			_replacements := map[string]string {
 					"@{PROJECT_URL}" : PROJECT_URL,
 					"@{BUILD_TARGET}" : BUILD_TARGET,
@@ -164,6 +168,16 @@ func PreMain () () {
 				case "--readme-html" :
 					_manual = ReadmeHtml
 					_useType = "html"
+				case "--sbom", "--sbom-text", "--sbom-txt" :
+					_manual = SbomTxt
+					_useType = "text"
+					_useDecorations = true
+				case "--sbom-html" :
+					_manual = SbomHtml
+					_useType = "html"
+				case "--sbom-json" :
+					_manual = SbomJson
+					_useType = "json"
 				default :
 					panic (abortUnreachable (0x795bbfd9))
 			}
