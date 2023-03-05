@@ -26,6 +26,10 @@
 :: run / flags / readme :: exec -- "${ZRUN[@]}" ':: run / exec' --readme "${@}"
 :: run / flags / readme / text :: exec -- "${ZRUN[@]}" ':: run / exec' --readme-text "${@}"
 :: run / flags / readme / html :: exec -- "${ZRUN[@]}" ':: run / exec' --readme-html "${@}"
+:: run / flags / sbom :: exec -- "${ZRUN[@]}" ':: run / exec' --sbom "${@}"
+:: run / flags / sbom / text :: exec -- "${ZRUN[@]}" ':: run / exec' --sbom-text "${@}"
+:: run / flags / sbom / html :: exec -- "${ZRUN[@]}" ':: run / exec' --sbom-html "${@}"
+:: run / flags / sbom / json :: exec -- "${ZRUN[@]}" ':: run / exec' --sbom-json "${@}"
 :: run / flags / help :: exec -- "${ZRUN[@]}" ':: run / exec' --help "${@}"
 
 
@@ -68,16 +72,18 @@
 	
 	case "${_target}" in
 		( debug-build )
+			export -- __BUILD_SUFFIX=native
 			"${ZRUN[@]}" ':: go / build / * / debug' "${_main}"
 		;;&
 		( release-build )
+			export -- __BUILD_SUFFIX=native
 			"${ZRUN[@]}" ':: go / build / * / release' "${_main}"
 		;;&
 		( debug | debug-build )
-			_command=( "./.outputs/${_main}--debug" "${_extra_arguments[@]}" "${@}" )
+			_command=( "./.outputs/binaries/${_main}--debug--native" "${_extra_arguments[@]}" "${@}" )
 		;;
 		( release | release-build )
-			_command=( "./.outputs/${_main}--release" "${_extra_arguments[@]}" "${@}" )
+			_command=( "./.outputs/binaries/${_main}--release--native" "${_extra_arguments[@]}" "${@}" )
 		;;
 		( installed )
 			_command=( "$( type -P -- "${_main}" )" "${_extra_arguments[@]}" "${@}" )
@@ -114,6 +120,7 @@
 			ZRUN_LIBRARY_FINGERPRINT= \
 			ZRUN_EXECUTABLE= \
 			ZRUN_WORKSPACE= \
+			ZRUN_WORKSPACE_IDENTIFIER= \
 			ZRUN_CACHE= \
 	#
 	

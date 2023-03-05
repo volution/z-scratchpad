@@ -6,6 +6,9 @@
 ::// *
 
 
+&& _/environment.z-run
+
+
 && _/run.z-run
 && _/examples.z-run
 
@@ -13,7 +16,7 @@
 && _/readme.z-run
 && _/documentation.z-run
 
-&& _/workspace.z-run
+&& _/workbench.z-run
 && _/sources.z-run
 && _/go.z-run
 
