@@ -46,7 +46,7 @@ func fingerprintStringLines (_values []string) (string) {
 
 func fingerprintFinalize (_hasher *blake3.Hasher) (string) {
 	if _hasher.Size () != 32 {
-		panic (0x4ac694be)
+		panic (abortUnreachable (0x4ac694be))
 	}
 	var _data_0 [32]byte
 	_data := NoEscapeBytes (_data_0[:])
@@ -66,10 +66,10 @@ func generateRandomToken () (string) {
 	_data := NoEscapeBytes (_data_0[:])
 	if _read, _error := crand.Read (_data); _error == nil {
 		if _read != (128 / 8) {
-			panic (0x57a9916a)
+			panic (abortUnreachable (0x57a9916a))
 		}
 	} else {
-		panic (0xb6800787)
+		panic (abortUnreachable (0xb6800787))
 	}
 	_token := hex.EncodeToString (_data)
 	runtime.KeepAlive (_data_0)

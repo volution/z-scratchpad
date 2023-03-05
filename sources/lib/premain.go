@@ -165,7 +165,7 @@ func PreMain () () {
 					_manual = ReadmeHtml
 					_useType = "html"
 				default :
-					panic (0x795bbfd9)
+					panic (abortUnreachable (0x795bbfd9))
 			}
 			if _manual != "__custom__" {
 				_chunks := make ([]string, 0, 8)
@@ -189,7 +189,7 @@ func PreMain () () {
 					panic (abortErrorw (0x5a1741cc, _error))
 				}
 				os.Exit (0)
-				panic (0x25d33d9b)
+				panic (abortUnreachable (0x25d33d9b))
 			}
 		}
 	}

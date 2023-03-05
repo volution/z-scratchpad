@@ -491,7 +491,7 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 					return nil, errorw (0x3c886fe6, _error)
 				}
 			default :
-				panic (0x93b101bf)
+				panic (abortUnreachable (0x93b101bf))
 		}
 		
 		_header.Identifier = stringTrimSpaces (_header.Identifier)
@@ -530,7 +530,7 @@ func DocumentLoadFromBuffer (_source string) (*Document, *Error) {
 		}
 		
 	} else if _headerSyntax != "" {
-		panic (0x514cd03a)
+		panic (abortUnreachable (0x514cd03a))
 	}
 	
 	_bodyLines_0, _ := stringSplitLines (_body)
