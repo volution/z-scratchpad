@@ -8,29 +8,29 @@
 
 
 
---:: watch / run / exec :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / exec' "${@}"
---:: watch / run / exec / * :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: run / exec / *' "${@}"
+--:: watch / run / exec :: exec -- "${ZRUN}" ':: sources / watch' ':: run / exec' "${@}"
+--:: watch / run / exec / * :: exec -- "${ZRUN}" ':: sources / watch' ':: run / exec / *' "${@}"
 
 
 
 
---:: run / exec :: exec -- "${ZRUN[@]}" ':: run / exec / *' z-scratchpad "${@}"
+--:: run / exec :: exec -- "${ZRUN}" ':: run / exec / *' z-scratchpad "${@}"
 
-:: run / flags / version :: exec -- "${ZRUN[@]}" ':: run / exec' --version "${@}"
-:: run / flags / sources / md5 :: exec -- "${ZRUN[@]}" ':: run / exec' --sources-md5 "${@}"
-:: run / flags / sources / cpio :: exec -- "${ZRUN[@]}" ':: run / exec' --sources-cpio "${@}"
-:: run / flags / manual :: exec -- "${ZRUN[@]}" ':: run / exec' --manual "${@}"
-:: run / flags / manual / text :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-text "${@}"
-:: run / flags / manual / html :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-html "${@}"
-:: run / flags / manual / man :: exec -- "${ZRUN[@]}" ':: run / exec' --manual-man "${@}"
-:: run / flags / readme :: exec -- "${ZRUN[@]}" ':: run / exec' --readme "${@}"
-:: run / flags / readme / text :: exec -- "${ZRUN[@]}" ':: run / exec' --readme-text "${@}"
-:: run / flags / readme / html :: exec -- "${ZRUN[@]}" ':: run / exec' --readme-html "${@}"
-:: run / flags / sbom :: exec -- "${ZRUN[@]}" ':: run / exec' --sbom "${@}"
-:: run / flags / sbom / text :: exec -- "${ZRUN[@]}" ':: run / exec' --sbom-text "${@}"
-:: run / flags / sbom / html :: exec -- "${ZRUN[@]}" ':: run / exec' --sbom-html "${@}"
-:: run / flags / sbom / json :: exec -- "${ZRUN[@]}" ':: run / exec' --sbom-json "${@}"
-:: run / flags / help :: exec -- "${ZRUN[@]}" ':: run / exec' --help "${@}"
+:: run / flags / version :: exec -- "${ZRUN}" ':: run / exec' --version "${@}"
+:: run / flags / sources / md5 :: exec -- "${ZRUN}" ':: run / exec' --sources-md5 "${@}"
+:: run / flags / sources / cpio :: exec -- "${ZRUN}" ':: run / exec' --sources-cpio "${@}"
+:: run / flags / manual :: exec -- "${ZRUN}" ':: run / exec' --manual "${@}"
+:: run / flags / manual / text :: exec -- "${ZRUN}" ':: run / exec' --manual-text "${@}"
+:: run / flags / manual / html :: exec -- "${ZRUN}" ':: run / exec' --manual-html "${@}"
+:: run / flags / manual / man :: exec -- "${ZRUN}" ':: run / exec' --manual-man "${@}"
+:: run / flags / readme :: exec -- "${ZRUN}" ':: run / exec' --readme "${@}"
+:: run / flags / readme / text :: exec -- "${ZRUN}" ':: run / exec' --readme-text "${@}"
+:: run / flags / readme / html :: exec -- "${ZRUN}" ':: run / exec' --readme-html "${@}"
+:: run / flags / sbom :: exec -- "${ZRUN}" ':: run / exec' --sbom "${@}"
+:: run / flags / sbom / text :: exec -- "${ZRUN}" ':: run / exec' --sbom-text "${@}"
+:: run / flags / sbom / html :: exec -- "${ZRUN}" ':: run / exec' --sbom-html "${@}"
+:: run / flags / sbom / json :: exec -- "${ZRUN}" ':: run / exec' --sbom-json "${@}"
+:: run / flags / help :: exec -- "${ZRUN}" ':: run / exec' --help "${@}"
 
 
 
@@ -73,11 +73,11 @@
 	case "${_target}" in
 		( debug-build )
 			export -- __BUILD_SUFFIX=native
-			"${ZRUN[@]}" ':: go / build / * / debug' "${_main}"
+			"${ZRUN}" ':: go / build / * / debug' "${_main}"
 		;;&
 		( release-build )
 			export -- __BUILD_SUFFIX=native
-			"${ZRUN[@]}" ':: go / build / * / release' "${_main}"
+			"${ZRUN}" ':: go / build / * / release' "${_main}"
 		;;&
 		( debug | debug-build )
 			_command=( "./.outputs/binaries/${_main}--debug--native" "${_extra_arguments[@]}" "${@}" )

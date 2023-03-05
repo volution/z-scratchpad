@@ -10,36 +10,36 @@
 
 
 
-:: watch / examples / server :: exec -- "${ZRUN[@]}" ':: watch / examples / exec' server "${@}"
-:: watch / examples / menu :: exec -- "${ZRUN[@]}" ':: watch / examples / exec' menu "${@}"
+:: watch / examples / server :: exec -- "${ZRUN}" ':: watch / examples / exec' server "${@}"
+:: watch / examples / menu :: exec -- "${ZRUN}" ':: watch / examples / exec' menu "${@}"
 
-:: watch / examples / exec :: exec -- "${ZRUN[@]}" ':: sources / watch' ':: examples / exec' "${@}"
-
-
+:: watch / examples / exec :: exec -- "${ZRUN}" ':: sources / watch' ':: examples / exec' "${@}"
 
 
-:: examples / menu :: exec -- "${ZRUN[@]}" ':: examples / exec' menu "${@}"
-:: examples / server :: exec -- "${ZRUN[@]}" ':: examples / exec' server "${@}"
-:: examples / browse :: exec -- "${ZRUN[@]}" ':: examples / exec' browse "${@}"
-:: examples / browse / authenticate :: exec -- "${ZRUN[@]}" ':: examples / exec' browse -a "${@}"
-:: examples / browse / select / library :: exec -- "${ZRUN[@]}" ':: examples / exec' browse -S "${@}"
-:: examples / browse / select / document :: exec -- "${ZRUN[@]}" ':: examples / exec' browse -s "${@}"
-:: examples / list :: exec -- "${ZRUN[@]}" ':: examples / exec' list "${@}"
-:: examples / list / libraries :: exec -- "${ZRUN[@]}" ':: examples / exec' list -t library "${@}"
-:: examples / list / documents :: exec -- "${ZRUN[@]}" ':: examples / exec' list -t document "${@}"
-:: examples / search :: exec -- "${ZRUN[@]}" ':: examples / exec' search "${@}"
-:: examples / search / body :: exec -- "${ZRUN[@]}" ':: examples / exec' search -W body "${@}"
-:: examples / grep :: exec -- "${ZRUN[@]}" ':: examples / exec' grep "${@}"
-:: examples / grep / body :: exec -- "${ZRUN[@]}" ':: examples / exec' grep -W body "${@}"
-:: examples / edit :: exec -- "${ZRUN[@]}" ':: examples / exec' edit "${@}"
-:: examples / edit / select :: exec -- "${ZRUN[@]}" ':: examples / exec' edit -s "${@}"
-:: examples / create :: exec -- "${ZRUN[@]}" ':: examples / exec' create "${@}"
-:: examples / create / select :: exec -- "${ZRUN[@]}" ':: examples / exec' create -s "${@}"
-:: examples / export :: exec -- "${ZRUN[@]}" ':: examples / exec' export "${@}"
-:: examples / export / select :: exec -- "${ZRUN[@]}" ':: examples / exec' export -s "${@}"
-:: examples / dump :: exec -- "${ZRUN[@]}" ':: examples / exec' dump "${@}"
 
-:: examples / exec :: exec -- "${ZRUN[@]}" ':: run / exec' -C ./examples "${@}"
+
+:: examples / menu :: exec -- "${ZRUN}" ':: examples / exec' menu "${@}"
+:: examples / server :: exec -- "${ZRUN}" ':: examples / exec' server "${@}"
+:: examples / browse :: exec -- "${ZRUN}" ':: examples / exec' browse "${@}"
+:: examples / browse / authenticate :: exec -- "${ZRUN}" ':: examples / exec' browse -a "${@}"
+:: examples / browse / select / library :: exec -- "${ZRUN}" ':: examples / exec' browse -S "${@}"
+:: examples / browse / select / document :: exec -- "${ZRUN}" ':: examples / exec' browse -s "${@}"
+:: examples / list :: exec -- "${ZRUN}" ':: examples / exec' list "${@}"
+:: examples / list / libraries :: exec -- "${ZRUN}" ':: examples / exec' list -t library "${@}"
+:: examples / list / documents :: exec -- "${ZRUN}" ':: examples / exec' list -t document "${@}"
+:: examples / search :: exec -- "${ZRUN}" ':: examples / exec' search "${@}"
+:: examples / search / body :: exec -- "${ZRUN}" ':: examples / exec' search -W body "${@}"
+:: examples / grep :: exec -- "${ZRUN}" ':: examples / exec' grep "${@}"
+:: examples / grep / body :: exec -- "${ZRUN}" ':: examples / exec' grep -W body "${@}"
+:: examples / edit :: exec -- "${ZRUN}" ':: examples / exec' edit "${@}"
+:: examples / edit / select :: exec -- "${ZRUN}" ':: examples / exec' edit -s "${@}"
+:: examples / create :: exec -- "${ZRUN}" ':: examples / exec' create "${@}"
+:: examples / create / select :: exec -- "${ZRUN}" ':: examples / exec' create -s "${@}"
+:: examples / export :: exec -- "${ZRUN}" ':: examples / exec' export "${@}"
+:: examples / export / select :: exec -- "${ZRUN}" ':: examples / exec' export -s "${@}"
+:: examples / dump :: exec -- "${ZRUN}" ':: examples / exec' dump "${@}"
+
+:: examples / exec :: exec -- "${ZRUN}" ':: run / exec' -C ./examples "${@}"
 
 
 
@@ -57,7 +57,7 @@
 		_identifier="${_document_and_identifier#* }"
 		for _theme in "${_themes[@]}" ; do
 			_output="./examples/exports/${_document}--${_theme}.html"
-			"${ZRUN[@]}" ':: examples / exec' export -d "${_identifier}" -f "html-${_theme}" >| "${_output}"
+			"${ZRUN}" ':: examples / exec' export -d "${_identifier}" -f "html-${_theme}" >| "${_output}"
 		done
 	done
 !!
