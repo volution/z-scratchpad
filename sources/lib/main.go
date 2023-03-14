@@ -98,7 +98,7 @@ type GrepFlags struct {
 	Library *string `long:"library" short:"l" value-name:"{identifier}"`
 	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"commonmark-link"`
 	Where *string `long:"where" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
-	Format *string `long:"format" short:"f" choice:"text" choice:"text-sp" choice:"text-0" choice:"json" choice:"context"`
+	Format *string `long:"format" short:"f" choice:"text" choice:"text-sp" choice:"text-0" choice:"json"`
 	Terms []string `long:"term" short:"t" value-name:"{term}"`
 	Action *string `long:"action" short:"a" choice:"output" choice:"edit" choice:"export" choice:"browse"`
 	MultipleAllowed *bool `long:"multiple" short:"m"`
