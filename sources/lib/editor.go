@@ -753,7 +753,8 @@ func EditorResolveSelectCommand (_editor *Editor) (*exec.Cmd, []int, bool, *Erro
 							"--prompt", ": ",
 							"-e", "-x", "-i",
 							"--tiebreak", "begin,length,index",
-							"--no-mouse", "--no-color", "--no-bold",
+							"--no-mouse", "--no-color", "--no-bold", "--no-unicode",
+							"--no-info", "--no-separator",
 						)
 				default :
 					// NOP
