@@ -102,6 +102,7 @@ type GrepFlags struct {
 	Terms []string `long:"term" short:"t" value-name:"{term}"`
 	Action *string `long:"action" short:"a" choice:"output" choice:"edit" choice:"export" choice:"browse"`
 	MultipleAllowed *bool `long:"multiple" short:"m"`
+	MatchAny *bool `long:"match-any"`
 }
 
 
@@ -763,25 +764,7 @@ func MainSearch (_flags *SearchFlags, _globals *Globals, _index *Index, _editor 
 						}
 					}
 			}
-			for _, _selection := range _selection {
-				_identifier := _selection[1]
-				_error := (*Error) (nil)
-				switch _action {
-					case "edit" :
-						_error = WorkflowDocumentEdit (_identifier, _index, _editor, true)
-					case "browse" :
-						_error = WorkflowDocumentBrowse (_identifier, _index, _browser, true)
-					case "export" :
-						// FIXME:  Add support for other formats!
-						_error = mainExportOutput (_identifier, "source", _globals, _index)
-					default :
-						return errorw (0xaf7a3532, nil)
-				}
-				if _error != nil {
-					return _error
-				}
-			}
-			return nil
+			return mainListAction (_selection, _action, _globals, _index, _editor, _browser)
 		
 		default :
 			return errorw (0xe611caea, nil)
@@ -798,6 +781,7 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 	_where := flagStringOrDefault (_flags.Where, "title")
 	_format := flagStringOrDefault (_flags.Format, "text")
 	_action := flagStringOrDefault (_flags.Action, "output")
+	_matchAny := flagBoolOrDefault (_flags.MatchAny, false)
 	
 	switch _action {
 		case "output" :
@@ -829,19 +813,24 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 		return _error
 	}
 	
+	_matchExpected := len (_terms)
+	if _matchAny {
+		_matchExpected = 1
+	}
+	
 	_selection := make ([][2]string, 0, len (_options) / 2)
 	for _, _option := range _options {
 		_contents := _option[0]
-		_matched := false
-		if !_matched {
-			for _, _term := range _terms {
-				if strings.Index (_contents, _term) != -1 {
-					_matched = true
+		_matchCount := 0
+		for _, _term := range _terms {
+			if strings.Index (_contents, _term) != -1 {
+				_matchCount += 1
+				if _matchCount == _matchExpected {
 					break
 				}
 			}
 		}
-		if _matched {
+		if _matchCount == _matchExpected {
 			_selection = append (_selection, _option)
 		}
 	}
@@ -862,25 +851,7 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 						return errorw (0x1e4d02e6, nil)
 					}
 			}
-			for _, _selection := range _selection {
-				_identifier := _selection[1]
-				_error := (*Error) (nil)
-				switch _action {
-					case "edit" :
-						_error = WorkflowDocumentEdit (_identifier, _index, _editor, true)
-					case "browse" :
-						_error = WorkflowDocumentBrowse (_identifier, _index, _browser, true)
-					case "export" :
-						// FIXME:  Add support for other formats!
-						_error = mainExportOutput (_identifier, "source", _globals, _index)
-					default :
-						return errorw (0xb5fa0b59, nil)
-				}
-				if _error != nil {
-					return _error
-				}
-			}
-			return nil
+			return mainListAction (_selection, _action, _globals, _index, _editor, _browser)
 		
 		default :
 			return errorw (0x1217cd0b, nil)
@@ -1506,6 +1477,41 @@ func mainListOutput (_options [][2]string, _format string, _globals *Globals) (*
 	
 	if _, _error := _buffer.WriteTo (_globals.Stdout); _error != nil {
 		return errorw (0xcf76965f, _error)
+	}
+	
+	return nil
+}
+
+
+func mainListAction (_options [][2]string, _action string, _globals *Globals, _index *Index, _editor *Editor, _browser *Browser) (*Error) {
+	
+	_list := make ([]string, 0, len (_options))
+	_listSet := make (map[string]bool, len (_options))
+	for _, _option := range _options {
+		_value := _option[1]
+		if _, _exists := _listSet[_value]; _exists {
+			continue
+		}
+		_list = append (_list, _value)
+		_listSet[_value] = true
+	}
+	
+	for _, _identifier := range _list {
+		_error := (*Error) (nil)
+		switch _action {
+			case "edit" :
+				_error = WorkflowDocumentEdit (_identifier, _index, _editor, true)
+			case "browse" :
+				_error = WorkflowDocumentBrowse (_identifier, _index, _browser, true)
+			case "export" :
+				// FIXME:  Add support for other formats!
+				_error = mainExportOutput (_identifier, "source", _globals, _index)
+			default :
+				return errorw (0xb5fa0b59, nil)
+		}
+		if _error != nil {
+			return _error
+		}
 	}
 	
 	return nil
