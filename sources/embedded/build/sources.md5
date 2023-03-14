@@ -61,12 +61,12 @@ c7c130a0c5eb1d4a6dd872ab216cc90f *embedded/templates/version.html
 20494525658fed218ab905b2c925f276 *embedded/variables.go
 41c90349029a7725d19a8af8a89047c3 *extensions/gemini/html.go
 393bd1cb203347316b5e9611a14d4fc8 *extensions/gemini/text.go
-e6cde30917e3c4060e44e12a4bf8d14c *go.mod
-cbab7abbe559ea1570dcdf56cdcf7c07 *go.sum
+5a298b01fa8ad6f6f23ca97ece085255 *go.mod
+9de7ceca657f0794f339468a0413cbf8 *go.sum
 2e244b8d92262285b7f84e18e5d51a00 *lib/browser.go
 e0b7953f24df6f335f77eebc38489ad6 *lib/crypto.go
 635f6a6a4f51f7ff8c0cf1d52ae6dda1 *lib/document.go
-564c2a94cfdf7c1f1b56dca80f63c711 *lib/editor.go
+90b1b32ca6ef76dfd5c0177530ae9e3a *lib/editor.go
 5430777c64386706f5836debcea97847 *lib/gencode.go
 a8dc15a6fd8163462d97ddf56353fc01 *lib/gencode.schema
 f7f009af8264fc099cd41bc2fec5c9c0 *lib/globals.go
