@@ -23,6 +23,7 @@ type Library struct {
 	Paths []string `toml:"paths"`
 	
 	Disabled bool `toml:"disabled"`
+	DisabledOnError bool `toml:"disabled_on_error"`
 	EditEnabled bool `toml:"edit_enabled"`
 	
 	CreateEnabled bool `toml:"create_enabled"`
@@ -76,13 +77,23 @@ func LibraryInitialize (_library *Library) (*Error) {
 			if ! _stat.IsDir () {
 				return errorw (0x410a4abd, nil)
 			}
+		} else if os.IsNotExist (_error) {
+			// FIXME:  Issue a warning!
+			continue
 		} else {
-			return errorw (0x1513652d, _error)
+			if _library.DisabledOnError {
+				// FIXME:  Issue a warning!
+				_library.Disabled = true
+				return nil
+			} else {
+				return errorw (0x1513652d, _error)
+			}
 		}
 		_library.Paths[_index] = _path
 	}
 	sort.Strings (_library.Paths)
 	
+	_createDisabled := false
 	if _library.CreateEnabled {
 		if _library.CreatePath == "" {
 			if len (_library.Paths) == 1 {
@@ -100,14 +111,31 @@ func LibraryInitialize (_library *Library) (*Error) {
 			if ! _stat.IsDir () {
 				return errorw (0x1ad922a3, nil)
 			}
+		} else if os.IsNotExist (_error) {
+			// FIXME:  Issue a warning!
+			_createDisabled = true
 		} else {
-			return errorw (0x98ade3fc, _error)
+			if _library.DisabledOnError {
+				// FIXME:  Issue a warning!
+				_library.Disabled = true
+				return nil
+			} else {
+				return errorw (0x98ade3fc, _error)
+			}
 		}
+	}
+	if _createDisabled {
+		_library.CreateEnabled = false
+	} else if _library.CreateEnabled {
 		{
 			_createPathFound := false
 			for _, _importPath := range _library.Paths {
 				if _library.CreatePath == _importPath {
 					_createPathFound = true
+				} else if strings.HasPrefix (_library.CreatePath, _importPath) && _library.CreatePath[len (_importPath)] == '/' {
+					_createPathFound = true
+				}
+				if _createPathFound {
 					break
 				}
 			}
@@ -282,6 +310,10 @@ func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([][2]str
 		_stat := os.FileInfo (nil)
 		if _stat_0, _error := os.Stat (_pathEntry); _error == nil {
 			_stat = _stat_0
+		} else if os.IsNotExist (_error) {
+//			logf ('d', 0xb94438d3, "%s", _pathEntry)
+			// FIXME:  Issue a warning!
+			return nil
 		} else {
 			return errorw (0xb00f4f21, _error)
 		}
@@ -373,8 +405,19 @@ func libraryDocumentsWalkPath (_library *Library, _libraryPath string) ([][2]str
 	for _folderIndex := 0; _folderIndex < len (_folderPaths); _folderIndex += 1 {
 		_folderPath := _folderPaths[_folderIndex]
 		_folderEntries, _error := os.ReadDir (_folderPath)
-		if _error != nil {
-			return nil, errorw (0x28422546, _error)
+		if _error == nil {
+			// NOP
+		} else if os.IsNotExist (_error) {
+//			logf ('d', 0x33d4990b, "%s", _pathEntry)
+			// FIXME:  Issue a warning!
+			continue
+		} else {
+			if _library.DisabledOnError {
+				// FIXME:  Issue a warning!
+				continue
+			} else {
+				return nil, errorw (0x28422546, _error)
+			}
 		}
 		for _, _folderEntry := range _folderEntries {
 			_folderEntryPath := filepath.Join (_folderPath, _folderEntry.Name ())
