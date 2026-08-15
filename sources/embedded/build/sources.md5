@@ -34,9 +34,9 @@ f4765d396c0c9903197543fe4364706b *embedded/documentation/sbom.html
 7e889fca17fa48189bab0218adfe02ce *embedded/documentation/sbom.json
 d483dc399c0042eb093ef4bd5bdbb298 *embedded/documentation/sbom.txt
 7e2a4392b5598a5ae4043de84890285f *embedded/documentation/z-scratchpad--help.txt
-d5c55439adcedcfe5102962820b41cad *embedded/documentation/z-scratchpad--manual.html
-f63cf0058ae68e68601883ad50294bac *embedded/documentation/z-scratchpad--manual.man
-019d035529a01caf4a8744d103a9a638 *embedded/documentation/z-scratchpad--manual.txt
+aaa84146ce482d6f82379b9517598868 *embedded/documentation/z-scratchpad--manual.html
+2bd91b8fb662a2a652f1990bd11908c8 *embedded/documentation/z-scratchpad--manual.man
+fee6dbd889bc5c74f2401395df9fc259 *embedded/documentation/z-scratchpad--manual.txt
 5508bd3c9263344a491e7208c23c0725 *embedded/templates.go
 d983e87522ae4308fba9d50ea5d1ce8f *embedded/templates/document-export.html
 667e0fe31715796a49d2de488d7ca4f1 *embedded/templates/document-export.html-document
@@ -71,8 +71,8 @@ e0b7953f24df6f335f77eebc38489ad6 *lib/crypto.go
 a8dc15a6fd8163462d97ddf56353fc01 *lib/gencode.schema
 f7f009af8264fc099cd41bc2fec5c9c0 *lib/globals.go
 cb903f25dfacfb9e4d3ebcd21e847da0 *lib/index.go
-b799f8cb8a9d9b367f2ba6d8b7be9efd *lib/library.go
-a969c211f9e01e467d9032f31074c3ae *lib/main.go
+1949f2b60c06cfce3f7b60d4702150d7 *lib/library.go
+8f25e8af6828763e59fe1738f271a749 *lib/main.go
 3b75dbc3e472c175443eb00ed51eeae8 *lib/parser-commonmark.go
 b72a2c9e0eba916d7fb97f64fc364545 *lib/parser-gemini.go
 836841c0f0e89e90aebd1b6ccdf930c8 *lib/parser-snippets.go

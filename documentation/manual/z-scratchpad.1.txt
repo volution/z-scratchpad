@@ -1,12 +1,8 @@
 Z-SCRATCHPAD(1)                  z-scratchpad                  Z-SCRATCHPAD(1)
 
-
-
 NAME
        z-scratchpad - lightweight notes library tool
 
        TBD
 
-
-
-volution.ro                       2023-03-14                   Z-SCRATCHPAD(1)
+volution.ro                       2026-08-15                   Z-SCRATCHPAD(1)
