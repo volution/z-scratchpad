@@ -99,7 +99,8 @@ type GrepFlags struct {
 	What *string `long:"what" short:"w" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"commonmark-link"`
 	Where *string `long:"where" short:"W" choice:"identifier" choice:"title" choice:"name" choice:"path" choice:"body"`
 	Format *string `long:"format" short:"f" choice:"text" choice:"text-sp" choice:"text-0" choice:"json"`
-	Terms []string `long:"term" short:"t" value-name:"{term}"`
+	TermsIncluded []string `long:"term-included" short:"t" value-name:"{term}"`
+	TermsExcluded []string `long:"term-excluded" short:"T" value-name:"{term}"`
 	Action *string `long:"action" short:"a" choice:"output" choice:"edit" choice:"export" choice:"browse"`
 	MultipleAllowed *bool `long:"multiple" short:"m"`
 	MatchAny *bool `long:"match-any"`
@@ -797,14 +798,23 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 			return errorw (0x4b4f9c3b, nil)
 	}
 	
-	_terms := make ([]string, 0, len (_flags.Terms))
-	for _, _term := range _flags.Terms {
+	_termsIncluded := make ([]string, 0, len (_flags.TermsIncluded))
+	for _, _term := range _flags.TermsIncluded {
 		if _term == "" {
 			continue
 		}
-		_terms = append (_terms, _term)
+		_termsIncluded = append (_termsIncluded, _term)
 	}
-	if len (_terms) == 0 {
+	
+	_termsExcluded := make ([]string, 0, len (_flags.TermsExcluded))
+	for _, _term := range _flags.TermsExcluded {
+		if _term == "" {
+			continue
+		}
+		_termsExcluded = append (_termsExcluded, _term)
+	}
+	
+	if (len (_termsIncluded) + len (_termsExcluded)) == 0 {
 		return errorw (0xa95cd520, nil)
 	}
 	
@@ -813,24 +823,35 @@ func MainGrep (_flags *GrepFlags, _globals *Globals, _index *Index, _editor *Edi
 		return _error
 	}
 	
-	_matchExpected := len (_terms)
+	_matchExpected := len (_termsIncluded)
+	_matchUnexpected := len (_termsExcluded)
 	if _matchAny {
 		_matchExpected = 1
+		//? _matchUnexpected = 1
 	}
 	
 	_selection := make ([][2]string, 0, len (_options) / 2)
 	for _, _option := range _options {
 		_contents := _option[0]
-		_matchCount := 0
-		for _, _term := range _terms {
+		_matchExpectedCount := 0
+		for _, _term := range _termsIncluded {
 			if strings.Index (_contents, _term) != -1 {
-				_matchCount += 1
-				if _matchCount == _matchExpected {
+				_matchExpectedCount += 1
+				if _matchExpectedCount == _matchExpected {
 					break
 				}
 			}
 		}
-		if _matchCount == _matchExpected {
+		_matchUnexpectedCount := 0
+		for _, _term := range _termsExcluded {
+			if strings.Index (_contents, _term) == -1 {
+				_matchUnexpectedCount += 1
+				if _matchUnexpectedCount == _matchUnexpected {
+					break
+				}
+			}
+		}
+		if (_matchExpectedCount == _matchExpected) && (_matchUnexpectedCount == _matchUnexpected) {
 			_selection = append (_selection, _option)
 		}
 	}
